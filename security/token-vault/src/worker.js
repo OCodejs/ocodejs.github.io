@@ -76,13 +76,20 @@ async function audit(env, actor, action, resource, outcome = "success") {
   await env.DB.prepare("INSERT INTO audit_events(id,actor,action,resource_id,outcome) VALUES(?,?,?,?,?)")
     .bind(crypto.randomUUID(), actor, action, resource || null, outcome).run();
 }
-async function currentUser(req, env) {
+async function currentUser(req, env, ctx) {
   const id = await verify(cookieValue(req), env.SESSION_SIGNING_KEY);
   if (!id) return null;
   const row = await env.DB.prepare("SELECT s.subject,i.role,s.expires_at,i.active FROM sessions s JOIN identities i ON i.subject=s.subject WHERE s.id_hash=? AND s.revoked=0")
     .bind(await hash(id)).first();
-  if (!row || !row.active || row.expires_at <= Math.floor(Date.now() / 1000)) return null;
-  return { subject: row.subject, role: row.role };
+  if (row && row.active && row.expires_at > Math.floor(Date.now() / 1000)) return { subject: row.subject, role: row.role, auth: "session" };
+  if (ctx?.access && typeof ctx.access.getIdentity === "function") {
+    const identity = await ctx.access.getIdentity();
+    const email = typeof identity?.email === "string" ? identity.email.trim().toLowerCase() : "";
+    if (!email || email.length > 254) return null;
+    const member = await env.DB.prepare("SELECT subject,role,active FROM identities WHERE subject=?").bind(email).first();
+    if (member?.active) return { subject: member.subject, role: member.role, auth: "cloudflare-access" };
+  }
+  return null;
 }
 async function key(env) {
   return crypto.subtle.importKey("raw", unb64(env.TOKEN_ENCRYPTION_KEY), "AES-GCM", false, ["encrypt", "decrypt"]);
@@ -141,20 +148,28 @@ async function login(req, env) {
   await audit(env, "TOKEN", "login", null);
   return json({ ok: true }, 200, { "set-cookie": cookie(await sign(id, env.SESSION_SIGNING_KEY), SESSION_TTL) });
 }
-async function route(req, env) {
+async function route(req, env, ctx) {
   const path = new URL(req.url).pathname;
-  if (req.method === "GET" && (path === "/" || path === "/login")) return page(LOGIN_HTML);
-  if (path.startsWith("/api/agent/")) {
+  const isAgentApi = path.startsWith("/api/agent/");
+  if (env.ACCESS_REQUIRED === "true" && !isAgentApi && !ctx?.access) return json({ error: "Cloudflare Access authentication required" }, 403);
+  if (req.method === "GET" && (path === "/" || path === "/login")) {
+    if (ctx?.access) {
+      configured(env);
+      if (await currentUser(req, env, ctx)) return Response.redirect(new URL("/vault", req.url), 303);
+    }
+    return page(LOGIN_HTML);
+  }
+  if (isAgentApi) {
     if (req.headers.has("origin")) return json({ error: "Forbidden" }, 403);
-  } else if ((req.method === "POST" || req.method === "DELETE") && !sameOrigin(req)) return json({ error: "Forbidden" }, 403);
+  } else if (["POST", "PATCH", "DELETE"].includes(req.method) && !sameOrigin(req)) return json({ error: "Forbidden" }, 403);
   if (req.method === "GET" && path === "/vault") {
     configured(env);
-    return await currentUser(req, env) ? page(VAULT_HTML) : Response.redirect(new URL("/", req.url), 303);
+    return await currentUser(req, env, ctx) ? page(VAULT_HTML) : Response.redirect(new URL("/", req.url), 303);
   }
   configured(env);
   if (req.method === "POST" && path === "/api/login") return login(req, env);
   if (req.method === "POST" && path === "/api/logout") {
-    const user = await currentUser(req, env), id = await verify(cookieValue(req), env.SESSION_SIGNING_KEY);
+    const user = await currentUser(req, env, ctx), id = await verify(cookieValue(req), env.SESSION_SIGNING_KEY);
     if (id) await env.DB.prepare("UPDATE sessions SET revoked=1 WHERE id_hash=?").bind(await hash(id)).run();
     if (user) await audit(env, user.subject, "logout", null);
     return json({ ok: true }, 200, { "set-cookie": cookie("", 0) });
@@ -195,9 +210,63 @@ async function route(req, env) {
     }
     return json({ error: "Not found" }, 404);
   }
-  const user = await currentUser(req, env);
+  const user = await currentUser(req, env, ctx);
   if (!user) return json({ error: "Unauthorized" }, 401);
-  if (req.method === "GET" && path === "/api/me") return json({ subject: user.subject, role: user.role });
+  if (req.method === "GET" && path === "/api/me") return json({ subject: user.subject, role: user.role, auth: user.auth || "session" });
+
+  if (req.method === "GET" && path === "/api/members") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    const rows = await env.DB.prepare(
+      "SELECT subject,role,active FROM identities WHERE subject<>'TOKEN' AND role<>'ai_agent' ORDER BY subject"
+    ).all();
+    return json({ members: rows.results });
+  }
+  if (req.method === "POST" && path === "/api/members") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    let body; try { body = await req.json(); } catch { return json({ error: "Invalid request" }, 400); }
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const role = body.role;
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || email.length > 254 ||
+        !["security_admin", "developer", "auditor"].includes(role)) {
+      return json({ error: "Invalid member email or role" }, 400);
+    }
+    try {
+      await env.DB.prepare("INSERT INTO identities(id,subject,role,active) VALUES(?,?,?,1)")
+        .bind(crypto.randomUUID(), email, role).run();
+    } catch {
+      return json({ error: "Member already exists or could not be created" }, 409);
+    }
+    await audit(env, user.subject, "member.create", email);
+    return json({ ok: true, email, role }, 201);
+  }
+  const memberPath = path.match(/^\\/api\\/members\\/(.+)$/);
+  if (memberPath && req.method === "PATCH") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    const email = decodeURIComponent(memberPath[1]).trim().toLowerCase();
+    let body; try { body = await req.json(); } catch { return json({ error: "Invalid request" }, 400); }
+    if (email === "TOKEN" || !["security_admin", "developer", "auditor"].includes(body.role)) {
+      return json({ error: "Invalid member role" }, 400);
+    }
+    const result = await env.DB.prepare("UPDATE identities SET role=? WHERE subject=? AND role<>'ai_agent'")
+      .bind(body.role, email).run();
+    if (!result.meta?.changes) return json({ error: "Member not found" }, 404);
+    await audit(env, user.subject, "member.role.update", email);
+    return json({ ok: true });
+  }
+  if (memberPath && req.method === "DELETE") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    const email = decodeURIComponent(memberPath[1]).trim().toLowerCase();
+    if (email === "TOKEN") return json({ error: "Cannot revoke bootstrap owner" }, 400);
+    const result = await env.DB.batch([
+      env.DB.prepare("UPDATE identities SET active=0 WHERE subject=? AND role<>'ai_agent'").bind(email),
+      env.DB.prepare("UPDATE sessions SET revoked=1 WHERE subject=?").bind(email)
+    ]);
+    const check = await env.DB.prepare("SELECT active FROM identities WHERE subject=?").bind(email).first();
+    if (!check) return json({ error: "Member not found" }, 404);
+    await audit(env, user.subject, "member.revoke", email);
+    return json({ ok: true, active: !!check.active });
+  }
+
 
   if (req.method === "GET" && path === "/api/agents") {
     if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
@@ -313,8 +382,8 @@ async function route(req, env) {
   return json({ error: "Not found" }, 404);
 }
 export default {
-  async fetch(req, env) {
-    try { return await route(req, env); }
+  async fetch(req, env, ctx) {
+    try { return await route(req, env, ctx); }
     catch { return json({ error: "Vault temporarily unavailable" }, 503); }
   }
 };
