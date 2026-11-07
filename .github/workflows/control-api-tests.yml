@@ -6,6 +6,9 @@ on:
       - "workers/control-api/**"
       - "index.html"
       - "scripts/check-control-center.mjs"
+      - "scripts/check-pages-theme.mjs"
+      - "ocodejs-pages-theme.css"
+      - "docs/ui-framework.md"
       - ".github/workflows/control-api-tests.yml"
   push:
     branches: [main]
@@ -13,6 +16,9 @@ on:
       - "workers/control-api/**"
       - "index.html"
       - "scripts/check-control-center.mjs"
+      - "scripts/check-pages-theme.mjs"
+      - "ocodejs-pages-theme.css"
+      - "docs/ui-framework.md"
       - ".github/workflows/control-api-tests.yml"
 
 permissions:
@@ -32,3 +38,5 @@ jobs:
         run: node --test workers/control-api/worker.test.mjs
       - name: Validate Control Center JavaScript
         run: node scripts/check-control-center.mjs
+      - name: Validate OCode.js Pages theme
+        run: node scripts/check-pages-theme.mjs
