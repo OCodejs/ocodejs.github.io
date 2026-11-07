@@ -8,15 +8,17 @@ OCodeJS Server Control Center and public technical documentation.
 - **Architecture:** [docs/architecture.md](docs/architecture.md)
 - **API contract:** [docs/api-contract.md](docs/api-contract.md)
 - **Authentication integration status:** [docs/auth-integration-status.md](docs/auth-integration-status.md)
+- **Environment configuration:** [docs/environment-configuration.md](docs/environment-configuration.md)
+- **Deployment runbook:** [docs/deployment-runbook.md](docs/deployment-runbook.md)
 - **Security baseline:** [docs/security.md](docs/security.md)
 - **Delivery roadmap:** [docs/roadmap.md](docs/roadmap.md)
 
 ## Current implementation status
 
-The GitHub Pages frontend is static. A separate Cloudflare staging Control API provides read-only liveness, readiness and service-registry endpoints. The live Dashboard, OCode.js CLI theme, and MCP staging server are merged to main. The Control API is read-only and staging-backed; Account Portal Auth.js is still not deployed.
+The GitHub Pages frontend is static. A separate Cloudflare staging Control API provides read-only health, service, agent and provider registries. The OCode.js CLI Pages theme is merged to main. Agent/Provider Registry and expanded MCP discovery are staged behind open PRs; Production remains unchanged.
 
-The OCodeJS CLI GitHub OAuth/PAT Worker is a separate service from the Account Portal Auth.js application. The Account Portal is not ready for sign-in: its current Worker deployment is a 503 preparation stub and its Preview database/provider callbacks are not verified. MCP initialize/tools/list is implemented on staging with two read-only tools. AI Agent Runtime and centralized telemetry are not connected.
+The OCodeJS CLI GitHub OAuth/PAT Worker is separate from Account Portal Auth.js. The Account Portal Preview build succeeded behind Cloudflare Access, but it has no dedicated PostgreSQL database or Preview OAuth secrets; sign-in is disabled. The staging MCP server exposes four read-only tools. The Provider Registry lists Workers AI as not configured; no inference or agent execution is enabled. Workers Logs/Traces are enabled, while centralized metrics and queryable audit storage remain pending.
 
 ## Development
 
-This repository intentionally avoids storing credentials or operational data. Configure backend endpoints and secrets only in the appropriate server-side deployment environment. Use staging for integration work; production changes require explicit approval.
+This repository intentionally avoids storing credentials or operational data. Configure backend endpoints and secrets only in the appropriate server-side deployment environment. Use staging for integration work; follow the [deployment runbook](docs/deployment-runbook.md). Production changes require explicit approval.
