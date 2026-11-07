@@ -1,14 +1,18 @@
-name: Control API tests
+name: Control API and dashboard checks
 
 on:
   pull_request:
     paths:
       - "workers/control-api/**"
+      - "index.html"
+      - "scripts/check-control-center.mjs"
       - ".github/workflows/control-api-tests.yml"
   push:
     branches: [main]
     paths:
       - "workers/control-api/**"
+      - "index.html"
+      - "scripts/check-control-center.mjs"
       - ".github/workflows/control-api-tests.yml"
 
 permissions:
@@ -26,3 +30,5 @@ jobs:
           node-version: 22
       - name: Run Control API tests
         run: node --test workers/control-api/worker.test.mjs
+      - name: Validate Control Center JavaScript
+        run: node scripts/check-control-center.mjs
