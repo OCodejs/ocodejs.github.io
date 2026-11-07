@@ -18,15 +18,7 @@
 <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính" aria-hidden="true" inert>
  <div class="drawer-head"><div class="brand"><div class="logo">&gt;_</div><div><strong>OCode.js</strong><small>SERVER CONTROL</small></div></div><button class="drawer-close" id="closeNav" type="button" aria-label="Đóng menu">×</button></div>
  <div class="nav-label">WORKSPACE</div>
- <nav class="nav" aria-label="Dashboard navigation">
-  <button class="active" data-view="overview"><span class="ico">▦</span>Server Dashboard</button>
-  <button data-view="agents"><span class="ico">✳</span>AI Agents</button>
-  <button data-view="api"><span class="ico">⌘</span>API Gateway</button>
-  <button data-view="auth"><span class="ico">◈</span>Authentication</button>
-  <button data-view="mcp"><span class="ico">⛓</span>MCP Server</button>
-  <button data-view="console"><span class="ico">▤</span>Developer Console</button>
-  <button data-view="docs"><span class="ico">▧</span>Documentation</button>
- </nav>
+ <nav class="nav" id="workspaceNavigation" aria-label="Dashboard navigation" data-navigation-registry></nav>
  <div class="side-bottom"><div class="connection"><small>ENVIRONMENT</small><strong>Cloudflare · staging API</strong><span class="demo-pill">● STAGING</span></div></div>
 </aside>
 <main class="main">
@@ -39,6 +31,15 @@
 <script>
 const viewRoot=document.getElementById('view');
 const names={overview:'Server Dashboard',agents:'AI Agents',api:'API Gateway',auth:'Authentication',mcp:'MCP Server',console:'Developer Console',docs:'Documentation'};
+const navigationRegistry=[
+ {id:'overview',label:'Server Dashboard',icon:'▦',group:'WORKSPACE'},
+ {id:'agents',label:'AI Agents',icon:'✳',group:'WORKSPACE'},
+ {id:'api',label:'API Gateway',icon:'⌘',group:'WORKSPACE'},
+ {id:'auth',label:'Authentication',icon:'◈',group:'WORKSPACE'},
+ {id:'mcp',label:'MCP Server',icon:'⛓',group:'WORKSPACE'},
+ {id:'console',label:'Developer Console',icon:'▤',group:'WORKSPACE'},
+ {id:'docs',label:'Documentation',icon:'▧',group:'WORKSPACE'}
+];
 let current='overview',connections=[];
 const CONTROL_API_BASE='https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1';
 const MCP_ENDPOINT='https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp';
@@ -179,13 +180,40 @@ async function refreshMcpConnections(){
 function consoleView(){return header('OBSERVABILITY / 05','Developer Console','Logs, monitoring và integrations. Chưa có telemetry pipeline hoặc log stream kết nối.')+'<div class="notice">Không có log hệ thống thật được truy xuất. Dòng bên dưới là event trạng thái của giao diện preview.</div><div class="grid stats"><div class="stat"><div class="stat-top">Error rate</div><div class="stat-value">N/A</div><div class="stat-foot">No telemetry source</div></div><div class="stat"><div class="stat-top">P95 latency</div><div class="stat-value">N/A</div><div class="stat-foot">No request metrics</div></div><div class="stat"><div class="stat-top">Events</div><div class="stat-value">03</div><div class="stat-foot">Local preview events</div></div><div class="stat"><div class="stat-top">Integrations</div><div class="stat-value">0</div><div class="stat-foot">Not configured</div></div></div><div class="grid cols">'+panel('PREVIEW EVENT LOG','<div class="panel-body"><div class="log"><span>LOCAL</span><code>INFO</code><span>Control Center interface mounted</span></div><div class="log"><span>LOCAL</span><code>INFO</code><span>API catalog rendered</span></div><div class="log"><span>LOCAL</span><code>WARN</code><span>Backend telemetry adapter not configured</span></div><div class="log"><span>LOCAL</span><code>WARN</code><span>Authentication provider unavailable</span></div></div>','<small>LOCAL ONLY</small>')+panel('INTEGRATIONS','<div class="panel-body service-list">'+[['GitHub','Repository & CI status'],['Cloudflare','Workers / Pages'],['Vercel','Preview deployments'],['OpenTelemetry','Logs · metrics · traces'],['PostgreSQL / Redis','Persistence & cache']].map(x=>'<div class="service"><div><b>'+x[0]+'</b><small>'+x[1]+'</small></div><span class="state off">NOT CONNECTED</span></div>').join('')+'</div>')+'</div>'}
 function docsView(){const docs=[['Getting Started','Tổng quan kiến trúc, yêu cầu runtime và cách khởi tạo môi trường.','/docs/getting-started'],['Server Architecture','Control plane, API layer, agent runtime và service adapters.','/docs/architecture'],['API Reference','Quy ước endpoint, request schema, auth và error response.','/docs/api'],['AI Agents','Provider configuration, agent lifecycle và orchestration.','/docs/agents'],['Authentication','OAuth, session management, account và access policy.','/docs/authentication'],['MCP Integration','MCP transport, initialize, tools/list và connection security.','/docs/mcp'],['Observability','Structured logging, metrics, tracing và alerting.','/docs/observability'],['Deployment','Environment variables, secrets, staging và production release.','/docs/deployment']];return header('KNOWLEDGE BASE / 06','Documentation','Tài liệu kỹ thuật và hướng dẫn tích hợp. Các trang con là cấu trúc đề xuất; nội dung chi tiết đang được xây dựng.')+'<div class="notice">Tài liệu trong danh mục này chưa được publish thành các trang riêng. Liên kết hiện mở repository để theo dõi source và cập nhật.</div><div class="doc-list">'+docs.map(d=>'<a class="doc" href="https://github.com/OCodejs/ocodejs.github.io" target="_blank" rel="noreferrer"><strong>'+d[0]+'</strong><p>'+d[1]+'</p><span>'+d[2]+' ↗</span></a>').join('')+'</div><div style="height:14px"></div>'+panel('PROJECT LINKS','<div class="panel-body feed"><a href="https://github.com/OCodejs" target="_blank" rel="noreferrer">OCode.js organization ↗</a><a href="https://github.com/OCodejs/ocodejs.github.io" target="_blank" rel="noreferrer">Control Center source ↗</a><a href="https://github.com/zskbot/ocodejs-cli" target="_blank" rel="noreferrer">OCode.js CLI ↗</a></div>')}
 const renderers={overview,agents:agentView,api:apiView,auth:authView,mcp:mcpView,console:consoleView,docs:docsView};
+function registerNavigationItem(item){
+ if(!item||typeof item.id!=='string'||!/^[a-z][a-z0-9-]*$/.test(item.id)||typeof item.label!=='string'||!item.label.trim())throw new TypeError('Navigation item requires a valid id and label');
+ const entry={id:item.id,label:item.label.trim(),icon:String(item.icon||'◇'),group:String(item.group||'MORE').trim()||'MORE'};
+ const index=navigationRegistry.findIndex(existing=>existing.id===entry.id);
+ if(index>=0)navigationRegistry[index]=entry;else navigationRegistry.push(entry);
+ renderNavigation();
+ return {...entry};
+}
+function registerWorkspacePage(page){
+ if(!page||typeof page.render!=='function')throw new TypeError('Workspace page requires a render function');
+ const id=String(page.id||'');
+ if(!/^[a-z][a-z0-9-]*$/.test(id))throw new TypeError('Workspace page id is invalid');
+ names[id]=String(page.title||page.label||id);
+ renderers[id]=page.render;
+ return registerNavigationItem({id,label:names[id],icon:page.icon,group:page.group});
+}
+function renderNavigation(){
+ const root=document.getElementById('workspaceNavigation');
+ if(!root)return;
+ const groups=[...new Set(navigationRegistry.map(item=>item.group))];
+ root.innerHTML=groups.map(group=>'<div class="nav-group"><div class="nav-label">'+escapeHtml(group)+'</div>'+navigationRegistry.filter(item=>item.group===group).map(item=>'<button type="button" data-view="'+escapeHtml(item.id)+'" class="'+(item.id===current?'active':'')+'" aria-current="'+(item.id===current?'page':'false')+'"><span class="ico" aria-hidden="true">'+escapeHtml(item.icon)+'</span><span>'+escapeHtml(item.label)+'</span></button>').join('')+'</div>').join('');
+}
+window.OCodeNavigation=Object.freeze({
+ registerItem:registerNavigationItem,
+ registerPage:registerWorkspacePage,
+ getItems:()=>navigationRegistry.map(item=>({...item}))
+});
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function navigate(key){if(!renderers[key])return;current=key;document.getElementById('crumb').textContent=names[key];document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===key));viewRoot.innerHTML=renderers[key]();document.getElementById('globalSearch').value='';setNavigationOpen(false);window.scrollTo({top:0,behavior:'smooth'});bindView();if(key==='overview')refreshDashboard();if(key==='agents')refreshAgentRegistry();if(key==='mcp')refreshMcpConnections();if(key==='auth')refreshAuthReadiness()}
+function navigate(key){if(!renderers[key])return;current=key;document.getElementById('crumb').textContent=names[key];renderNavigation();viewRoot.innerHTML=renderers[key]();document.getElementById('globalSearch').value='';setNavigationOpen(false);window.scrollTo({top:0,behavior:'smooth'});bindView();if(key==='overview')refreshDashboard();if(key==='agents')refreshAgentRegistry();if(key==='mcp')refreshMcpConnections();if(key==='auth')refreshAuthReadiness()}
 async function runMcpCheck(method){const output=document.getElementById('mcpResult'),status=document.getElementById('mcpStatus');if(!output||!status)return;output.textContent='Đang gửi '+method+'…';status.textContent='CHECKING';try{const response=await fetch(MCP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json, text/event-stream','MCP-Protocol-Version':'2025-03-26'},body:JSON.stringify({jsonrpc:'2.0',id:method==='initialize'?101:102,method,params:method==='initialize'?{protocolVersion:'2025-03-26',capabilities:{},clientInfo:{name:'ocodejs-control-center',version:'1.0.0'}}:{}})});const data=await response.json();if(!response.ok||data.error)throw new Error(data.error?.message||('HTTP '+response.status));if(method==='initialize'){status.textContent='INITIALIZE OK';output.textContent=JSON.stringify(data,null,2);await fetch(MCP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json, text/event-stream','MCP-Protocol-Version':'2025-03-26'},body:JSON.stringify({jsonrpc:'2.0',method:'notifications/initialized'})});}else{const tools=data.result?.tools||[];status.textContent='TOOLS '+tools.length;output.textContent=tools.map(tool=>tool.name+' — '+tool.description).join('\n')||'No tools returned';}}catch(error){status.textContent='UNVERIFIED';output.textContent='MCP smoke test failed: '+error.message+'\nKiểm tra CORS, endpoint và trạng thái Worker.';}}
 function bindView(){viewRoot.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));const refresh=document.getElementById('refreshServices');if(refresh)refresh.addEventListener('click',refreshDashboard);const refreshAgents=document.getElementById('refreshAgents');if(refreshAgents)refreshAgents.addEventListener('click',refreshAgentRegistry);const add=document.getElementById('addConnection')||document.getElementById('addConnectionEmpty');if(add)add.addEventListener('click',openModal);const refreshMcp=document.getElementById('refreshMcpConnections');if(refreshMcp)refreshMcp.addEventListener('click',refreshMcpConnections);const mcpInit=document.getElementById('mcpInitialize');if(mcpInit)mcpInit.addEventListener('click',()=>runMcpCheck('initialize'));const mcpTools=document.getElementById('mcpTools');if(mcpTools)mcpTools.addEventListener('click',()=>runMcpCheck('tools/list'));viewRoot.querySelectorAll('[data-connect]').forEach(b=>b.addEventListener('click',()=>{navigate('mcp');openModal();document.getElementById('connName').value=b.dataset.connect+' provider'}))}
 function openModal(){document.getElementById('modal').classList.add('show');document.getElementById('connName').focus()}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
-document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.view)));
+document.getElementById('workspaceNavigation').addEventListener('click',event=>{const button=event.target.closest('button[data-view]');if(button)navigate(button.dataset.view);});
 const sidebar=document.getElementById('sidebar'),menuButton=document.getElementById('mobileMenu'),navScrim=document.getElementById('navScrim');
 function setNavigationOpen(open){sidebar.classList.toggle('open',open);sidebar.setAttribute('aria-hidden',String(!open));sidebar.inert=!open;document.body.classList.toggle('nav-open',open);menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Đóng menu điều hướng':'Mở menu điều hướng');if(open){const first=sidebar.querySelector('.nav button');if(first)first.focus();}else menuButton.focus();}
 menuButton.addEventListener('click',()=>setNavigationOpen(!sidebar.classList.contains('open')));
@@ -196,6 +224,7 @@ document.getElementById('closeModal').addEventListener('click',closeModal);docum
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 document.getElementById('connectionForm').addEventListener('submit',e=>{e.preventDefault();connections.push({name:document.getElementById('connName').value,type:document.getElementById('connType').value,url:document.getElementById('connUrl').value});closeModal();e.target.reset();navigate('mcp')});
 document.getElementById('globalSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase();viewRoot.querySelectorAll('.service,.tile,.doc,.table tbody tr,.feed-item,.log').forEach(el=>el.style.display=el.textContent.toLowerCase().includes(q)?'':'none')});
+renderNavigation();
 navigate('overview');
 </script>
 </body>
