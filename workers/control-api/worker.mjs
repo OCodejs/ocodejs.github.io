@@ -1,5 +1,7 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.0.1";
+const API_VERSION = "1.1.0";
+const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
+const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
 
 const SERVICES = [
@@ -13,9 +15,23 @@ const SERVICES = [
   {
     id: "identity",
     name: "Identity & Authentication",
-    description: "Authentication integration is not connected to this API",
+    description: "OCodeJS Account Portal Auth.js backend is not deployed; tracked separately from CLI OAuth.",
     state: "not_configured",
     source: "unverified"
+  },
+  {
+    id: "cli-auth",
+    name: "OCodeJS CLI GitHub Auth",
+    description: "GitHub OAuth/PAT session service health probe",
+    state: "unknown",
+    source: "remote_probe"
+  },
+  {
+    id: "mcp-server",
+    name: "OCodeJS MCP Server",
+    description: "Staging MCP protocol handshake and read-only tool discovery",
+    state: "unknown",
+    source: "remote_probe"
   },
   {
     id: "ai-runtime",
@@ -84,6 +100,141 @@ function errorResponse(code, message, status, id, headers) {
   }, status, headers);
 }
 
+async function probeCliAuth() {
+  const startedAt = Date.now();
+  const checkedAt = new Date().toISOString();
+  try {
+    const response = await fetch(CLI_AUTH_HEALTH_URL, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(4000)
+    });
+    if (!response.ok) {
+      return {
+        state: "unavailable",
+        description: "CLI Auth health endpoint returned HTTP " + response.status + ".",
+        checkedAt,
+        latencyMs: Date.now() - startedAt
+      };
+    }
+    const payload = await response.json();
+    if (payload.ok !== true || payload.service !== "ocodejs-auth-worker") {
+      return {
+        state: "unknown",
+        description: "CLI Auth health response did not match the expected service contract.",
+        checkedAt,
+        latencyMs: Date.now() - startedAt
+      };
+    }
+    const configured = payload.patConfigured === true && payload.oauthConfigured === true;
+    return {
+      state: configured ? "healthy" : "degraded",
+      description: configured
+        ? "Health endpoint responds and required GitHub OAuth/PAT bindings are present; end-to-end login is not verified."
+        : "Health endpoint responds, but one or more GitHub OAuth/PAT bindings are missing.",
+      checkedAt,
+      latencyMs: Date.now() - startedAt
+    };
+  } catch {
+    return {
+      state: "unavailable",
+      description: "CLI Auth health endpoint could not be reached.",
+      checkedAt,
+      latencyMs: Date.now() - startedAt
+    };
+  }
+}
+
+async function probeMcpServer() {
+  const startedAt = Date.now();
+  const checkedAt = new Date().toISOString();
+  try {
+    const initializeResponse = await fetch(MCP_ENDPOINT, {
+      method: "POST",
+      headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: {
+          protocolVersion: "2025-03-26",
+          capabilities: {},
+          clientInfo: { name: "ocodejs-control-api-probe", version: "1.0.0" }
+        }
+      }),
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(4000)
+    });
+    if (!initializeResponse.ok) {
+      return { state: "unavailable", description: "MCP initialize returned HTTP " + initializeResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
+    }
+    const initialized = await initializeResponse.json();
+    if (initialized?.result?.protocolVersion !== "2025-03-26" || initialized?.result?.serverInfo?.name !== "ocodejs-control-center") {
+      return { state: "unknown", description: "MCP initialize response did not match the expected protocol contract.", checkedAt, latencyMs: Date.now() - startedAt };
+    }
+
+    const notificationResponse = await fetch(MCP_ENDPOINT, {
+      method: "POST",
+      headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
+      body: JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(4000)
+    });
+    if (notificationResponse.status !== 202) {
+      return { state: "unknown", description: "MCP initialized notification was not accepted.", checkedAt, latencyMs: Date.now() - startedAt };
+    }
+
+    const toolsResponse = await fetch(MCP_ENDPOINT, {
+      method: "POST",
+      headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(4000)
+    });
+    if (!toolsResponse.ok) {
+      return { state: "unavailable", description: "MCP tools/list returned HTTP " + toolsResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
+    }
+    const listed = await toolsResponse.json();
+    const toolNames = (listed?.result?.tools || []).map((tool) => tool.name).sort();
+    if (JSON.stringify(toolNames) !== JSON.stringify(["get_control_api_health", "list_services"])) {
+      return { state: "unknown", description: "MCP tools/list did not return the expected read-only tool allowlist.", checkedAt, latencyMs: Date.now() - startedAt };
+    }
+    return {
+      state: "healthy",
+      description: "MCP initialize and tools/list passed; two read-only tools discovered. Tool execution is not part of this probe.",
+      checkedAt,
+      latencyMs: Date.now() - startedAt,
+      toolCount: toolNames.length
+    };
+  } catch {
+    return {
+      state: "unavailable",
+      description: "MCP staging endpoint could not complete the protocol handshake.",
+      checkedAt,
+      latencyMs: Date.now() - startedAt
+    };
+  }
+}
+
+async function serviceSnapshot(service, checkedAt) {
+  if (service.id === "cli-auth") {
+    return { ...service, ...(await probeCliAuth()) };
+  }
+  if (service.id === "mcp-server") {
+    return { ...service, ...(await probeMcpServer()) };
+  }
+  return {
+    ...service,
+    checkedAt: service.source === "self" ? checkedAt : null,
+    latencyMs: null
+  };
+}
+
 export default {
   async fetch(request, env = {}) {
     const url = new URL(request.url);
@@ -145,13 +296,10 @@ export default {
 
     if (url.pathname === `${API_PREFIX}/services`) {
       const checkedAt = new Date().toISOString();
+      const services = await Promise.all(SERVICES.map((service) => serviceSnapshot(service, checkedAt)));
       return json({
-        services: SERVICES.map((service) => ({
-          ...service,
-          checkedAt: service.source === "self" ? checkedAt : null,
-          latencyMs: null
-        })),
-        count: SERVICES.length,
+        services,
+        count: services.length,
         checkedAt,
         requestId: id
       }, 200, headers);
@@ -174,11 +322,7 @@ export default {
       }
 
       return json({
-        service: {
-          ...service,
-          checkedAt: service.source === "self" ? new Date().toISOString() : null,
-          latencyMs: null
-        },
+        service: await serviceSnapshot(service, new Date().toISOString()),
         requestId: id
       }, 200, headers);
     }
