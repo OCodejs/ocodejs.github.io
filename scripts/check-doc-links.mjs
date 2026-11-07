@@ -1,8 +1,9 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
-const root = path.resolve(new URL("../", import.meta.url).pathname);
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const markdownFiles = ["README.md"];
 async function walk(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -15,15 +16,16 @@ await walk(path.join(root, "docs"));
 
 const failures = [];
 let checked = 0;
+const codeFence = String.fromCharCode(96).repeat(3);
 for (const file of markdownFiles) {
-  const source = (await readFile(path.join(root, file), "utf8"))
-    .replace(/\`\`\`[\\s\\S]*?\`\`\`/g, "");
-  for (const match of source.matchAll(/\\[[^\\]]*\\]\\(([^)]+)\\)/g)) {
-    let target = match[1].trim().split(/\\s+/)[0].replace(/^<|>$/g, "");
+  const raw = await readFile(path.join(root, file), "utf8");
+  const source = raw.split(codeFence).filter((_, index) => index % 2 === 0).join("");
+  for (const match of source.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
+    let target = match[1].trim().split(/\s+/)[0].replace(/^<|>$/g, "");
     if (!target || target.startsWith("#") || /^(?:https?:|mailto:|tel:|data:|javascript:)/i.test(target)) continue;
     target = decodeURIComponent(target.split(/[?#]/)[0]);
     if (!target) continue;
-    const candidate = path.resolve(target.startsWith("/") ? root : path.dirname(path.join(root, file)), target.replace(/^\\//, ""));
+    const candidate = path.resolve(target.startsWith("/") ? root : path.dirname(path.join(root, file)), target.replace(/^\//, ""));
     if (!candidate.startsWith(root + path.sep) && candidate !== root) {
       failures.push(file + " -> " + target + " (outside repository)");
       continue;
@@ -39,5 +41,5 @@ for (const file of markdownFiles) {
   }
 }
 
-assert.deepEqual(failures, [], failures.join("\\n"));
-process.stdout.write("Local Markdown link checks passed (" + checked + " links across " + markdownFiles.length + " files).\\n");
+assert.deepEqual(failures, [], failures.join("\n"));
+process.stdout.write("Local Markdown link checks passed (" + checked + " links across " + markdownFiles.length + " files).\n");
