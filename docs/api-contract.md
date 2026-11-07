@@ -34,11 +34,13 @@ Example health response:
 ```
 
 ## AI Agents
+The staging Control API currently exposes a read-only, versioned Agent Registry. Definitions remain `draft`, have no configured provider or tools, and cannot execute.
+
 | Method | Path | Purpose |
 |---|---|---|
-| GET | /agents | List agent definitions |
+| GET | /agents | List versioned agent definitions (implemented, read-only) |
 | POST | /agents | Create agent definition |
-| GET | /agents/{agentId} | Read agent metadata |
+| GET | /agents/{agentId} | Read one agent definition (implemented, read-only) |
 | PATCH | /agents/{agentId} | Update definition |
 | POST | /agents/{agentId}/runs | Start a run |
 | GET | /runs/{runId} | Read run state and sanitized output |
