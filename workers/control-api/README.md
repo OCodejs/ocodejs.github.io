@@ -1,4 +1,4 @@
-# OCodeJS Control API — Phase 1.2
+# OCodeJS Control API — Phase 1.4
 
 This Worker is the first read-only backend slice for the OCodeJS Server Control Center.
 
@@ -22,8 +22,12 @@ The deployment API confirmed the Worker script and its 100% deployment version. 
 | GET | `/api/v1/health/ready` | Confirms this stateless API slice is ready |
 | GET | `/api/v1/services` | Lists service states without exposing credentials |
 | GET | `/api/v1/services/{serviceId}` | Reads one registered service |
+| GET | `/api/v1/agents` | Lists versioned, read-only agent definitions |
+| GET | `/api/v1/agents/{agentId}` | Reads one agent definition |
+| GET | `/api/v1/mcp/connections` | Lists the fixed staging MCP connection registry and protocol health |
+| GET | `/api/v1/mcp/connections/{connectionId}` | Reads one fixed MCP connection |
 
-Service Registry probes `https://auth.ocodejs.dev/health` for the separate OCodeJS CLI GitHub OAuth/PAT service and performs an MCP `initialize` + `tools/list` handshake against the isolated `ocodejs-mcp-staging` Worker. The MCP probe validates the protocol version and the two-tool read-only allowlist; it does not invoke tools. The Account Portal Auth.js service remains `not_configured`: its source exists in the private `zskbot/mcp.server.auth` repository, and a Cloudflare Workers Preview build has now compiled and deployed behind Access. Its health route is not yet verified; Preview settings intentionally contain no database or OAuth secrets, so Account Portal Auth.js remains `not_configured`. AI runtime and MCP connection manager remain `not_configured`. Telemetry is `degraded`: structured request events are emitted to Workers Logs, but metrics aggregation and a queryable audit store are not configured.
+Service Registry probes `https://auth.ocodejs.dev/health` for the separate OCodeJS CLI GitHub OAuth/PAT service and performs an MCP `initialize` + `tools/list` handshake against the isolated `ocodejs-mcp-staging` Worker. The MCP probe validates the protocol version and the two-tool read-only allowlist; it does not invoke tools. The Account Portal Auth.js service remains `not_configured`: its source exists in the private `zskbot/mcp.server.auth` repository, and a Cloudflare Workers Preview build has now compiled and deployed behind Access. Its health route is not yet verified; Preview settings intentionally contain no database or OAuth secrets, so Account Portal Auth.js remains `not_configured`. Agent Registry is available as read-only metadata; all definitions are `draft`, have no provider/tools, and `executionEnabled: false`. The MCP Connection Registry exposes only the fixed staging endpoint and a live initialize/tools-list probe; it accepts no arbitrary URL or write operation. AI runtime and MCP connection manager remain `not_configured`. Telemetry is `degraded`: structured request events are emitted to Workers Logs, but metrics aggregation and a queryable audit store are not configured.
 
 ## Local tests
 

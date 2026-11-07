@@ -1,8 +1,59 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.2.0";
+const API_VERSION = "1.4.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
+
+const AGENTS = [
+  {
+    id: "ocodejs-builder",
+    name: "OCode.js Builder",
+    version: "0.1.0",
+    status: "draft",
+    description: "Draft agent definition for prompt-to-code generation and preview builds.",
+    provider: { id: null, state: "not_configured" },
+    capabilities: ["prompt_to_code", "preview_build"],
+    tools: [],
+    executionEnabled: false,
+    approvalRequired: true
+  },
+  {
+    id: "ocodejs-reviewer",
+    name: "OCode.js Reviewer",
+    version: "0.1.0",
+    status: "draft",
+    description: "Draft agent definition for source-code review and change-risk summaries.",
+    provider: { id: null, state: "not_configured" },
+    capabilities: ["code_review", "risk_summary"],
+    tools: [],
+    executionEnabled: false,
+    approvalRequired: true
+  },
+  {
+    id: "ocodejs-docs",
+    name: "OCode.js Docs Agent",
+    version: "0.1.0",
+    status: "draft",
+    description: "Draft agent definition for generating and maintaining project documentation.",
+    provider: { id: null, state: "not_configured" },
+    capabilities: ["documentation", "api_reference"],
+    tools: [],
+    executionEnabled: false,
+    approvalRequired: true
+  }
+];
+
+const MCP_CONNECTIONS = [
+  {
+    id: "ocodejs-mcp-staging",
+    name: "OCode.js MCP Staging",
+    endpoint: MCP_ENDPOINT,
+    transport: "streamable-http",
+    environment: "staging",
+    access: "read_only",
+    managed: false
+  }
+];
 
 const SERVICES = [
   {
@@ -260,7 +311,11 @@ async function handleRequest(request, env, url, headers, id) {
           "GET /api/v1/health/live",
           "GET /api/v1/health/ready",
           "GET /api/v1/services",
-          "GET /api/v1/services/{serviceId}"
+          "GET /api/v1/services/{serviceId}",
+          "GET /api/v1/agents",
+          "GET /api/v1/agents/{agentId}",
+          "GET /api/v1/mcp/connections",
+          "GET /api/v1/mcp/connections/{connectionId}"
         ],
         requestId: id
       }, 200, headers);
@@ -318,6 +373,77 @@ async function handleRequest(request, env, url, headers, id) {
 
       return json({
         service: await serviceSnapshot(service, new Date().toISOString()),
+        requestId: id
+      }, 200, headers);
+    }
+
+    if (url.pathname === API_PREFIX + "/agents") {
+      const agents = AGENTS.map((agent) => ({
+        ...agent,
+        provider: { ...agent.provider },
+        capabilities: [...agent.capabilities],
+        tools: [...agent.tools]
+      }));
+      return json({
+        agents,
+        count: agents.length,
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
+    const agentMatch = url.pathname.match(/^\/api\/v1\/agents\/([a-z0-9-]+)$/);
+    if (agentMatch) {
+      const agent = AGENTS.find((item) => item.id === agentMatch[1]);
+      if (!agent) {
+        return errorResponse(
+          "NOT_FOUND",
+          "The requested agent is not registered.",
+          404,
+          id,
+          headers
+        );
+      }
+      return json({
+        agent: {
+          ...agent,
+          provider: { ...agent.provider },
+          capabilities: [...agent.capabilities],
+          tools: [...agent.tools]
+        },
+        requestId: id
+      }, 200, headers);
+    }
+
+    if (url.pathname === API_PREFIX + "/mcp/connections") {
+      const health = await probeMcpServer();
+      const connections = MCP_CONNECTIONS.map((connection) => ({
+        ...connection,
+        ...health
+      }));
+      return json({
+        connections,
+        count: connections.length,
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
+    const mcpConnectionMatch = url.pathname.match(/^\/api\/v1\/mcp\/connections\/([a-z0-9-]+)$/);
+    if (mcpConnectionMatch) {
+      const connection = MCP_CONNECTIONS.find((item) => item.id === mcpConnectionMatch[1]);
+      if (!connection) {
+        return errorResponse(
+          "NOT_FOUND",
+          "The requested MCP connection is not registered.",
+          404,
+          id,
+          headers
+        );
+      }
+      const health = await probeMcpServer();
+      return json({
+        connection: { ...connection, ...health },
         requestId: id
       }, 200, headers);
     }
