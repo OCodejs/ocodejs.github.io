@@ -54,8 +54,8 @@ This roadmap separates the static control center from the multi-service platform
 - [ ] Tool permission snapshots and approval gates.
 
 ## Phase 6 — Developer Console and integrations
-- [x] Enable persisted Cloudflare Worker logs and traces for staging Control API and MCP Worker (query strings redacted).
-- [ ] Centralize application metrics, distributed traces and retention policies.
+- [x] Enable persisted Cloudflare Worker logs and traces for staging Control API and MCP Worker (query strings redacted).\n- [x] Emit structured Control API request events and correlation headers; keep metric aggregation and queryable audit storage explicitly pending.
+- [x] Emit structured request events to Cloudflare Workers Logs with request ID, method, normalized path, status and latency; exclude query strings and request credentials.\n- [ ] Centralize application metrics, distributed traces and retention policies.
 - [ ] Role-based audit event explorer.
 - [ ] GitHub, Cloudflare and Vercel status adapters with least-privilege access.
 - [ ] Alert rules, retention policies and incident playbooks.
