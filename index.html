@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050505">
+  <meta name="description" content="OCodeJS Server — trung tâm điều phối cho ứng dụng, AI agents, công cụ developer và tích hợp MCP trong hệ sinh thái OCode.js.">
+  <meta property="og:title" content="OCodeJS Server — Build. Connect. Ship.">
+  <meta property="og:description" content="Một điểm điều phối cho AI agents, developer tools và ứng dụng trong hệ sinh thái OCode.js.">
+  <meta property="og:type" content="website">
+  <title>OCodeJS Server — Build. Connect. Ship.</title>
+  <style>
+    :root{color-scheme:dark;--bg:#050505;--panel:#0b0b0b;--panel2:#101010;--line:#242424;--muted:#8b8b8b;--text:#f5f5f5;--blue:#6d8cff;--green:#a7f3d0;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg)}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14px;line-height:1.65;letter-spacing:-.025em}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+    .wrap{width:min(1200px,calc(100% - 48px));margin:auto}
+    .topline{height:3px;background:linear-gradient(90deg,#5276ff,#9b8cff 45%,#74e5c0)}
+    header{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.07em;font-size:17px}
+    .mark{width:30px;height:30px;border:1px solid #555;display:grid;place-items:center;background:#101010;color:white;font-size:12px;letter-spacing:-.1em}
+    .brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:.12em;font-weight:500;margin-top:-3px}
+    .navlinks{display:flex;align-items:center;gap:26px;color:#aaa;font-size:11px}
+    .navlinks a:hover,.textlink:hover{color:white}
+    .navcta{border:1px solid #555;padding:10px 14px;color:#fff;font-size:11px}
+    .menu{display:none;background:none;border:1px solid #444;color:#fff;padding:8px 11px}
+    .hero{padding:100px 0 78px;position:relative;overflow:hidden}
+    .hero:before{content:"";position:absolute;width:560px;height:560px;right:-170px;top:-280px;border:1px solid #1b1b1b;border-radius:50%;box-shadow:0 0 0 60px #080808,0 0 0 61px #171717,0 0 0 130px #080808,0 0 0 131px #151515;pointer-events:none}
+    .eyebrow{display:flex;align-items:center;gap:10px;color:#aaa;text-transform:uppercase;font-size:10px;letter-spacing:.16em}
+    .dot{width:7px;height:7px;background:#8ef0c2;box-shadow:0 0 14px #8ef0c288}
+    h1{font-size:clamp(48px,8vw,92px);line-height:.98;letter-spacing:-.095em;max-width:900px;margin:28px 0 24px;font-weight:800}
+    h1 span{color:#777}
+    .hero-copy{max-width:620px;color:#aaa;font-size:14px;line-height:1.9}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+    .btn{min-height:48px;padding:0 19px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #555;background:#f3f3f3;color:#050505;font-weight:800;font-size:11px;transition:.2s}
+    .btn:hover{background:#cbd5ff;border-color:#cbd5ff;transform:translateY(-2px)}
+    .btn.secondary{background:transparent;color:#eee;border-color:#383838}
+    .btn.secondary:hover{border-color:#aaa;background:#111}
+    .hero-meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:54px;color:#777;font-size:10px;text-transform:uppercase;letter-spacing:.12em}
+    .hero-meta b{color:#ddd;font-weight:500}
+    .section{padding:76px 0;border-top:1px solid var(--line)}
+    .section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:32px}
+    .kicker{color:#7f96ff;font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+    h2{font-size:clamp(28px,4vw,46px);line-height:1.08;letter-spacing:-.075em;margin:12px 0 0}
+    .section-intro{max-width:390px;color:#888;font-size:12px;line-height:1.9}
+    .overview{display:grid;grid-template-columns:1.1fr .9fr;border:1px solid var(--line);background:#080808}
+    .overview-copy{padding:34px}
+    .overview-copy h3{font-size:22px;letter-spacing:-.06em;margin:0 0 14px}
+    .overview-copy p{color:#999;font-size:12px;line-height:1.9;margin:0}
+    .architecture{border-left:1px solid var(--line);padding:26px;background:radial-gradient(ellipse at 100% 0%,#17203c55,transparent 60%),#090909}
+    .arch-label{font-size:9px;color:#777;letter-spacing:.15em;margin-bottom:18px}
+    .layer{border:1px solid #303030;background:#0d0d0d;padding:13px 15px;margin-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .layer strong{font-size:11px;font-weight:600}
+    .layer span{font-size:9px;color:#777;text-align:right}
+    .connector{height:12px;width:1px;background:#555;margin:auto}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .card{min-height:210px;padding:24px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:#080808;transition:background .2s}
+    .card:hover{background:#101010}
+    .card-num{font-size:10px;color:#718cff}
+    .card h3{font-size:16px;letter-spacing:-.05em;margin:25px 0 8px}
+    .card p{font-size:11px;color:#888;line-height:1.85;margin:0}
+    .tag{display:inline-block;margin-top:18px;border:1px solid #303030;color:#aaa;padding:4px 7px;font-size:9px}
+    .ecosystem{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .repo{border:1px solid var(--line);padding:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;background:#080808}
+    .repo:hover{border-color:#666;background:#0d0d0d}
+    .repo strong{font-size:12px;display:block}
+    .repo small{color:#777;font-size:10px}
+    .arrow{color:#888;font-size:18px}
+    .cta{border:1px solid #333;background:linear-gradient(120deg,#0d0d0d,#0a0d18);padding:42px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .cta h2{font-size:clamp(25px,4vw,38px);margin:0}
+    .cta p{color:#888;font-size:11px;margin:12px 0 0;max-width:500px}
+    footer{padding:30px 0;border-top:1px solid var(--line);color:#777;font-size:10px}
+    .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .footlinks{display:flex;gap:18px}
+    @media(max-width:760px){
+      .wrap{width:calc(100% - 32px)}
+      .nav{height:64px}.menu{display:block}
+      .navlinks{display:none;position:absolute;top:64px;left:0;right:0;background:#080808;border-bottom:1px solid var(--line);padding:18px 16px;flex-direction:column;align-items:stretch;gap:0}
+      .navlinks.open{display:flex}.navlinks a{padding:13px 0;border-bottom:1px solid #1e1e1e}.navcta{margin-top:12px;text-align:center}
+      .hero{padding:76px 0 54px}h1{font-size:clamp(46px,13vw,68px)}
+      .hero:before{right:-350px;opacity:.6}.hero-meta{gap:12px 18px;margin-top:40px}
+      .section{padding:54px 0}.section-head{display:block}.section-intro{margin-top:16px}
+      .overview{grid-template-columns:1fr}.architecture{border-left:0;border-top:1px solid var(--line)}
+      .overview-copy{padding:24px}.grid{grid-template-columns:1fr}
+      .card{min-height:0;padding:22px}.card h3{margin-top:17px}
+      .ecosystem{grid-template-columns:1fr}.cta{padding:26px;display:block}.cta .btn{margin-top:22px;width:100%}
+      .actions .btn{flex:1 1 100%}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#" aria-label="OCodeJS Server home"><span class="mark">O/</span><span>OCodeJS<small>SERVER ECOSYSTEM</small></span></a>
+      <button class="menu" id="menu" aria-label="Mở điều hướng" aria-expanded="false">MENU</button>
+      <nav class="navlinks" id="navlinks" aria-label="Điều hướng chính">
+        <a href="#platform">Nền tảng</a><a href="#architecture">Kiến trúc</a><a href="#ecosystem">Hệ sinh thái</a><a href="#start">Bắt đầu</a>
+        <a class="navcta" href="https://github.com/OCodejs" target="_blank" rel="noreferrer">GITHUB ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow"><span class="dot"></span> Developer infrastructure · Open ecosystem</div>
+        <h1>Build your tools.<br><span>Run your ideas.</span></h1>
+        <p class="hero-copy">OCodeJS là hệ sinh thái hạ tầng dành cho developer — kết nối ứng dụng, AI agents, công cụ lập trình và dịch vụ backend trong một trải nghiệm thống nhất. Từ một điểm điều phối, đưa ý tưởng thành sản phẩm có thể phát triển và mở rộng.</p>
+        <div class="actions">
+          <a class="btn" href="#platform">KHÁM PHÁ NỀN TẢNG <span aria-hidden="true">&nbsp;↘</span></a>
+          <a class="btn secondary" href="https://github.com/OCodejs" target="_blank" rel="noreferrer">XEM SOURCE CODE ↗</a>
+        </div>
+        <div class="hero-meta"><span><b>01</b> / AI WORKFLOWS</span><span><b>02</b> / DEVELOPER TOOLS</span><span><b>03</b> / CONNECTED SERVICES</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="platform">
+      <div class="wrap">
+        <div class="section-head">
+          <div><div class="kicker">01 — Platform overview</div><h2>Một nền tảng.<br>Nhiều khả năng kết nối.</h2></div>
+          <p class="section-intro">OCodeJS hướng đến việc giảm phân mảnh giữa môi trường phát triển, lớp điều phối AI và các dịch vụ vận hành ứng dụng.</p>
+        </div>
+        <div class="overview" id="architecture">
+          <div class="overview-copy">
+            <h3>Developer-first infrastructure</h3>
+            <p>Thiết kế theo hướng module: mỗi thành phần có trách nhiệm rõ ràng, có thể tích hợp qua API hoặc giao thức phù hợp. Trang này giới thiệu định hướng kiến trúc của hệ sinh thái; trạng thái khả dụng của từng dịch vụ phụ thuộc vào repository và cấu hình triển khai tương ứng.</p>
+          </div>
+          <div class="architecture">
+            <div class="arch-label">CONCEPTUAL SYSTEM MAP / 04 LAYERS</div>
+            <div class="layer"><strong>01&nbsp; Developer Interface</strong><span>CLI · Workspace</span></div><div class="connector"></div>
+            <div class="layer"><strong>02&nbsp; Control & API Layer</strong><span>Routing · Identity</span></div><div class="connector"></div>
+            <div class="layer"><strong>03&nbsp; Agent Runtime</strong><span>Providers · Orchestration</span></div><div class="connector"></div>
+            <div class="layer"><strong>04&nbsp; Connected Services</strong><span>MCP · Cloud · Data</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div><div class="kicker">02 — Core capabilities</div><h2>Hạ tầng cho<br>developer hiện đại.</h2></div>
+          <p class="section-intro">Các nhóm năng lực được tổ chức để hỗ trợ vòng đời phát triển — từ viết code, điều phối agent đến kết nối dịch vụ.</p>
+        </div>
+        <div class="grid">
+          <article class="card"><div class="card-num">CAPABILITY / 01</div><h3>AI Agent Orchestration</h3><p>Kết nối nhiều AI provider và thiết kế luồng làm việc đa agent cho các tác vụ phát triển phần mềm.</p><span class="tag">MULTI-PROVIDER</span></article>
+          <article class="card"><div class="card-num">CAPABILITY / 02</div><h3>Developer Workspace</h3><p>Không gian làm việc tập trung cho công cụ, dự án, tài liệu và quy trình xây dựng ứng dụng.</p><span class="tag">WORKSPACE</span></article>
+          <article class="card"><div class="card-num">CAPABILITY / 03</div><h3>CLI & Automation</h3><p>Đưa thao tác phát triển và quản lý dự án vào workflow có thể lặp lại, kiểm tra và tự động hóa.</p><span class="tag">CLI TOOLING</span></article>
+          <article class="card"><div class="card-num">CAPABILITY / 04</div><h3>Identity & Access</h3><p>Lớp định danh và xác thực cho trải nghiệm tài khoản, quyền truy cập và tích hợp dịch vụ.</p><span class="tag">AUTH INTEGRATION</span></article>
+          <article class="card"><div class="card-num">CAPABILITY / 05</div><h3>MCP Connectivity</h3><p>Kết nối công cụ và nguồn dữ liệu qua Model Context Protocol trong các workflow tương thích.</p><span class="tag">MCP ECOSYSTEM</span></article>
+          <article class="card"><div class="card-num">CAPABILITY / 06</div><h3>Cloud Deployment</h3><p>Tích hợp với nền tảng triển khai hiện đại để xây dựng, phát hành và vận hành ứng dụng.</p><span class="tag">CLOUD INTEGRATIONS</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ecosystem">
+      <div class="wrap">
+        <div class="section-head">
+          <div><div class="kicker">03 — Open ecosystem</div><h2>Khám phá các<br>thành phần OCode.js.</h2></div>
+          <p class="section-intro">Truy cập mã nguồn và theo dõi tiến độ phát triển trực tiếp tại các repository của hệ sinh thái.</p>
+        </div>
+        <div class="ecosystem">
+          <a class="repo" href="https://github.com/OCodejs/OCodejs" target="_blank" rel="noreferrer"><span><strong>OCodejs / OCodejs</strong><small>Core developer tooling & packages</small></span><span class="arrow">↗</span></a>
+          <a class="repo" href="https://github.com/OCodejs/ask-chatbot" target="_blank" rel="noreferrer"><span><strong>OCodejs / ask-chatbot</strong><small>AI assistant & agent orchestration</small></span><span class="arrow">↗</span></a>
+          <a class="repo" href="https://github.com/OCodejs/ocodejs-legal" target="_blank" rel="noreferrer"><span><strong>OCodejs / ocodejs-legal</strong><small>Legal information center</small></span><span class="arrow">↗</span></a>
+          <a class="repo" href="https://github.com/zskbot/ocodejs-cli" target="_blank" rel="noreferrer"><span><strong>zskbot / ocodejs-cli</strong><small>OCode.js CLI Hub</small></span><span class="arrow">↗</span></a>
+          <a class="repo" href="https://github.com/zskbot/ask-ocodejs" target="_blank" rel="noreferrer"><span><strong>zskbot / ask-ocodejs</strong><small>Ask OCode.js application</small></span><span class="arrow">↗</span></a>
+          <a class="repo" href="https://github.com/OCodejs" target="_blank" rel="noreferrer"><span><strong>OCode.js Organization</strong><small>All public repositories</small></span><span class="arrow">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="start">
+      <div class="wrap">
+        <div class="cta">
+          <div><div class="kicker">04 — Get involved</div><h2>Build the next layer<br>of OCode.js.</h2><p>Khám phá mã nguồn, đọc tài liệu và tham gia đóng góp để cùng phát triển hệ sinh thái developer mở.</p></div>
+          <a class="btn" href="https://github.com/OCodejs" target="_blank" rel="noreferrer">EXPLORE GITHUB ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap foot"><span>© <span id="year">2026</span> OCode.js — Developer infrastructure ecosystem.</span><div class="footlinks"><a href="https://github.com/OCodejs" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/OCodejs/ocodejs-legal" target="_blank" rel="noreferrer">Legal</a></div></div></footer>
+  <script>
+    const menu = document.getElementById('menu');
+    const nav = document.getElementById('navlinks');
+    menu.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(open));
+    });
+    nav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      nav.classList.remove('open');
+      menu.setAttribute('aria-expanded', 'false');
+    }));
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
