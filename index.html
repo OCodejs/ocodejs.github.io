@@ -96,7 +96,7 @@ async function refreshDashboard(){
   notice.style.borderColor='#633b40';notice.style.background='#1b1013';notice.style.color='#f3a5ad';
  }finally{if(button){button.disabled=false;button.textContent='↻ Refresh';}}
 }
-function agentView(){return header('AI PLATFORM / 01','AI Agents','Agent Registry thật từ Control API; định nghĩa có version nhưng runtime chưa bật.','<button class="btn ghost" id="refreshAgents" type="button">↻ Refresh</button>')+'<div class="notice">Các định nghĩa bên dưới đang ở trạng thái DRAFT. Chưa cấu hình model provider, chưa cấp tool và chưa cho phép thực thi agent; không phát sinh lượt gọi AI hoặc chi phí inference.</div><div id="agentRegistry" class="grid cards"><div class="empty">Đang tải Agent Registry từ staging Control API…</div></div>'}
+function agentView(){return header('AI PLATFORM / 01','AI Agents','Agent Registry thật từ Control API; định nghĩa có version nhưng runtime chưa bật.','<button class="btn ghost" id="refreshAgents" type="button">↻ Refresh</button>')+'<div class="notice">Các định nghĩa bên dưới đang ở trạng thái DRAFT. Chưa cấu hình model provider, chưa cấp tool và chưa cho phép thực thi agent; không phát sinh lượt gọi AI hoặc chi phí inference.</div><div id="agentRuntimeStatus" class="notice">Đang kiểm tra AI Runtime…</div><div id="agentRegistry" class="grid cards"><div class="empty">Đang tải Agent Registry từ staging Control API…</div></div>'}
 
 async function refreshAgentRegistry(){
  const target=document.getElementById('agentRegistry');
@@ -104,9 +104,11 @@ async function refreshAgentRegistry(){
  if(!target)return;
  if(button){button.disabled=true;button.textContent='… Loading';}
  try{
-  const response=await fetch(CONTROL_API_BASE+'/agents',{method:'GET',cache:'no-store',headers:{'Accept':'application/json'}});
-  if(!response.ok)throw new Error('HTTP '+response.status);
-  const body=await response.json();
+  const [response,runtimeResponse]=await Promise.all([fetch(CONTROL_API_BASE+'/agents',{method:'GET',cache:'no-store',headers:{'Accept':'application/json'}}),fetch(CONTROL_API_BASE+'/runtime/status',{method:'GET',cache:'no-store',headers:{'Accept':'application/json'}})]);
+  if(!response.ok||!runtimeResponse.ok)throw new Error('HTTP '+response.status+'/'+runtimeResponse.status);
+  const [body,runtimeBody]=await Promise.all([response.json(),runtimeResponse.json()]);
+  const runtimeTarget=document.getElementById('agentRuntimeStatus');
+  if(runtimeTarget){const runtime=runtimeBody.runtime;runtimeTarget.textContent='AI Runtime: '+String(runtime.state).toUpperCase()+' · Provider: '+runtime.provider.state+' · Run store: '+runtime.runStore.state+' · Agent execution: DISABLED';}
   if(!Array.isArray(body.agents))throw new Error('Agent Registry schema không hợp lệ');
   target.innerHTML=body.agents.map((agent,i)=>'<article class="panel tile"><div class="agent-row"><div class="agent-icon">'+['✳','⌘','◇'][i%3]+'</div><div><strong>'+escapeHtml(agent.name)+'</strong><small>'+escapeHtml(agent.id)+' · v'+escapeHtml(agent.version)+'</small></div></div><p style="margin-top:16px">'+escapeHtml(agent.description)+'</p><div class="tile-foot"><span class="state warn">'+escapeHtml(agent.status.toUpperCase())+'</span><span class="tag">RUNTIME DISABLED</span></div><p style="font-size:10px;color:var(--muted);margin-top:12px">Capabilities: '+agent.capabilities.map(escapeHtml).join(' · ')+'</p><p style="font-size:10px;color:var(--muted)">Provider: '+escapeHtml(agent.provider.state)+' · Tools: '+agent.tools.length+' · Approval required: '+(agent.approvalRequired?'YES':'NO')+'</p></article>').join('')||'<div class="empty">Agent Registry chưa có định nghĩa nào.</div>';
  }catch(error){
