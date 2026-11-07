@@ -24,3 +24,5 @@ jobs:
           node-version: 22
       - name: Validate Worker and password utility
         run: node security/token-vault/scripts/check-source.mjs
+      - name: Run Worker smoke tests
+        run: node --test security/token-vault/tests/*.test.mjs
