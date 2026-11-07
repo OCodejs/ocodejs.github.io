@@ -34,15 +34,16 @@ Example health response:
 ```
 
 ## AI Agents
-The staging Control API currently exposes a read-only, versioned Agent Registry. Definitions remain `draft`, have no configured provider or tools, and cannot execute.
+The staging Control API exposes a read-only, versioned Agent Registry and a read-only runtime readiness endpoint. Definitions remain `draft`, have no configured provider or tools, and cannot execute. Runtime status reports provider and run-store as `not_configured`; no run lifecycle is exposed.
 
 | Method | Path | Purpose |
 |---|---|---|
+| GET | /runtime/status | Read provider and run-store readiness (implemented, read-only) |
 | GET | /agents | List versioned agent definitions (implemented, read-only) |
 | POST | /agents | Create agent definition |
 | GET | /agents/{agentId} | Read one agent definition (implemented, read-only) |
 | PATCH | /agents/{agentId} | Update definition |
-| POST | /agents/{agentId}/runs | Start a run |
+| POST | /agents/{agentId}/runs | Not implemented; rejected by the read-only API |
 | GET | /runs/{runId} | Read run state and sanitized output |
 | POST | /runs/{runId}/cancel | Cancel a run |
 
