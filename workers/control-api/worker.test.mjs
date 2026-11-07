@@ -27,17 +27,34 @@ test("readiness does not claim downstream dependencies are configured", async ()
   assert.match(body.note, /not configured/);
 });
 
-test("service registry probes CLI Auth and keeps account Auth.js unconfigured", async () => {
+test("service registry probes CLI Auth and MCP while keeping Account Auth.js separate", async () => {
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (url, options) => {
-    assert.equal(url, "https://auth.ocodejs.dev/health");
-    assert.equal(options.redirect, "error");
-    return new Response(JSON.stringify({
-      ok: true,
-      service: "ocodejs-auth-worker",
-      patConfigured: true,
-      oauthConfigured: true
-    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  globalThis.fetch = async (url, options = {}) => {
+    if (url === "https://auth.ocodejs.dev/health") {
+      assert.equal(options.redirect, "error");
+      return new Response(JSON.stringify({
+        ok: true,
+        service: "ocodejs-auth-worker",
+        patConfigured: true,
+        oauthConfigured: true
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    assert.equal(url, "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp");
+    const message = JSON.parse(options.body);
+    if (message.method === "initialize") {
+      return new Response(JSON.stringify({ jsonrpc: "2.0", id: 1, result: {
+        protocolVersion: "2025-03-26",
+        serverInfo: { name: "ocodejs-control-center" }
+      }}), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    assert.equal(options.headers["MCP-Protocol-Version"], "2025-03-26");
+    if (message.method === "notifications/initialized") return new Response(null, { status: 202 });
+    if (message.method === "tools/list") {
+      return new Response(JSON.stringify({ jsonrpc: "2.0", id: 2, result: { tools: [
+        { name: "get_control_api_health" }, { name: "list_services" }
+      ]}}), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    throw new Error("Unexpected MCP method");
   };
   try {
     const response = await call("/api/v1/services");
@@ -47,6 +64,8 @@ test("service registry probes CLI Auth and keeps account Auth.js unconfigured", 
     assert.equal(body.services.find((item) => item.id === "identity").state, "not_configured");
     assert.equal(body.services.find((item) => item.id === "cli-auth").state, "healthy");
     assert.equal(body.services.find((item) => item.id === "cli-auth").source, "remote_probe");
+    assert.equal(body.services.find((item) => item.id === "mcp-server").state, "healthy");
+    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 2);
     assert.equal(body.count, body.services.length);
   } finally {
     globalThis.fetch = originalFetch;
@@ -139,6 +158,36 @@ test("CLI Auth is unavailable when its health endpoint fails", async () => {
     assert.equal(response.status, 200);
     assert.equal(body.service.state, "unavailable");
     assert.equal(body.service.latencyMs >= 0, true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+
+test("MCP service is unknown when protocol contract mismatches", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ jsonrpc: "2.0", id: 1, result: {
+    protocolVersion: "2024-11-05",
+    serverInfo: { name: "unexpected-server" }
+  }}), { status: 200, headers: { "Content-Type": "application/json" } });
+  try {
+    const response = await call("/api/v1/services/mcp-server");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.service.state, "unknown");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("MCP service is unavailable when the staging endpoint cannot be reached", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response("unavailable", { status: 503 });
+  try {
+    const response = await call("/api/v1/services/mcp-server");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.service.state, "unavailable");
   } finally {
     globalThis.fetch = originalFetch;
   }
