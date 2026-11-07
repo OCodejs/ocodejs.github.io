@@ -1,5 +1,5 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.3.0";
+const API_VERSION = "1.4.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
@@ -40,6 +40,18 @@ const AGENTS = [
     tools: [],
     executionEnabled: false,
     approvalRequired: true
+  }
+];
+
+const MCP_CONNECTIONS = [
+  {
+    id: "ocodejs-mcp-staging",
+    name: "OCode.js MCP Staging",
+    endpoint: MCP_ENDPOINT,
+    transport: "streamable-http",
+    environment: "staging",
+    access: "read_only",
+    managed: false
   }
 ];
 
@@ -301,7 +313,9 @@ async function handleRequest(request, env, url, headers, id) {
           "GET /api/v1/services",
           "GET /api/v1/services/{serviceId}",
           "GET /api/v1/agents",
-          "GET /api/v1/agents/{agentId}"
+          "GET /api/v1/agents/{agentId}",
+          "GET /api/v1/mcp/connections",
+          "GET /api/v1/mcp/connections/{connectionId}"
         ],
         requestId: id
       }, 200, headers);
@@ -397,6 +411,39 @@ async function handleRequest(request, env, url, headers, id) {
           capabilities: [...agent.capabilities],
           tools: [...agent.tools]
         },
+        requestId: id
+      }, 200, headers);
+    }
+
+    if (url.pathname === API_PREFIX + "/mcp/connections") {
+      const health = await probeMcpServer();
+      const connections = MCP_CONNECTIONS.map((connection) => ({
+        ...connection,
+        ...health
+      }));
+      return json({
+        connections,
+        count: connections.length,
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
+    const mcpConnectionMatch = url.pathname.match(/^\/api\/v1\/mcp\/connections\/([a-z0-9-]+)$/);
+    if (mcpConnectionMatch) {
+      const connection = MCP_CONNECTIONS.find((item) => item.id === mcpConnectionMatch[1]);
+      if (!connection) {
+        return errorResponse(
+          "NOT_FOUND",
+          "The requested MCP connection is not registered.",
+          404,
+          id,
+          headers
+        );
+      }
+      const health = await probeMcpServer();
+      return json({
+        connection: { ...connection, ...health },
         requestId: id
       }, 200, headers);
     }
