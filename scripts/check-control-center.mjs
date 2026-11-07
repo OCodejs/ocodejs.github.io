@@ -21,6 +21,8 @@ for (const marker of [
   "refreshAgentRegistry",
   "Agent Registry",
   "RUNTIME DISABLED",
+  "refreshMcpConnections",
+  "MCP CONNECTIONS",
   "ĐĂNG NHẬP TẠM KHÓA"
 ]) {
   assert.ok(html.includes(marker), "Control Center is missing required integration marker: " + marker);
