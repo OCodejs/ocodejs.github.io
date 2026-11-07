@@ -45,6 +45,7 @@ This roadmap separates the static control center from the multi-service platform
 - [x] Implement initialize/capability negotiation and tools/list.
 - [x] Add protocol error handling and a fixed read-only tool allowlist.
 - [x] Add a read-only MCP connection registry for the fixed staging endpoint; no arbitrary URL or mutation support.
+- [x] Expose the versioned Agent Registry through two additional read-only MCP tools; validate agent IDs and keep execution disabled.
 - [ ] Add authenticated connection management, secret storage and expanded SSRF protections.
 - [ ] Complete external browser smoke test; outbound verification is blocked by the integration runner.
 
