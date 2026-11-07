@@ -25,8 +25,9 @@ function b64(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 function unb64(value) {
-  if (typeof value !== "string" || !/^[A-Za-z0-9_-]+$/.test(value)) throw Error("bad encoding");
-  const s = value.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - value.length % 4) % 4);
+  if (typeof value !== "string" || !/^[A-Za-z0-9+/_-]+={0,2}$/.test(value)) throw Error("bad encoding");
+  const raw = value.replace(/-/g, "+").replace(/_/g, "/").replace(/=+$/g, "");
+  const s = raw + "=".repeat((4 - raw.length % 4) % 4);
   return Uint8Array.from(atob(s), c => c.charCodeAt(0));
 }
 async function hash(value) { return b64(await crypto.subtle.digest("SHA-256", enc.encode(value))); }
