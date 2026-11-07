@@ -51,7 +51,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     if (message.method === "notifications/initialized") return new Response(null, { status: 202 });
     if (message.method === "tools/list") {
       return new Response(JSON.stringify({ jsonrpc: "2.0", id: 2, result: { tools: [
-        { name: "get_control_api_health" }, { name: "list_services" }
+        { name: "get_control_api_health" }, { name: "list_services" }, { name: "list_agents" }, { name: "get_agent_definition" }
       ]}}), { status: 200, headers: { "Content-Type": "application/json" } });
     }
     throw new Error("Unexpected MCP method");
@@ -65,7 +65,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     assert.equal(body.services.find((item) => item.id === "cli-auth").state, "healthy");
     assert.equal(body.services.find((item) => item.id === "cli-auth").source, "remote_probe");
     assert.equal(body.services.find((item) => item.id === "mcp-server").state, "healthy");
-    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 2);
+    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 4);
     assert.equal(body.count, body.services.length);
   } finally {
     globalThis.fetch = originalFetch;
@@ -296,7 +296,9 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
         result: {
           tools: [
             { name: "get_control_api_health", description: "Read health" },
-            { name: "list_services", description: "List services" }
+            { name: "list_services", description: "List services" },
+            { name: "list_agents", description: "List agent definitions" },
+            { name: "get_agent_definition", description: "Read one agent definition" }
           ]
         }
       });
@@ -311,7 +313,7 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
     assert.equal(calls, 3);
     assert.equal(body.connections[0].id, "ocodejs-mcp-staging");
     assert.equal(body.connections[0].state, "healthy");
-    assert.equal(body.connections[0].toolCount, 2);
+    assert.equal(body.connections[0].toolCount, 4);
     assert.equal(body.connections[0].access, "read_only");
     assert.equal(body.connections[0].managed, false);
   } finally {
@@ -352,7 +354,9 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
         result: {
           tools: [
             { name: "get_control_api_health", description: "Read health" },
-            { name: "list_services", description: "List services" }
+            { name: "list_services", description: "List services" },
+            { name: "list_agents", description: "List agent definitions" },
+            { name: "get_agent_definition", description: "Read one agent definition" }
           ]
         }
       });
@@ -366,7 +370,7 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
     assert.equal(body.connection.id, "ocodejs-mcp-staging");
     assert.equal(body.connection.environment, "staging");
     assert.equal(body.connection.state, "healthy");
-    assert.equal(body.connection.toolCount, 2);
+    assert.equal(body.connection.toolCount, 4);
     assert.equal(body.connection.managed, false);
   } finally {
     globalThis.fetch = originalFetch;

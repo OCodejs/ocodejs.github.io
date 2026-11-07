@@ -10,8 +10,10 @@ This Worker exposes a minimal, stateless MCP Streamable HTTP endpoint at `POST /
 
 - `get_control_api_health` — reads staging liveness and readiness.
 - `list_services` — reads the staging service registry.
+- `list_agents` — reads versioned agent definitions; every current definition is a non-executable draft.
+- `get_agent_definition` — reads one agent definition by its validated ID.
 
-The server is intentionally read-only. It has no account, DNS, deployment, secret, or mutation tools. It does not accept arbitrary URLs or proxy caller-supplied destinations. Backend destinations are fixed to the OCode.js staging Control API.
+The server is intentionally read-only. It has no account, DNS, deployment, secret, agent-execution, or mutation tools. It does not accept arbitrary URLs or proxy caller-supplied destinations. Backend destinations are fixed to the OCode.js staging Control API.
 
 ## Protocol
 
