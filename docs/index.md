@@ -6,16 +6,18 @@ This repository hosts a static GitHub Pages frontend, a separately deployed Clou
 - [Platform architecture](architecture.md)
 - [API contract](api-contract.md)
 - [Authentication integration status](auth-integration-status.md)
+- [Environment configuration](environment-configuration.md)
+- [Deployment runbook](deployment-runbook.md)
 - [Security baseline](security.md)
 - [Delivery roadmap](roadmap.md)
 
 | Area | Responsibility | Current state |
 |---|---|---|
 | Server Dashboard | Health, uptime, resource and deployment status | Live API integration merged; visual browser verification pending |
-| AI Agents | Registry, provider configuration, task execution | Catalog concept; runtime not configured |
+| AI Agents | Registry, provider configuration, task execution | Read-only Agent/Provider catalogs staged; runtime not configured |
 | API Gateway | Routing, auth, quotas, validation | Read-only Control API live on staging |
-| Authentication | Identity, OAuth, sessions, roles | CLI OAuth health and MCP protocol probes integrated; Account Portal Auth.js not configured |
-| MCP Server | Endpoint registry, handshake, tool discovery | Staging handshake + read-only tools/list implemented; external smoke test pending |
+| Authentication | Identity, OAuth, sessions, roles | CLI OAuth health probe integrated; Account Auth Preview build succeeded, but DB/provider secrets and E2E auth remain pending |
+| MCP Server | Endpoint registry, handshake, tool discovery | Staging handshake and four fixed read-only tools deployed; external smoke test pending |
 | Developer Console | Logs, metrics, traces, audit | Cloudflare Logs/Traces enabled for staging Control API and MCP Worker; centralized app telemetry not integrated |
 | Documentation | Technical guides and API references | Initial docs |
 
