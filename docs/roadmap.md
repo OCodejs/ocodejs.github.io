@@ -14,16 +14,19 @@ This roadmap separates a static control center from a real multi-service platfor
 - [x] API contract draft.
 - [x] Security baseline.
 - [x] Delivery roadmap.
-- [ ] OpenAPI 3.1 generated from the first implemented backend.
+- [x] OpenAPI 3.1 contract for Control API Phase 1.
+- [x] Automated Node test workflow for the Control API.
 - [ ] Environment configuration schema and deployment runbook.
-- [ ] Automated lint, HTML validation, link checking and accessibility checks.
+- [ ] Automated HTML validation, link checking and accessibility checks.
 
 ## Phase 2 — Read-only backend integration
-- [ ] Choose and verify the authoritative API gateway endpoint.
-- [ ] Implement liveness/readiness and service registry.
+- [ ] Verify the authoritative API endpoint with external HTTP smoke tests.
+- [x] Implement liveness/readiness and read-only service registry.
 - [ ] Add authenticated read-only service status to dashboard.
-- [ ] Add request IDs, safe errors and timeouts.
-- [ ] Verify staging integration; do not connect production by default.
+- [x] Add request IDs, stable error envelopes and restrictive CORS handling.
+- [x] Deploy an isolated staging Worker with Logs and Traces enabled.
+- [ ] Configure the exact staging frontend origin and complete browser integration.
+- [ ] Keep production disconnected until explicit approval.
 
 ## Phase 3 — Identity and access
 - [ ] Integrate selected OIDC/Auth service.
