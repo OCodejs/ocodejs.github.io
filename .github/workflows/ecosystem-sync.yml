@@ -1,0 +1,101 @@
+name: OCode.js Ecosystem Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ecosystem/shared/**"
+      - "projects.registry.json"
+      - ".github/workflows/ecosystem-sync.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview synchronization without pushing branches or opening PRs"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ocodejs-ecosystem-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout control repository
+        uses: actions/checkout@v4
+
+      - name: Validate registry and shared payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '.registryVersion and .controlRepository and (.repositories | type == "array")' projects.registry.json >/dev/null
+          jq -e '[.repositories[].repository] | length == (unique | length)' projects.registry.json >/dev/null
+          test -d ecosystem/shared
+          echo "Registry valid: $(jq '.repositories | length' projects.registry.json) repositories"
+
+      - name: Synchronize opted-in repositories through pull requests
+        env:
+          GH_TOKEN: ${{ secrets.OCODEJS_SYNC_TOKEN }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "::error::Missing OCODEJS_SYNC_TOKEN. Add a fine-grained token with Contents (read/write) and Pull requests (read/write) on intended target repositories."
+            exit 1
+          fi
+
+          dry_run=false
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$INPUT_DRY_RUN" == "true" ]]; then
+            dry_run=true
+          fi
+
+          while IFS= read -r repo; do
+            [[ -z "$repo" ]] && continue
+            branch="bot/ecosystem-sync-${GITHUB_RUN_ID}"
+            workdir="$(mktemp -d)"
+            echo "::group::${repo}"
+            if ! git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" "$workdir/repo"; then
+              echo "::warning::Unable to clone ${repo}; check token access and repository availability."
+              echo "::endgroup::"
+              rm -rf "$workdir"
+              continue
+            fi
+
+            target="$workdir/repo/.ocodejs/shared"
+            mkdir -p "$target"
+            cp -R ecosystem/shared/. "$target/"
+            if git -C "$workdir/repo" diff --quiet && [[ -z "$(git -C "$workdir/repo" status --porcelain)" ]]; then
+              echo "No managed-file changes."
+              rm -rf "$workdir"
+              echo "::endgroup::"
+              continue
+            fi
+
+            if [[ "$dry_run" == "true" ]]; then
+              echo "DRY RUN: changes detected; no branch or PR created."
+              git -C "$workdir/repo" status --short
+              rm -rf "$workdir"
+              echo "::endgroup::"
+              continue
+            fi
+
+            git -C "$workdir/repo" config user.name "OCode.js Ecosystem Bot"
+            git -C "$workdir/repo" config user.email "actions@users.noreply.github.com"
+            git -C "$workdir/repo" checkout -b "$branch"
+            git -C "$workdir/repo" add .ocodejs/shared
+            git -C "$workdir/repo" commit -m "chore(ocodejs): sync managed ecosystem assets"
+            git -C "$workdir/repo" push origin "$branch"
+            base="$(git -C "$workdir/repo" remote show origin | sed -n '/HEAD branch/s/.*: //p')"
+            gh pr create --repo "$repo" --base "$base" --head "$branch" \
+              --title "chore(ocodejs): sync managed ecosystem assets" \
+              --body "Automated update from OCodejs/ocodejs.github.io. Only files under .ocodejs/shared are managed by this sync. Review before merging; application-specific code and configuration are not changed."
+            rm -rf "$workdir"
+            echo "::endgroup::"
+          done < <(jq -r '.repositories[] | select(.sync.enabled == true) | .repository' projects.registry.json)
