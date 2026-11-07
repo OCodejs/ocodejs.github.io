@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: OCodeJS Control API
-  version: 1.5.0
+  version: 1.6.0
   description: Read-only health and service registry API with structured request logging. Staging implementation.
 servers:
   - url: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
@@ -73,6 +73,43 @@ paths:
                     items:
                       $ref: "#/components/schemas/Service"
                   count: { type: integer }
+                  checkedAt: { type: string, format: date-time }
+                  requestId: { type: string }
+  /api/v1/runtime/status:
+    get:
+      summary: Read AI runtime readiness without executing agents
+      responses:
+        "200":
+          description: Provider and run-store readiness; execution is disabled until configured
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [runtime, checkedAt, requestId]
+                properties:
+                  runtime:
+                    type: object
+                    required: [state, provider, availableProviders, runStore, executionEnabled, runLifecycle, approvalRequired, reason]
+                    properties:
+                      state: { type: string, enum: [not_configured] }
+                      provider:
+                        type: object
+                        required: [id, state]
+                        properties:
+                          id: { type: [string, "null"] }
+                          state: { type: string, enum: [not_configured] }
+                      availableProviders:
+                        type: array
+                        items: { type: string }
+                      runStore:
+                        type: object
+                        required: [state]
+                        properties:
+                          state: { type: string, enum: [not_configured] }
+                      executionEnabled: { type: boolean, const: false }
+                      runLifecycle: { type: string, enum: [disabled] }
+                      approvalRequired: { type: boolean, const: true }
+                      reason: { type: string }
                   checkedAt: { type: string, format: date-time }
                   requestId: { type: string }
   /api/v1/agents:
