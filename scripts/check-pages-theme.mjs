@@ -22,7 +22,7 @@ for (const marker of ["zskbot/ocodejs-cli", "Layout contract", "Component contra
 
 for (const marker of [
   'id="mobileMenu"', 'aria-controls="sidebar"', 'aria-expanded="false"',
-  'id="navScrim"', 'id="closeNav"', 'data-view="overview"', 'data-view="agents"',
+  'id="navScrim"', 'id="closeNav"', 'aria-hidden="true" inert', 'sidebar.inert=!open', 'data-view="overview"', 'data-view="agents"',
   'data-view="api"', 'data-view="auth"', 'data-view="mcp"', 'data-view="console"',
   'data-view="docs"', 'function setNavigationOpen(open)'
 ]) assert.ok(html.includes(marker), "Navigation drawer contract missing: " + marker);
