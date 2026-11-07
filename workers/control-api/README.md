@@ -2,6 +2,17 @@
 
 This Worker is the first read-only backend slice for the OCodeJS Server Control Center.
 
+## Staging deployment
+
+- Worker: `ocodejs-server-api-staging`
+- Staging URL: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
+- Deployment: uploaded successfully to the OCodeJS Cloudflare account.
+- Workers.dev: enabled for this Worker only; preview URLs remain disabled.
+- Observability: Workers Logs and Traces enabled; query strings redacted.
+- No custom domain, production route, secret, or existing Worker was changed.
+
+The deployment API confirmed the Worker script and its 100% deployment version. Runtime HTTP smoke tests are still pending: the current execution environment could not resolve the workers.dev hostname, so do not treat the endpoint as browser-verified.
+
 ## Implemented routes
 
 | Method | Route | Behavior |
@@ -22,13 +33,12 @@ Requires Node.js 20 or later. No third-party package is required.
 node --test workers/control-api/worker.test.mjs
 ```
 
-## Staging deployment requirements
+## Next staging checks
 
-- Use a separate Worker named `ocodejs-server-api-staging`.
-- Do not attach production routes or replace existing Worker scripts.
-- Configure `ALLOWED_ORIGINS` with the exact staging Control Center origin(s).
-- Do not add credentials or secrets to source control.
-- Verify `/api/v1/health/live`, `/api/v1/health/ready`, and `/api/v1/services` over HTTPS after deployment.
-- Keep the API disconnected from the public dashboard until staging checks pass.
+1. Open the staging URL and confirm `/api/v1/health/live` returns HTTP 200.
+2. Confirm `/api/v1/health/ready` returns `ready: true`.
+3. Confirm `/api/v1/services` marks only `control-api` as healthy.
+4. Configure the exact staging Control Center origin in `ALLOWED_ORIGINS` before browser integration.
+5. Keep the public dashboard disconnected until those checks pass.
 
-Deployment is intentionally not performed by this source change. The Cloudflare account currently contains existing OCodeJS Workers; staging deployment must be a separate, explicit operation with isolated naming and no production route changes.
+No production routes are attached. This Worker is isolated from existing OCodeJS Worker scripts.
