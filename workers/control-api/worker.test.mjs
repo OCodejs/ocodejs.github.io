@@ -192,3 +192,43 @@ test("MCP service is unavailable when the staging endpoint cannot be reached", a
     globalThis.fetch = originalFetch;
   }
 });
+
+test("emits structured request logs with correlation headers and excludes query strings", async () => {
+  const originalLog = console.log;
+  const events = [];
+  console.log = (line) => events.push(JSON.parse(line));
+  try {
+    const response = await call("/api/v1/health/live?access_token=must-not-be-logged", {
+      headers: { "x-request-id": "req-safe-123" }
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("X-Request-Id"), "req-safe-123");
+    assert.match(response.headers.get("Server-Timing") || "", /^app;dur=\d+$/);
+    assert.equal(events.length, 1);
+    assert.deepEqual({
+      event: events[0].event,
+      requestId: events[0].requestId,
+      method: events[0].method,
+      path: events[0].path,
+      status: events[0].status
+    }, {
+      event: "control_api.request",
+      requestId: "req-safe-123",
+      method: "GET",
+      path: "/api/v1/health/live",
+      status: 200
+    });
+    assert.equal(JSON.stringify(events).includes("must-not-be-logged"), false);
+  } finally {
+    console.log = originalLog;
+  }
+});
+
+test("telemetry reports partial structured logging without claiming metrics storage", async () => {
+  const response = await call("/api/v1/services/telemetry");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.service.state, "degraded");
+  assert.equal(body.service.source, "self");
+  assert.match(body.service.description, /metrics aggregation/i);
+});

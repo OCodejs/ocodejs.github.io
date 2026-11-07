@@ -1,5 +1,5 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.1.0";
+const API_VERSION = "1.2.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
@@ -50,9 +50,9 @@ const SERVICES = [
   {
     id: "telemetry",
     name: "Developer Telemetry",
-    description: "No telemetry backend is configured",
-    state: "not_configured",
-    source: "unverified"
+    description: "Structured request events are emitted to Workers Logs; metrics aggregation and a queryable audit store are not configured.",
+    state: "degraded",
+    source: "self"
   }
 ];
 
@@ -235,12 +235,7 @@ async function serviceSnapshot(service, checkedAt) {
   };
 }
 
-export default {
-  async fetch(request, env = {}) {
-    const url = new URL(request.url);
-    const headers = corsHeaders(request, env);
-    const id = requestId(request);
-
+async function handleRequest(request, env, url, headers, id) {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers });
     }
@@ -334,5 +329,42 @@ export default {
       id,
       headers
     );
+}
+
+function logRequest(response, request, url, id, startedAt) {
+  const durationMs = Math.max(0, Date.now() - startedAt);
+  response.headers.set("X-Request-Id", id);
+  response.headers.set("Server-Timing", `app;dur=${durationMs}`);
+  console.log(JSON.stringify({
+    event: "control_api.request",
+    requestId: id,
+    method: request.method,
+    path: url.pathname,
+    status: response.status,
+    durationMs,
+    timestamp: new Date().toISOString()
+  }));
+  return response;
+}
+
+export default {
+  async fetch(request, env = {}) {
+    const startedAt = Date.now();
+    const url = new URL(request.url);
+    const headers = corsHeaders(request, env);
+    const id = requestId(request);
+    let response;
+    try {
+      response = await handleRequest(request, env, url, headers, id);
+    } catch {
+      response = errorResponse(
+        "INTERNAL_ERROR",
+        "The API could not complete the request.",
+        500,
+        id,
+        headers
+      );
+    }
+    return logRequest(response, request, url, id, startedAt);
   }
 };
