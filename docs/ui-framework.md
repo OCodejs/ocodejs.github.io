@@ -46,12 +46,42 @@ Spacing uses a 4px base scale. Corners remain square to match the CLI Hub. Typog
 
 ## Layout contract
 
-- Desktop: fixed-width 240px workspace navigation, sticky 64px topbar, fluid content canvas.
-- Tablet: navigation compresses while content and metric grids reflow.
-- Mobile: fixed two-row, four-column bottom navigation; sticky topbar; single-column panels; safe-area insets for iOS.
+- Desktop and mobile: one global three-line hamburger control opens the same left-side navigation drawer; sticky topbar and fluid content canvas.
+- The drawer has a backdrop, explicit close control, Escape-to-close, active-page indication, focus handling, and `aria-hidden`/`inert` while closed.
+- Mobile: drawer respects iOS safe-area insets; content and metric grids reflow to a single column; no duplicate bottom navigation.
 - Touch controls remain at least 38–42px high.
 - Tables retain horizontal scrolling rather than shrinking columns into unreadable text.
 - Reduced-motion preference disables non-essential transitions.
+
+## Navigation registry contract
+
+The workspace menu is generated from the central `navigationRegistry` in `index.html`; navigation buttons must not be duplicated as static HTML. The seven existing destinations are registered once and rendered into grouped sections.
+
+Register a new view and it is added to the menu automatically:
+
+```js
+window.OCodeNavigation.registerPage({
+  id: "billing",
+  title: "Billing",
+  icon: "$",
+  group: "PLATFORM",
+  render: () => billingView()
+});
+```
+
+For an action-only menu entry, register a callback:
+
+```js
+window.OCodeNavigation.registerItem({
+  id: "refresh-data",
+  label: "Refresh data",
+  icon: "↻",
+  group: "ACTIONS",
+  onSelect: () => refreshData()
+});
+```
+
+IDs must be lowercase route-safe identifiers (`a-z`, `0-9`, hyphens; first character a letter). Labels and icons are escaped before rendering. Use `registerPage` for navigable screens; use `registerItem` only for menu actions. Existing IDs are updated in place instead of duplicated.
 
 ## Component contract
 
