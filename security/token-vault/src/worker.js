@@ -226,7 +226,7 @@ async function route(req, env, ctx) {
     let body; try { body = await req.json(); } catch { return json({ error: "Invalid request" }, 400); }
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const role = body.role;
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || email.length > 254 ||
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 ||
         !["security_admin", "developer", "auditor"].includes(role)) {
       return json({ error: "Invalid member email or role" }, 400);
     }
@@ -239,7 +239,7 @@ async function route(req, env, ctx) {
     await audit(env, user.subject, "member.create", email);
     return json({ ok: true, email, role }, 201);
   }
-  const memberPath = path.match(/^\\/api\\/members\\/(.+)$/);
+  const memberPath = path.match(/^\/api\/members\/(.+)$/);
   if (memberPath && req.method === "PATCH") {
     if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
     const email = decodeURIComponent(memberPath[1]).trim().toLowerCase();
@@ -257,14 +257,14 @@ async function route(req, env, ctx) {
     if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
     const email = decodeURIComponent(memberPath[1]).trim().toLowerCase();
     if (email === "TOKEN") return json({ error: "Cannot revoke bootstrap owner" }, 400);
-    const result = await env.DB.batch([
-      env.DB.prepare("UPDATE identities SET active=0 WHERE subject=? AND role<>'ai_agent'").bind(email),
+    const check = await env.DB.prepare("SELECT active,role FROM identities WHERE subject=?").bind(email).first();
+    if (!check || check.role === "ai_agent") return json({ error: "Member not found" }, 404);
+    await env.DB.batch([
+      env.DB.prepare("UPDATE identities SET active=0 WHERE subject=?").bind(email),
       env.DB.prepare("UPDATE sessions SET revoked=1 WHERE subject=?").bind(email)
     ]);
-    const check = await env.DB.prepare("SELECT active FROM identities WHERE subject=?").bind(email).first();
-    if (!check) return json({ error: "Member not found" }, 404);
     await audit(env, user.subject, "member.revoke", email);
-    return json({ ok: true, active: !!check.active });
+    return json({ ok: true, active: false });
   }
 
 
