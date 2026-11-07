@@ -1,5 +1,5 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.6.0";
+const API_VERSION = "1.7.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
@@ -325,6 +325,7 @@ async function handleRequest(request, env, url, headers, id) {
           "GET /api/v1/health/ready",
           "GET /api/v1/services",
           "GET /api/v1/services/{serviceId}",
+          "GET /api/v1/runtime/status",
           "GET /api/v1/providers",
           "GET /api/v1/providers/{providerId}",
           "GET /api/v1/agents",
@@ -388,6 +389,23 @@ async function handleRequest(request, env, url, headers, id) {
 
       return json({
         service: await serviceSnapshot(service, new Date().toISOString()),
+        requestId: id
+      }, 200, headers);
+    }
+
+    if (url.pathname === API_PREFIX + "/runtime/status") {
+      return json({
+        runtime: {
+          state: "not_configured",
+          provider: { id: null, state: "not_configured" },
+          availableProviders: PROVIDERS.filter((provider) => provider.state === "ready").map((provider) => provider.id),
+          runStore: { state: "not_configured" },
+          executionEnabled: false,
+          runLifecycle: "disabled",
+          approvalRequired: true,
+          reason: "No server-side model provider or isolated run store has been configured."
+        },
+        checkedAt: new Date().toISOString(),
         requestId: id
       }, 200, headers);
     }
