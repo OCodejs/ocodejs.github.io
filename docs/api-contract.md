@@ -61,7 +61,7 @@ Check tool permissions server-side on every invocation.
 Never expose stored credentials. Validate destination hosts and resolved IPs to mitigate SSRF, including redirects and DNS rebinding.
 
 ## Identity and telemetry
-The current Account Portal Auth.js runtime is not configured. The separate OCodeJS CLI GitHub OAuth/PAT service is health-probed through the service registry; that probe is not an account login session. The staging MCP server is probed with `initialize` and `tools/list`; the probe does not invoke tools. A fixed read-only MCP Connection Registry is exposed; it does not accept arbitrary URLs or mutations.
+The current Account Portal Auth.js runtime is not configured. The separate OCodeJS CLI GitHub OAuth/PAT service is health-probed through the service registry; that probe is not an account login session. The staging MCP server is probed with `initialize` and `tools/list`; the probe does not invoke tools. Its fixed read-only tool allowlist now includes health, services, agent listing and agent-definition lookup. Agent definitions remain drafts and cannot execute. A fixed read-only MCP Connection Registry is exposed; it does not accept arbitrary URLs or mutations.
 
 | Method | Path | Purpose |
 |---|---|---|
