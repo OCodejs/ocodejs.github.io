@@ -5,14 +5,14 @@ on:
     paths:
       - "workers/control-api/**"
       - "index.html"
-      - "scripts/check-control-center.mjs"
+      - "scripts/check-control-center.mjs"\n      - "scripts/check-pages-theme.mjs"\n      - "ocodejs-pages-theme.css"\n      - "docs/ui-framework.md"
       - ".github/workflows/control-api-tests.yml"
   push:
     branches: [main]
     paths:
       - "workers/control-api/**"
       - "index.html"
-      - "scripts/check-control-center.mjs"
+      - "scripts/check-control-center.mjs"\n      - "scripts/check-pages-theme.mjs"\n      - "ocodejs-pages-theme.css"\n      - "docs/ui-framework.md"
       - ".github/workflows/control-api-tests.yml"
 
 permissions:
