@@ -16,7 +16,7 @@ This repository hosts a static GitHub Pages frontend, a separately deployed Clou
 | API Gateway | Routing, auth, quotas, validation | Read-only Control API live on staging |
 | Authentication | Identity, OAuth, sessions, roles | CLI OAuth health and MCP protocol probes integrated; Account Portal Auth.js not configured |
 | MCP Server | Endpoint registry, handshake, tool discovery | Staging handshake + read-only tools/list implemented; external smoke test pending |
-| Developer Console | Logs, metrics, traces, audit | Worker Logs/Traces enabled for Control API; application telemetry not integrated |
+| Developer Console | Logs, metrics, traces, audit | Cloudflare Logs/Traces enabled for staging Control API and MCP Worker; centralized app telemetry not integrated |
 | Documentation | Technical guides and API references | Initial docs |
 
 ## Status vocabulary
