@@ -49,4 +49,4 @@ The current API only bootstraps the `TOKEN` owner identity. It does **not yet** 
 
 ## Validation and deployment
 
-Run `node security/token-vault/scripts/check-source.mjs` for source validation. This repository change is not a deployment. No Worker, D1 database, Access policy, secrets, or live tokens have been created or configured. Keep the service behind Cloudflare Access before any staging exposure.
+Run `node security/token-vault/scripts/check-source.mjs` for source validation and `node --test security/token-vault/tests/*.test.mjs` for Worker smoke tests. This repository change is not a deployment. No Worker, D1 database, Access policy, secrets, or live tokens have been created or configured. Keep the service behind Cloudflare Access before any staging exposure.
