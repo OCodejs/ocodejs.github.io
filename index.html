@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="./ocodejs-pages-theme.css?v=1.0.0">\n</head>
 <body>
 <div class="app">
-<aside class="sidebar" id="sidebar">
- <div class="brand"><div class="logo">&gt;_</div><div><strong>OCode.js</strong><small>SERVER CONTROL</small></div></div>
+<aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+ <div class="drawer-head"><div class="brand"><div class="logo">&gt;_</div><div><strong>OCode.js</strong><small>SERVER CONTROL</small></div></div><button class="drawer-close" id="closeNav" type="button" aria-label="Đóng menu">×</button></div>
  <div class="nav-label">WORKSPACE</div>
  <nav class="nav" aria-label="Dashboard navigation">
   <button class="active" data-view="overview"><span class="ico">▦</span>Server Dashboard</button>
@@ -30,10 +30,11 @@
  <div class="side-bottom"><div class="connection"><small>ENVIRONMENT</small><strong>Cloudflare · staging API</strong><span class="demo-pill">● STAGING</span></div></div>
 </aside>
 <main class="main">
- <header class="topbar"><div class="top-actions"><button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button><div class="crumb">OCodeJS / <b id="crumb">Server Dashboard</b></div></div><div class="top-actions"><input class="search" id="globalSearch" placeholder="Tìm trong trang hiện tại..." aria-label="Tìm kiếm"><div class="avatar" title="Preview">OC</div></div></header>
+ <header class="topbar"><div class="top-actions"><button class="mobile-menu" id="mobileMenu" type="button" aria-label="Mở menu điều hướng" aria-controls="sidebar" aria-expanded="false"><span aria-hidden="true">☰</span></button><div class="crumb">OCodeJS / <b id="crumb">Server Dashboard</b></div></div><div class="top-actions"><input class="search" id="globalSearch" placeholder="Tìm trong trang hiện tại..." aria-label="Tìm kiếm"><div class="avatar" title="Preview">OC</div></div></header>
  <div class="content" id="view"></div>
 </main>
 </div>
+<button class="nav-scrim" id="navScrim" type="button" tabindex="-1" aria-label="Đóng menu"></button>
 <div class="modal-backdrop" id="modal"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><strong id="modalTitle">Thêm kết nối</strong><button class="close" id="closeModal" aria-label="Đóng">×</button></div><form id="connectionForm"><div class="form-grid"><div class="field full"><label for="connName">Tên kết nối</label><input id="connName" required placeholder="Ví dụ: Local MCP"></div><div class="field"><label for="connType">Loại kết nối</label><select id="connType"><option>MCP Server</option><option>AI Provider</option><option>API Service</option></select></div><div class="field"><label for="connUrl">Endpoint URL</label><input id="connUrl" type="url" placeholder="https://..."></div><div class="field full"><label for="connNote">Ghi chú</label><textarea id="connNote" placeholder="Mô tả mục đích kết nối (không nhập token hoặc secret)"></textarea></div></div><p style="font-size:9px;color:#8c9ab0;line-height:1.7">Bản preview chỉ lưu trạng thái tạm trong trình duyệt hiện tại. Chưa gửi dữ liệu tới máy chủ.</p><div class="modal-actions"><button type="button" class="btn ghost" id="cancelModal">Hủy</button><button class="btn" type="submit">Thêm vào bản preview</button></div></form></section></div>
 <script>
 const viewRoot=document.getElementById('view');
@@ -185,7 +186,12 @@ function bindView(){viewRoot.querySelectorAll('[data-go]').forEach(b=>b.addEvent
 function openModal(){document.getElementById('modal').classList.add('show');document.getElementById('connName').focus()}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.view)));
-document.getElementById('mobileMenu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+const sidebar=document.getElementById('sidebar'),menuButton=document.getElementById('mobileMenu'),navScrim=document.getElementById('navScrim');
+function setNavigationOpen(open){sidebar.classList.toggle('open',open);document.body.classList.toggle('nav-open',open);menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Đóng menu điều hướng':'Mở menu điều hướng');if(open){const first=sidebar.querySelector('.nav button');if(first)first.focus();}else menuButton.focus();}
+menuButton.addEventListener('click',()=>setNavigationOpen(!sidebar.classList.contains('open')));
+document.getElementById('closeNav').addEventListener('click',()=>setNavigationOpen(false));
+navScrim.addEventListener('click',()=>setNavigationOpen(false));
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&sidebar.classList.contains('open'))setNavigationOpen(false);});
 document.getElementById('closeModal').addEventListener('click',closeModal);document.getElementById('cancelModal').addEventListener('click',closeModal);
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 document.getElementById('connectionForm').addEventListener('submit',e=>{e.preventDefault();connections.push({name:document.getElementById('connName').value,type:document.getElementById('connType').value,url:document.getElementById('connUrl').value});closeModal();e.target.reset();navigate('mcp')});
