@@ -130,47 +130,6 @@ test("AI agent grants isolate projects and reveal permission, and revocation wor
 });
 
 
-test("Cloudflare Access maps only provisioned staff identities to their assigned roles", async () => {
-  const { env, password } = makeEnv();
-  env.ACCESS_REQUIRED = "true";
-  const login = await call("/api/login", env, {
-    method: "POST", headers: browserHeaders(), body: { password }
-  });
-  assert.equal(login.status, 200);
-  const cookie = login.headers.get("set-cookie").split(";")[0];
-
-  const addMember = await call("/api/members", env, {
-    method: "POST",
-    headers: browserHeaders(cookie),
-    body: { email: "dev@example.com", role: "developer" }
-  });
-  assert.equal(addMember.status, 201);
-
-  const accessContext = { access: { getIdentity: async () => ({ email: "DEV@example.com" }) } };
-  const staffMe = await worker.fetch(new Request("https://vault.example/api/me"), env, accessContext);
-  assert.equal(staffMe.status, 200);
-  assert.deepEqual(await staffMe.json(), {
-    subject: "dev@example.com",
-    role: "developer",
-    auth: "cloudflare-access"
-  });
-
-  const deniedWrite = await worker.fetch(new Request("https://vault.example/api/tokens", {
-    method: "POST",
-    headers: browserHeaders(),
-    body: JSON.stringify({ label: "test", provider: "test", project_id: "project-alpha", value: "some-secret-value" })
-  }), env, accessContext);
-  assert.equal(deniedWrite.status, 403);
-
-  const unprovisioned = { access: { getIdentity: async () => ({ email: "unknown@example.com" }) } };
-  const unknown = await worker.fetch(new Request("https://vault.example/api/me"), env, unprovisioned);
-  assert.equal(unknown.status, 401);
-
-  const noAccess = await worker.fetch(new Request("https://vault.example/"), env);
-  assert.equal(noAccess.status, 403);
-});
-
-
 test("owner provisions personnel and Cloudflare Access enforces the assigned role", async () => {
   const { env, password } = makeEnv();
   env.ACCESS_REQUIRED = "true";
