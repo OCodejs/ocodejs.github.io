@@ -36,8 +36,9 @@ for (const match of html.matchAll(/<img\b([^>]*)>/gi)) {
   if (alt === null) errors.push("Image is missing an alt attribute");
 }
 
-for (const match of html.matchAll(/<([a-z][a-z0-9-]*)\b([^>]*)\brole=["']dialog["'][^>]*>/gi)) {
+for (const match of html.matchAll(/<([a-z][a-z0-9-]*)\b([^>]*)>/gi)) {
   const attributes = match[2];
+  if (attr(attributes, "role") !== "dialog") continue;
   if (attr(attributes, "aria-modal") !== "true" || !attr(attributes, "aria-labelledby")) {
     errors.push("Dialog must declare aria-modal=true and aria-labelledby");
   }
