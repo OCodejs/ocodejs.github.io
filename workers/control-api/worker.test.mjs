@@ -51,7 +51,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     if (message.method === "notifications/initialized") return new Response(null, { status: 202 });
     if (message.method === "tools/list") {
       return new Response(JSON.stringify({ jsonrpc: "2.0", id: 2, result: { tools: [
-        { name: "get_control_api_health" }, { name: "list_services" }
+        { name: "get_control_api_health" }, { name: "list_services" }, { name: "list_agents" }, { name: "get_agent_definition" }
       ]}}), { status: 200, headers: { "Content-Type": "application/json" } });
     }
     throw new Error("Unexpected MCP method");
@@ -65,7 +65,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     assert.equal(body.services.find((item) => item.id === "cli-auth").state, "healthy");
     assert.equal(body.services.find((item) => item.id === "cli-auth").source, "remote_probe");
     assert.equal(body.services.find((item) => item.id === "mcp-server").state, "healthy");
-    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 2);
+    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 4);
     assert.equal(body.count, body.services.length);
   } finally {
     globalThis.fetch = originalFetch;
