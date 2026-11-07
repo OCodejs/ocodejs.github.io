@@ -7,7 +7,7 @@ This roadmap separates the static control center from the multi-service platform
 - [x] Responsive navigation and local preview interactions.
 - [x] Clear preview/not-connected labels.
 - [x] GitHub Pages workflow succeeded for the merged Control Center commit.
-- [ ] Browser visual and accessibility verification on desktop and mobile.
+- [ ] Browser visual and assistive-technology verification on desktop and mobile.
 
 ## Phase 1 — Technical foundation
 - [x] Architecture baseline.
@@ -17,8 +17,8 @@ This roadmap separates the static control center from the multi-service platform
 - [x] OpenAPI 3.1 contract for Control API.
 - [x] Automated Node test workflow for the Control API.
 - [x] Isolated staging Worker with Logs and Traces enabled.
-- [ ] Environment configuration schema and deployment runbook.
-- [ ] Automated link checking and accessibility checks.
+- [x] Environment configuration schema and staging/production deployment runbook.
+- [x] Automated local Markdown link checks and static HTML accessibility checks (not a substitute for browser/assistive-technology review).
 
 ## Phase 2 — Read-only backend integration
 - [x] Implement liveness/readiness and read-only service registry.
