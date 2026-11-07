@@ -25,7 +25,8 @@ This roadmap separates the static control center from the multi-service platform
 - [x] Add request IDs, stable error envelopes and restrictive CORS handling.
 - [x] Deploy the isolated staging Control API.
 - [x] Add the official GitHub Pages origin to the staging API CORS allowlist.
-- [x] Merge Dashboard integration and align the Pages shell with OCode.js CLI theme.\n- [ ] Verify browser-side cross-origin requests from GitHub Pages.
+- [x] Merge Dashboard integration and align the Pages shell with OCode.js CLI theme.
+- [ ] Verify browser-side cross-origin requests from GitHub Pages.
 - [ ] Add authenticated read-only service status after Account Portal Auth.js is ready.
 - [ ] Keep Production disconnected until explicit approval.
 
