@@ -22,7 +22,6 @@ for (const marker of [
   "Agent Registry",
   "Provider Registry",
   "providerRegistry",
-  "cloudflare-workers-ai",
   "RUNTIME DISABLED",
   "refreshMcpConnections",
   "MCP CONNECTIONS",
