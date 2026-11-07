@@ -59,8 +59,12 @@ Check tool permissions server-side on every invocation.
 Never expose stored credentials. Validate destination hosts and resolved IPs to mitigate SSRF, including redirects and DNS rebinding.
 
 ## Identity and telemetry
+The current Account Portal Auth.js runtime is not configured. The separate OCodeJS CLI GitHub OAuth/PAT service is health-probed through the service registry; that probe is not an account login session.
+
 | Method | Path | Purpose |
 |---|---|---|
+| GET | /services/cli-auth | Read-only health snapshot for the CLI GitHub OAuth/PAT Worker |
+| GET | /services/identity | Read-only status for the Account Portal Auth.js integration |
 | GET | /auth/session | Read current session |
 | POST | /auth/logout | End session |
 | GET | /account | Read account profile |
