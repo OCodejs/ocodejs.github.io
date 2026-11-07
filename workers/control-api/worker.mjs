@@ -1,5 +1,6 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.0.0";
+const API_VERSION = "1.0.1";
+const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
 
 const SERVICES = [
   {
@@ -55,10 +56,10 @@ function corsHeaders(request, env) {
   });
 
   const origin = request.headers.get("Origin");
-  const allowed = String(env.ALLOWED_ORIGINS || "")
+  const allowed = [...DEFAULT_ALLOWED_ORIGINS, ...String(env.ALLOWED_ORIGINS || "")
     .split(",")
     .map((value) => value.trim())
-    .filter(Boolean);
+    .filter(Boolean)];
 
   if (origin && allowed.includes(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);

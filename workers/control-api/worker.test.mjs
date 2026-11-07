@@ -86,3 +86,14 @@ test("responses include no-store and nosniff security headers", async () => {
   assert.equal(response.headers.get("Cache-Control"), "no-store");
   assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
 });
+
+
+test("GitHub Pages production origin is allowed by the staging API", async () => {
+  const response = await worker.fetch(
+    new Request("https://api-staging.example.workers.dev/api/v1/services", {
+      headers: { Origin: "https://ocodejs.github.io" }
+    }),
+    {}
+  );
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://ocodejs.github.io");
+});
