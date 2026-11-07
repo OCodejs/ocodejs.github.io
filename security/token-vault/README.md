@@ -42,6 +42,8 @@ For an approved reveal grant:
 - D1 database created from schema.sql.
 - D1 binding named DB.
 - Worker secrets: BOOTSTRAP_PASSWORD_HASH, SESSION_SIGNING_KEY, TOKEN_ENCRYPTION_KEY.
+- Worker variable: ACCESS_REQUIRED=true before staging/production exposure.
+- Cloudflare Access Self-hosted application for the Worker hostname, with Allow policies restricted to approved staff identity emails or groups. Do not add a public bypass policy.
 
 Generate a new unique password locally with the hidden-input utility in scripts/hash-password.mjs. Store only its output as BOOTSTRAP_PASSWORD_HASH. Generate independent random 32-byte signing and encryption keys; store them as Worker secrets. The password previously supplied in chat is exposed and must never be used.
 
@@ -57,7 +59,7 @@ The encryption key is expected as Base64 or Base64URL encoding of exactly 32 ran
 | ai_agent | Project-scoped | Project-granted reveal only | No |
 | auditor | Yes | No | No |
 
-The bootstrap TOKEN identity is currently the only human login. Individual staff SSO/identity provisioning is not implemented in this milestone. AI Agent credentials are independent, project-scoped machine identities; do not share the bootstrap password with agents or staff.
+Staff use Cloudflare Access SSO. An owner provisions each staff email and assigns security_admin, developer, or auditor; the email from ctx.access.getIdentity() must match an active D1 identity. Set ACCESS_REQUIRED=true on the Worker before exposure. This also blocks direct workers.dev access for browser/human routes; the independent bearer-key agent API remains protected by its own project-scoped credentials. The TOKEN password remains the bootstrap owner login and is never shared with staff or agents.
 
 ## API
 
@@ -68,6 +70,9 @@ The bootstrap TOKEN identity is currently the only human login. Individual staff
 - POST /api/tokens — encrypt and store a project-scoped credential.
 - POST /api/tokens/:id/reveal — privileged human reveal with audit event.
 - DELETE /api/tokens/:id — privileged deletion with audit event.
+- GET /api/members, POST /api/members — owner-only personnel inventory and Access email provisioning.
+- PATCH /api/members/:email — update staff role.
+- DELETE /api/members/:email — disable staff identity and revoke sessions.
 - GET /api/agents, POST /api/agents — owner-only agent inventory and one-time key issuance.
 - GET/POST /api/agents/:subject/grants — owner-only project grants.
 - DELETE /api/agents/:subject — revoke an agent.
@@ -80,3 +85,7 @@ Run node security/token-vault/scripts/check-source.mjs for source validation and
 
 
 Schema validation is executed against an in-memory SQLite database in CI before the Worker integration suite.
+
+Cloudflare Workers exposes authenticated Access identity through ctx.access; the Worker uses the verified email claim and then checks the matching active D1 identity before assigning application permissions. See the official Cloudflare Workers Access integration guide: https://developers.cloudflare.com/workers/configuration/cloudflare-access/.
+
+Staff Access identity is checked against the active D1 identity record on every authenticated request.

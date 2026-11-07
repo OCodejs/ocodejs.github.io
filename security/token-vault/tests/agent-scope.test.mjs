@@ -128,3 +128,43 @@ test("AI agent grants isolate projects and reveal permission, and revocation wor
   const afterRevoke = await call("/api/agent/tokens?project_id=project-alpha", env, { headers: bearer });
   assert.equal(afterRevoke.status, 401);
 });
+
+
+test("owner provisions personnel and Cloudflare Access enforces the assigned role", async () => {
+  const { env, password } = makeEnv();
+  env.ACCESS_REQUIRED = "true";
+  const accessContext = { access: { getIdentity: async () => ({ email: "owner-operator@example.com" }) } };
+  const login = await worker.fetch(new Request("https://vault.example/api/login", {
+    method: "POST",
+    headers: browserHeaders(),
+    body: JSON.stringify({ password })
+  }), env, accessContext);
+  assert.equal(login.status, 200);
+  const cookie = login.headers.get("set-cookie").split(";")[0];
+
+  const createMember = await worker.fetch(new Request("https://vault.example/api/members", {
+    method: "POST",
+    headers: browserHeaders(cookie),
+    body: JSON.stringify({ email: "developer@example.com", role: "developer" })
+  }), env, accessContext);
+  assert.equal(createMember.status, 201);
+
+  const staffContext = { access: { getIdentity: async () => ({ email: "DEVELOPER@example.com" }) } };
+  const me = await worker.fetch(new Request("https://vault.example/api/me"), env, staffContext);
+  assert.equal(me.status, 200);
+  assert.deepEqual(await me.json(), {
+    subject: "developer@example.com",
+    role: "developer",
+    auth: "cloudflare-access"
+  });
+
+  const forbidden = await worker.fetch(new Request("https://vault.example/api/tokens", {
+    method: "POST",
+    headers: browserHeaders(),
+    body: JSON.stringify({ label: "forbidden", provider: "test", project_id: "project-a", value: "not-a-real-secret" })
+  }), env, staffContext);
+  assert.equal(forbidden.status, 403);
+
+  const noAccess = await worker.fetch(new Request("https://vault.example/"), env);
+  assert.equal(noAccess.status, 403);
+});

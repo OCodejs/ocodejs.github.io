@@ -76,13 +76,21 @@ async function audit(env, actor, action, resource, outcome = "success") {
   await env.DB.prepare("INSERT INTO audit_events(id,actor,action,resource_id,outcome) VALUES(?,?,?,?,?)")
     .bind(crypto.randomUUID(), actor, action, resource || null, outcome).run();
 }
-async function currentUser(req, env) {
+async function currentUser(req, env, ctx) {
   const id = await verify(cookieValue(req), env.SESSION_SIGNING_KEY);
-  if (!id) return null;
-  const row = await env.DB.prepare("SELECT s.subject,i.role,s.expires_at,i.active FROM sessions s JOIN identities i ON i.subject=s.subject WHERE s.id_hash=? AND s.revoked=0")
-    .bind(await hash(id)).first();
-  if (!row || !row.active || row.expires_at <= Math.floor(Date.now() / 1000)) return null;
-  return { subject: row.subject, role: row.role };
+  if (id) {
+    const row = await env.DB.prepare("SELECT s.subject,i.role,s.expires_at,i.active FROM sessions s JOIN identities i ON i.subject=s.subject WHERE s.id_hash=? AND s.revoked=0")
+      .bind(await hash(id)).first();
+    if (row && row.active && row.expires_at > Math.floor(Date.now() / 1000)) return { subject: row.subject, role: row.role, auth: "session" };
+  }
+  if (ctx?.access && typeof ctx.access.getIdentity === "function") {
+    const identity = await ctx.access.getIdentity();
+    const email = typeof identity?.email === "string" ? identity.email.trim().toLowerCase() : "";
+    if (!email || email.length > 254) return null;
+    const member = await env.DB.prepare("SELECT subject,role,active FROM identities WHERE subject=?").bind(email).first();
+    if (member?.active) return { subject: member.subject, role: member.role, auth: "cloudflare-access" };
+  }
+  return null;
 }
 async function key(env) {
   return crypto.subtle.importKey("raw", unb64(env.TOKEN_ENCRYPTION_KEY), "AES-GCM", false, ["encrypt", "decrypt"]);
@@ -121,7 +129,7 @@ function validProject(value) {
   return typeof value === "string" && /^[a-z0-9][a-z0-9._-]{1,63}$/.test(value);
 }
 const LOGIN_HTML = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>OCode.js · Token Vault</title><style>:root{color-scheme:dark;font:13px/1.6 ui-monospace,monospace;background:#000;color:#f5f5f5}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px}main{width:min(100%,420px);border:1px solid #444;background:#080808;padding:28px}p{color:#999}h1{font-size:28px;margin:30px 0 4px}label{display:block;color:#aaa;font-size:10px;margin:24px 0 8px}input,button{width:100%;height:46px;border:1px solid #555;background:#000;color:#fff;padding:0 12px;font:inherit}button{margin-top:14px;background:#f5f5f5;color:#000;font-weight:700}.msg{min-height:24px;color:#aaa;margin-top:12px}</style><body><main><small>OCODE.JS / SECURITY</small><h1>Token Vault</h1><p>Protected credential workspace</p><form id="f"><label for="p">MASTER PASSWORD · TOKEN</label><input id="p" type="password" minlength="16" maxlength="1024" autocomplete="current-password" required autofocus><button id="b">Unlock Vault</button><div class="msg" id="m" role="status"></div></form></main><script>document.querySelector("#f").addEventListener("submit",async e=>{e.preventDefault();const form=e.currentTarget,button=document.querySelector("#b"),message=document.querySelector("#m");button.disabled=true;message.textContent="Authenticating…";try{const r=await fetch("/api/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password:document.querySelector("#p").value})});if(!r.ok)throw Error();location.assign("/vault")}catch{message.textContent="Authentication failed or temporarily unavailable"}finally{button.disabled=false;form.reset()}})</script></body></html>';
-const VAULT_HTML = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>OCode.js · Vault</title><style>:root{color-scheme:dark;font:13px/1.6 ui-monospace,monospace;background:#000;color:#f5f5f5}*{box-sizing:border-box}body{max-width:1100px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;border-bottom:1px solid #444;padding:12px 0 20px}h1{font-size:26px;margin:28px 0 4px}.muted{color:#999}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:24px 0}.panel{border:1px solid #444;background:#080808;padding:18px}label{display:block;color:#aaa;font-size:10px;margin:12px 0 6px}input{width:100%;height:42px;background:#000;border:1px solid #555;color:#fff;padding:8px;font:inherit}button{border:1px solid #777;background:#f5f5f5;color:#000;padding:9px 12px;font:inherit;font-weight:700;margin:6px 6px 0 0}.alt{background:#080808;color:#fff}.token{border-top:1px solid #333;padding:14px 0}.token strong{display:block}.msg{min-height:20px;color:#aaa}</style><body><header class="top"><div><b>OCode.js / TOKEN VAULT</b><div class="muted" id="who">Checking session…</div></div><button class="alt" id="out">Sign out</button></header><h1>Credential workspace</h1><p class="muted">Encrypted storage · Explicit reveal · Audited access</p><div class="grid"><form class="panel" id="create"><b>Register credential</b><label>LABEL</label><input id="label" maxlength="100" required><label>PROVIDER</label><input id="provider" maxlength="80" required><label>PROJECT ID</label><input id="project" value="ocodejs-core" maxlength="64" required><label>SECRET VALUE</label><input id="value" type="password" minlength="8" maxlength="8192" autocomplete="off" required><button>Encrypt & save</button><div class="msg" id="createMsg"></div></form><section class="panel"><b>Security</b><p class="muted">Secrets are encrypted before storage. Reveal is restricted to privileged roles. Revealed values are cleared after 15 seconds.</p><button class="alt" id="refresh">Refresh inventory</button><div class="msg" id="status"></div></section></div><section class="panel" id="agentPanel" hidden><b>AI Agent access · Owner only</b><form id="newAgent"><label>AGENT SUBJECT</label><input id="agentSubject" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,63}" required><label>EXPIRY DAYS · 1–365</label><input id="agentDays" type="number" min="1" max="365" value="90" required><button>Issue one-time API key</button></form><label>ONE-TIME KEY · COPY NOW</label><input id="agentKey" readonly autocomplete="off" placeholder="Key appears once after creation"><form id="grantAgent"><label>AGENT SUBJECT</label><input id="grantSubject" maxlength="64" required><label>PROJECT ID</label><input id="grantProject" maxlength="64" required><label>PERMISSION</label><select id="grantPermission"><option value="metadata">Metadata only</option><option value="reveal">Read token value</option></select><button>Save project grant</button></form><div id="agents" class="muted"></div></section><section class="panel"><b>Stored credentials</b><div id="tokens" class="muted">Loading…</div></section><script>const $=s=>document.querySelector(s);async function api(path,o={}){const r=await fetch(path,{...o,headers:{"content-type":"application/json",...(o.headers||{})}});if(r.status===401){location.assign("/");throw Error("Session expired")}const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}async function loadAgents(){try{const d=await api("/api/agents");$("#agents").replaceChildren();for(const a of d.agents){const row=document.createElement("div");row.className="token";const name=document.createElement("strong");name.textContent=a.subject+" · "+(a.active?"active":"revoked");const meta=document.createElement("div");meta.textContent="Expires "+new Date(a.expires_at*1000).toLocaleString()+" · Last used "+(a.last_used_at||"never");const revoke=document.createElement("button");revoke.className="alt";revoke.textContent="Revoke";revoke.disabled=!a.active;revoke.onclick=async()=>{if(confirm("Revoke this agent key?")){await api("/api/agents/"+encodeURIComponent(a.subject),{method:"DELETE"});loadAgents()}};row.append(name,meta,revoke);$("#agents").append(row)}}catch(e){$("#status").textContent=e.message}}$("#newAgent").onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const d=await api("/api/agents",{method:"POST",body:JSON.stringify({subject:$("#agentSubject").value,expires_in_days:Number($("#agentDays").value)})});$("#agentKey").value=d.api_key;$("#grantSubject").value=d.subject;$("#agentSubject").value="";loadAgents()}catch(x){$("#status").textContent=x.message}finally{b.disabled=false}};$("#grantAgent").onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await api("/api/agents/"+encodeURIComponent($("#grantSubject").value)+"/grants",{method:"POST",body:JSON.stringify({project_id:$("#grantProject").value,permission:$("#grantPermission").value})});$("#status").textContent="Project grant saved.";loadAgents()}catch(x){$("#status").textContent=x.message}finally{b.disabled=false}};async function load(){try{const me=await api("/api/me");$("#who").textContent=me.subject+" · "+me.role;const canManage=["owner","security_admin"].includes(me.role);$("#agentPanel").hidden=me.role!=="owner";if(me.role==="owner")loadAgents();const d=await api("/api/tokens");$("#tokens").replaceChildren();if(!d.tokens.length){$("#tokens").textContent="No credentials stored.";return}for(const t of d.tokens){const row=document.createElement("div");row.className="token";const title=document.createElement("strong");title.textContent=t.label;const meta=document.createElement("div");meta.className="muted";meta.textContent=t.provider+" · "+t.project_id+" · "+new Date(t.created_at).toLocaleString();const reveal=document.createElement("button");reveal.className="alt";reveal.textContent="Reveal";reveal.disabled=!canManage;reveal.onclick=async()=>{try{const x=await api("/api/tokens/"+t.id+"/reveal",{method:"POST",body:"{}"});const v=document.createElement("input");v.readOnly=true;v.value=x.value;row.append(v);setTimeout(()=>{v.value="";v.remove()},15000)}catch(e){$("#status").textContent=e.message}};const del=document.createElement("button");del.className="alt";del.textContent="Delete";del.disabled=!canManage;del.onclick=async()=>{if(confirm("Delete this credential?")){await api("/api/tokens/"+t.id,{method:"DELETE"});load()}};row.append(title,meta,reveal,del);$("#tokens").append(row)}}catch(e){$("#status").textContent=e.message}}$("#create").onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await api("/api/tokens",{method:"POST",body:JSON.stringify({label:$("#label").value,provider:$("#provider").value,project_id:$("#project").value,value:$("#value").value})});e.target.reset();$("#createMsg").textContent="Encrypted credential saved.";load()}catch(x){$("#createMsg").textContent=x.message}finally{b.disabled=false}};$("#out").onclick=async()=>{try{await api("/api/logout",{method:"POST",body:"{}"})}finally{location.assign("/")}};$("#refresh").onclick=load;load();</script></body></html>';
+const VAULT_HTML = '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>OCode.js · Vault</title><style>:root{color-scheme:dark;font:13px/1.6 ui-monospace,monospace;background:#000;color:#f5f5f5}*{box-sizing:border-box}body{max-width:1100px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;border-bottom:1px solid #444;padding:12px 0 20px}h1{font-size:26px;margin:28px 0 4px}.muted{color:#999}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:24px 0}.panel{border:1px solid #444;background:#080808;padding:18px}label{display:block;color:#aaa;font-size:10px;margin:12px 0 6px}input{width:100%;height:42px;background:#000;border:1px solid #555;color:#fff;padding:8px;font:inherit}button{border:1px solid #777;background:#f5f5f5;color:#000;padding:9px 12px;font:inherit;font-weight:700;margin:6px 6px 0 0}.alt{background:#080808;color:#fff}.token{border-top:1px solid #333;padding:14px 0}.token strong{display:block}.msg{min-height:20px;color:#aaa}</style><body><header class="top"><div><b>OCode.js / TOKEN VAULT</b><div class="muted" id="who">Checking session…</div></div><button class="alt" id="out">Sign out</button></header><h1>Credential workspace</h1><p class="muted">Encrypted storage · Explicit reveal · Audited access</p><div class="grid"><form class="panel" id="create"><b>Register credential</b><label>LABEL</label><input id="label" maxlength="100" required><label>PROVIDER</label><input id="provider" maxlength="80" required><label>PROJECT ID</label><input id="project" value="ocodejs-core" maxlength="64" required><label>SECRET VALUE</label><input id="value" type="password" minlength="8" maxlength="8192" autocomplete="off" required><button>Encrypt & save</button><div class="msg" id="createMsg"></div></form><section class="panel"><b>Security</b><p class="muted">Secrets are encrypted before storage. Reveal is restricted to privileged roles. Revealed values are cleared after 15 seconds.</p><button class="alt" id="refresh">Refresh inventory</button><div class="msg" id="status"></div></section></div><section class="panel" id="memberPanel" hidden><b>Authorized personnel · Owner only</b><form id="newMember"><label>WORK EMAIL · MUST MATCH CLOUDFLARE ACCESS IDENTITY</label><input id="memberEmail" type="email" maxlength="254" required><label>ROLE</label><select id="memberRole"><option value="security_admin">Security Admin</option><option value="developer">Developer · metadata only</option><option value="auditor">Auditor · metadata only</option></select><button>Add authorized member</button></form><div id="members" class="muted"></div></section><section class="panel" id="agentPanel" hidden><b>AI Agent access · Owner only</b><form id="newAgent"><label>AGENT SUBJECT</label><input id="agentSubject" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,63}" required><label>EXPIRY DAYS · 1–365</label><input id="agentDays" type="number" min="1" max="365" value="90" required><button>Issue one-time API key</button></form><label>ONE-TIME KEY · COPY NOW</label><input id="agentKey" readonly autocomplete="off" placeholder="Key appears once after creation"><form id="grantAgent"><label>AGENT SUBJECT</label><input id="grantSubject" maxlength="64" required><label>PROJECT ID</label><input id="grantProject" maxlength="64" required><label>PERMISSION</label><select id="grantPermission"><option value="metadata">Metadata only</option><option value="reveal">Read token value</option></select><button>Save project grant</button></form><div id="agents" class="muted"></div></section><section class="panel"><b>Stored credentials</b><div id="tokens" class="muted">Loading…</div></section><script>const $=s=>document.querySelector(s);async function api(path,o={}){const r=await fetch(path,{...o,headers:{"content-type":"application/json",...(o.headers||{})}});if(r.status===401){location.assign("/");throw Error("Session expired")}const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}async function loadMembers(){try{const d=await api("/api/members");$("#members").replaceChildren();for(const m of d.members){const row=document.createElement("div");row.className="token";const name=document.createElement("strong");name.textContent=m.subject+" · "+m.role+(m.active?"":" · disabled");const select=document.createElement("select");for(const role of ["security_admin","developer","auditor"]){const option=document.createElement("option");option.value=role;option.textContent=role;select.append(option)}select.value=m.role;const save=document.createElement("button");save.className="alt";save.textContent="Update role";save.disabled=!m.active;save.onclick=async()=>{await api("/api/members/"+encodeURIComponent(m.subject),{method:"PATCH",body:JSON.stringify({role:select.value})});loadMembers()};const revoke=document.createElement("button");revoke.className="alt";revoke.textContent="Revoke";revoke.disabled=!m.active;revoke.onclick=async()=>{if(confirm("Revoke access for "+m.subject+"?")){await api("/api/members/"+encodeURIComponent(m.subject),{method:"DELETE"});loadMembers()}};row.append(name,select,save,revoke);$("#members").append(row)}}catch(e){$("#status").textContent=e.message}}$("#newMember").onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await api("/api/members",{method:"POST",body:JSON.stringify({email:$("#memberEmail").value,role:$("#memberRole").value})});$("#memberEmail").value="";loadMembers()}catch(x){$("#status").textContent=x.message}finally{b.disabled=false}};async function loadAgents(){try{const d=await api("/api/agents");$("#agents").replaceChildren();for(const a of d.agents){const row=document.createElement("div");row.className="token";const name=document.createElement("strong");name.textContent=a.subject+" · "+(a.active?"active":"revoked");const meta=document.createElement("div");meta.textContent="Expires "+new Date(a.expires_at*1000).toLocaleString()+" · Last used "+(a.last_used_at||"never");const revoke=document.createElement("button");revoke.className="alt";revoke.textContent="Revoke";revoke.disabled=!a.active;revoke.onclick=async()=>{if(confirm("Revoke this agent key?")){await api("/api/agents/"+encodeURIComponent(a.subject),{method:"DELETE"});loadAgents()}};row.append(name,meta,revoke);$("#agents").append(row)}}catch(e){$("#status").textContent=e.message}}$("#newAgent").onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const d=await api("/api/agents",{method:"POST",body:JSON.stringify({subject:$("#agentSubject").value,expires_in_days:Number($("#agentDays").value)})});$("#agentKey").value=d.api_key;$("#grantSubject").value=d.subject;$("#agentSubject").value="";loadAgents()}catch(x){$("#status").textContent=x.message}finally{b.disabled=false}};$("#grantAgent").onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await api("/api/agents/"+encodeURIComponent($("#grantSubject").value)+"/grants",{method:"POST",body:JSON.stringify({project_id:$("#grantProject").value,permission:$("#grantPermission").value})});$("#status").textContent="Project grant saved.";loadAgents()}catch(x){$("#status").textContent=x.message}finally{b.disabled=false}};async function load(){try{const me=await api("/api/me");$("#who").textContent=me.subject+" · "+me.role;const canManage=["owner","security_admin"].includes(me.role);$("#memberPanel").hidden=me.role!=="owner";$("#agentPanel").hidden=me.role!=="owner";if(me.role==="owner"){loadMembers();loadAgents();}const d=await api("/api/tokens");$("#tokens").replaceChildren();if(!d.tokens.length){$("#tokens").textContent="No credentials stored.";return}for(const t of d.tokens){const row=document.createElement("div");row.className="token";const title=document.createElement("strong");title.textContent=t.label;const meta=document.createElement("div");meta.className="muted";meta.textContent=t.provider+" · "+t.project_id+" · "+new Date(t.created_at).toLocaleString();const reveal=document.createElement("button");reveal.className="alt";reveal.textContent="Reveal";reveal.disabled=!canManage;reveal.onclick=async()=>{try{const x=await api("/api/tokens/"+t.id+"/reveal",{method:"POST",body:"{}"});const v=document.createElement("input");v.readOnly=true;v.value=x.value;row.append(v);setTimeout(()=>{v.value="";v.remove()},15000)}catch(e){$("#status").textContent=e.message}};const del=document.createElement("button");del.className="alt";del.textContent="Delete";del.disabled=!canManage;del.onclick=async()=>{if(confirm("Delete this credential?")){await api("/api/tokens/"+t.id,{method:"DELETE"});load()}};row.append(title,meta,reveal,del);$("#tokens").append(row)}}catch(e){$("#status").textContent=e.message}}$("#create").onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await api("/api/tokens",{method:"POST",body:JSON.stringify({label:$("#label").value,provider:$("#provider").value,project_id:$("#project").value,value:$("#value").value})});e.target.reset();$("#createMsg").textContent="Encrypted credential saved.";load()}catch(x){$("#createMsg").textContent=x.message}finally{b.disabled=false}};$("#out").onclick=async()=>{try{await api("/api/logout",{method:"POST",body:"{}"})}finally{location.assign("/")}};$("#refresh").onclick=load;load();</script></body></html>';
 async function login(req, env) {
   if (!sameOrigin(req)) return json({ error: "Forbidden" }, 403);
   const limit = await rateLimit(req, env, "login");
@@ -141,20 +149,28 @@ async function login(req, env) {
   await audit(env, "TOKEN", "login", null);
   return json({ ok: true }, 200, { "set-cookie": cookie(await sign(id, env.SESSION_SIGNING_KEY), SESSION_TTL) });
 }
-async function route(req, env) {
+async function route(req, env, ctx) {
   const path = new URL(req.url).pathname;
-  if (req.method === "GET" && (path === "/" || path === "/login")) return page(LOGIN_HTML);
-  if (path.startsWith("/api/agent/")) {
+  const isAgentApi = path.startsWith("/api/agent/");
+  if (env.ACCESS_REQUIRED === "true" && !isAgentApi && !ctx?.access) return json({ error: "Cloudflare Access authentication required" }, 403);
+  if (req.method === "GET" && (path === "/" || path === "/login")) {
+    if (ctx?.access) {
+      configured(env);
+      if (await currentUser(req, env, ctx)) return Response.redirect(new URL("/vault", req.url), 303);
+    }
+    return page(LOGIN_HTML);
+  }
+  if (isAgentApi) {
     if (req.headers.has("origin")) return json({ error: "Forbidden" }, 403);
-  } else if ((req.method === "POST" || req.method === "DELETE") && !sameOrigin(req)) return json({ error: "Forbidden" }, 403);
+  } else if (["POST", "PATCH", "DELETE"].includes(req.method) && !sameOrigin(req)) return json({ error: "Forbidden" }, 403);
   if (req.method === "GET" && path === "/vault") {
     configured(env);
-    return await currentUser(req, env) ? page(VAULT_HTML) : Response.redirect(new URL("/", req.url), 303);
+    return await currentUser(req, env, ctx) ? page(VAULT_HTML) : Response.redirect(new URL("/", req.url), 303);
   }
   configured(env);
   if (req.method === "POST" && path === "/api/login") return login(req, env);
   if (req.method === "POST" && path === "/api/logout") {
-    const user = await currentUser(req, env), id = await verify(cookieValue(req), env.SESSION_SIGNING_KEY);
+    const user = await currentUser(req, env, ctx), id = await verify(cookieValue(req), env.SESSION_SIGNING_KEY);
     if (id) await env.DB.prepare("UPDATE sessions SET revoked=1 WHERE id_hash=?").bind(await hash(id)).run();
     if (user) await audit(env, user.subject, "logout", null);
     return json({ ok: true }, 200, { "set-cookie": cookie("", 0) });
@@ -195,9 +211,63 @@ async function route(req, env) {
     }
     return json({ error: "Not found" }, 404);
   }
-  const user = await currentUser(req, env);
+  const user = await currentUser(req, env, ctx);
   if (!user) return json({ error: "Unauthorized" }, 401);
-  if (req.method === "GET" && path === "/api/me") return json({ subject: user.subject, role: user.role });
+  if (req.method === "GET" && path === "/api/me") return json({ subject: user.subject, role: user.role, auth: user.auth || "session" });
+
+  if (req.method === "GET" && path === "/api/members") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    const rows = await env.DB.prepare(
+      "SELECT subject,role,active FROM identities WHERE subject<>'TOKEN' AND role<>'ai_agent' ORDER BY subject"
+    ).all();
+    return json({ members: rows.results });
+  }
+  if (req.method === "POST" && path === "/api/members") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    let body; try { body = await req.json(); } catch { return json({ error: "Invalid request" }, 400); }
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const role = body.role;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 ||
+        !["security_admin", "developer", "auditor"].includes(role)) {
+      return json({ error: "Invalid member email or role" }, 400);
+    }
+    try {
+      await env.DB.prepare("INSERT INTO identities(id,subject,role,active) VALUES(?,?,?,1)")
+        .bind(crypto.randomUUID(), email, role).run();
+    } catch {
+      return json({ error: "Member already exists or could not be created" }, 409);
+    }
+    await audit(env, user.subject, "member.create", email);
+    return json({ ok: true, email, role }, 201);
+  }
+  const memberPath = path.match(/^\/api\/members\/(.+)$/);
+  if (memberPath && req.method === "PATCH") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    const email = decodeURIComponent(memberPath[1]).trim().toLowerCase();
+    let body; try { body = await req.json(); } catch { return json({ error: "Invalid request" }, 400); }
+    if (email === "TOKEN" || !["security_admin", "developer", "auditor"].includes(body.role)) {
+      return json({ error: "Invalid member role" }, 400);
+    }
+    const result = await env.DB.prepare("UPDATE identities SET role=? WHERE subject=? AND role<>'ai_agent'")
+      .bind(body.role, email).run();
+    if (!result.meta?.changes) return json({ error: "Member not found" }, 404);
+    await audit(env, user.subject, "member.role.update", email);
+    return json({ ok: true });
+  }
+  if (memberPath && req.method === "DELETE") {
+    if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
+    const email = decodeURIComponent(memberPath[1]).trim().toLowerCase();
+    if (email === "TOKEN") return json({ error: "Cannot revoke bootstrap owner" }, 400);
+    const check = await env.DB.prepare("SELECT active,role FROM identities WHERE subject=?").bind(email).first();
+    if (!check || check.role === "ai_agent") return json({ error: "Member not found" }, 404);
+    await env.DB.batch([
+      env.DB.prepare("UPDATE identities SET active=0 WHERE subject=?").bind(email),
+      env.DB.prepare("UPDATE sessions SET revoked=1 WHERE subject=?").bind(email)
+    ]);
+    await audit(env, user.subject, "member.revoke", email);
+    return json({ ok: true, active: false });
+  }
+
 
   if (req.method === "GET" && path === "/api/agents") {
     if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
@@ -313,8 +383,8 @@ async function route(req, env) {
   return json({ error: "Not found" }, 404);
 }
 export default {
-  async fetch(req, env) {
-    try { return await route(req, env); }
+  async fetch(req, env, ctx) {
+    try { return await route(req, env, ctx); }
     catch { return json({ error: "Vault temporarily unavailable" }, 503); }
   }
 };

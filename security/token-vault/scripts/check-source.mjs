@@ -28,6 +28,9 @@ for (const marker of [
   "agent_project_grants",
   "agent.token.reveal",
   "validProject(projectId)",
+  "ctx.access.getIdentity",
+  "ACCESS_REQUIRED",
+  "/api/members",
   '"cache-control": "no-store, max-age=0"'
 ]) assert.ok(worker.includes(marker), "Missing security invariant: " + marker);
 assert.ok(!worker.includes("!origin ||"), "Missing Origin must not be accepted");
