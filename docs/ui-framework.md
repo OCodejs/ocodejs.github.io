@@ -94,3 +94,16 @@ Existing components keep their behavior and receive the shared theme: `.panel`, 
 3. Keep mobile navigation reachable above the iOS home indicator.
 4. Do not put credentials, provider tokens or runtime secrets in HTML, CSS or browser storage.
 5. Run the repository validation and Control API tests before merging.
+
+
+## Live Control Center pages
+
+The workspace includes read-only operational views backed by the staging Control API:
+
+- **Service Registry** — `GET /api/v1/services`; displays per-service state, probe source, latency when supplied, and request/check metadata.
+- **Provider Registry** — `GET /api/v1/providers`; displays catalog metadata and explicitly indicates whether inference is configured or disabled.
+- **AI Runtime** — `GET /api/v1/runtime/status`; displays provider, run-store, inference and agent-execution readiness.
+
+These pages are registered in the same navigation registry as the original seven sections. Their Refresh controls perform fresh `GET` requests with `cache: no-store`. Errors are shown as errors; the UI does not substitute sample data or claim an unavailable service is healthy.
+
+No write or deployment action is exposed by these views. Provider inference and agent execution remain disabled until server-side bindings, a run store, quota enforcement, authentication and explicit approval controls are in place.
