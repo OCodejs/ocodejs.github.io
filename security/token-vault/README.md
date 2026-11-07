@@ -1,50 +1,52 @@
 # OCode.js Token Vault
 
-A private credential-management service for OCode.js projects. This directory is an application source package, not a place to store actual credentials.
+A private credential-management service for OCode.js projects. This source package contains no live credentials.
 
-## Security model
+## Current implementation
 
-- The bootstrap account identifier is fixed to `TOKEN`; the login screen asks only for a password.
-- The bootstrap password is configured as a Cloudflare Worker secret in PBKDF2-SHA-256 format. It is never committed.
-- Do not use a password that has been pasted into chat, source control, screenshots, or logs. The password mentioned in the project request is considered exposed and must be replaced with a new, unique password before deployment.
-- Token values are encrypted server-side with AES-256-GCM before D1 storage. The encryption key is a separate Worker secret.
-- Session cookies are HttpOnly, Secure, SameSite=Strict, signed with a separate secret, and expire.
-- Token plaintext is returned only from an explicit reveal endpoint to roles `owner` and `security_admin`; every reveal is audited.
-- Developer and AI-agent roles receive metadata / masked values by default, never plaintext.
-- Login attempts are rate-limited in D1. Responses do not disclose whether an account exists.
-- No token is ever placed in browser storage, HTML, client-side JavaScript, URL parameters, logs, or repository files.
+- Bootstrap identity is fixed to `TOKEN`; the sign-in screen asks for a password only.
+- Password verification uses PBKDF2-SHA-256 with 310,000 iterations. The verifier is configured as Worker secret `BOOTSTRAP_PASSWORD_HASH`.
+- Token values are encrypted server-side with AES-256-GCM and a fresh 96-bit IV before D1 storage.
+- Session cookies are Secure, HttpOnly, SameSite=Strict, signed with a separate key, and expire after four hours. Server-side revocation is supported.
+- State-changing browser requests require an exact same-origin `Origin` and reject cross-site Fetch Metadata.
+- Login and reveal operations have IP-based D1 rate limits. Authentication responses do not reveal whether an identity exists.
+- The Worker sends no-store and browser security headers. Session role is read from the current identity row, not copied from an old session snapshot.
+- The Worker currently serves its password-only login and credential inventory UI at `/` and `/vault`.
+- Token reveal is explicit, audited, and restricted to `owner` and `security_admin`. The dashboard clears a revealed value after 15 seconds.
 
 ## Required Cloudflare resources
 
-- Workers runtime for the API and static frontend.
-- D1 database using `schema.sql`.
+- Cloudflare Worker runtime.
+- D1 database created from `schema.sql`.
+- D1 binding named `DB`.
 - Worker secrets: `BOOTSTRAP_PASSWORD_HASH`, `SESSION_SIGNING_KEY`, `TOKEN_ENCRYPTION_KEY`.
-- Bind D1 as `DB`.
 
-Generate a password hash outside the repository using PBKDF2-SHA-256 (minimum 310,000 iterations), then set the resulting `salt:hash` value as `BOOTSTRAP_PASSWORD_HASH`. Generate independent random 32-byte values for the signing and encryption keys. Never reuse the same key for multiple purposes.
+Generate a new unique password locally with the hidden-input utility in `scripts/hash-password.mjs`. Store only its output as `BOOTSTRAP_PASSWORD_HASH`. Generate independent random 32-byte signing and encryption keys; store them as Worker secrets. The password previously supplied in chat is exposed and must never be used.
 
-## Roles
+The encryption key is expected as Base64 or Base64URL encoding of exactly 32 random bytes. The signing key must be at least 32 characters. Do not reuse key material across purposes.
 
-| Role | Browse metadata | Create / rotate | Reveal plaintext | Manage members |
-|---|---:|---:|---:|---:|
-| owner | Yes | Yes | Yes | Yes |
-| security_admin | Yes | Yes | Yes | Limited |
-| developer | Yes | Request only | No | No |
-| ai_agent | Scoped metadata | Scoped request only | No | No |
-| auditor | Audit metadata | No | No | No |
+## Roles and current limitations
 
-The bootstrap `TOKEN` identity is the initial owner. Additional identities must be provisioned by an owner through a future audited admin workflow; never share the bootstrap password with developers or agents.
+| Role | Browse metadata | Create / reveal / delete |
+|---|---:|---:|
+| owner | Yes | Yes |
+| security_admin | Yes | Yes |
+| developer | Yes | No |
+| ai_agent | Yes | No |
+| auditor | Yes | No |
+
+The current API only bootstraps the `TOKEN` owner identity. It does **not yet** provision staff identities, issue scoped AI-agent grants, or provide a safe token-broker/proxy for agents. Do not grant an agent a human administrator role. The next security milestone is individual identity provisioning plus project-scoped capabilities and audited approval. Until then, AI-agent and staff access is not enabled.
 
 ## API
 
 - `POST /api/login` — password-only bootstrap login.
-- `POST /api/logout` — clear session.
-- `GET /api/me` — current role.
-- `GET /api/tokens` — metadata and masked token values.
-- `POST /api/tokens` — encrypt and store a token.
-- `POST /api/tokens/:id/reveal` — privileged reveal with audit record.
-- `DELETE /api/tokens/:id` — privileged delete with audit record.
+- `POST /api/logout` — revoke the current session.
+- `GET /api/me` — current identity and role.
+- `GET /api/tokens` — credential metadata only.
+- `POST /api/tokens` — encrypt and store a credential.
+- `POST /api/tokens/:id/reveal` — privileged reveal with audit event.
+- `DELETE /api/tokens/:id` — privileged deletion with audit event.
 
-## Deployment status
+## Validation and deployment
 
-This is a staging implementation proposal in the OCode.js control repository. It has not been deployed and does not contain any live secrets. Protect the eventual hostname with Cloudflare Access as an additional identity/network gate, and keep the Worker API private to the intended application origin.
+Run `node security/token-vault/scripts/check-source.mjs` for source validation. This repository change is not a deployment. No Worker, D1 database, Access policy, secrets, or live tokens have been created or configured. Keep the service behind Cloudflare Access before any staging exposure.
