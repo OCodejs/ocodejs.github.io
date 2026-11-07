@@ -24,6 +24,10 @@ for (const marker of [
   'rateLimit(req, env, "login")',
   'rateLimit(req, env, "reveal")',
   'path === "/vault"',
+  "authenticateAgent",
+  "agent_project_grants",
+  "agent.token.reveal",
+  "validProject(projectId)",
   '"cache-control": "no-store, max-age=0"'
 ]) assert.ok(worker.includes(marker), "Missing security invariant: " + marker);
 assert.ok(!worker.includes("!origin ||"), "Missing Origin must not be accepted");
@@ -33,3 +37,7 @@ assert.ok(passwordScript.includes("code === 13 || code === 10"), "Password utili
 assert.ok(passwordScript.includes("password.length < 16"), "Bootstrap password must be at least 16 chars");
 assert.ok(!/sk-[A-Za-z0-9]{20,}/.test(worker + passwordScript), "Possible hard-coded provider token");
 console.log("Token Vault source validation passed.");
+
+assert.ok(schema.includes("CREATE TABLE IF NOT EXISTS agent_credentials"));
+assert.ok(schema.includes("CREATE TABLE IF NOT EXISTS agent_project_grants"));
+assert.ok(schema.includes("project_id TEXT NOT NULL DEFAULT 'ocodejs-core'"));
