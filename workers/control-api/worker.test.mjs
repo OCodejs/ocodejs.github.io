@@ -313,7 +313,7 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
     assert.equal(calls, 3);
     assert.equal(body.connections[0].id, "ocodejs-mcp-staging");
     assert.equal(body.connections[0].state, "healthy");
-    assert.equal(body.connections[0].toolCount, 2);
+    assert.equal(body.connections[0].toolCount, 4);
     assert.equal(body.connections[0].access, "read_only");
     assert.equal(body.connections[0].managed, false);
   } finally {
@@ -370,7 +370,7 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
     assert.equal(body.connection.id, "ocodejs-mcp-staging");
     assert.equal(body.connection.environment, "staging");
     assert.equal(body.connection.state, "healthy");
-    assert.equal(body.connection.toolCount, 2);
+    assert.equal(body.connection.toolCount, 4);
     assert.equal(body.connection.managed, false);
   } finally {
     globalThis.fetch = originalFetch;
