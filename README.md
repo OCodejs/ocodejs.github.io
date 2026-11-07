@@ -17,7 +17,7 @@ OCodeJS Server Control Center and public technical documentation.
 
 The GitHub Pages frontend is static. A separate Cloudflare staging Control API provides read-only health, service, agent and provider registries. The OCode.js CLI Pages theme is merged to main. Agent/Provider Registry and expanded MCP discovery are staged behind open PRs; Production remains unchanged.
 
-The OCodeJS CLI GitHub OAuth/PAT Worker is separate from Account Portal Auth.js. The Account Portal Preview build succeeded behind Cloudflare Access, but it has no dedicated PostgreSQL database or Preview OAuth secrets; sign-in is disabled. The staging MCP server exposes four read-only tools. The Provider Registry lists Workers AI as not configured; no inference or agent execution is enabled. Workers Logs/Traces are enabled, while centralized metrics and queryable audit storage remain pending.
+The OCodeJS CLI GitHub OAuth/PAT Worker is separate from Account Portal Auth.js. The Account Portal Preview build succeeded behind Cloudflare Access, but it has no dedicated PostgreSQL database or Preview OAuth secrets; sign-in is disabled. The staging MCP server exposes six read-only tools, including provider listing and lookup. The Provider Registry lists Workers AI as not configured; the runtime readiness endpoint confirms that inference, agent execution and run lifecycle remain disabled. Workers Logs/Traces are enabled, while centralized metrics and queryable audit storage remain pending.
 
 ## Development
 
