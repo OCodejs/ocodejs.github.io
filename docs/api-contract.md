@@ -33,6 +33,14 @@ Example health response:
 }
 ```
 
+## AI Providers
+The staging Control API exposes a read-only Provider Registry catalog. The Cloudflare Workers AI adapter is listed as a candidate but remains `not_configured`; no AI binding, inference request or model execution is enabled.
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | /providers | List provider adapters (implemented, read-only) |
+| GET | /providers/{providerId} | Read provider adapter metadata (implemented, read-only) |
+
 ## AI Agents
 The staging Control API currently exposes a read-only, versioned Agent Registry. Definitions remain `draft`, have no configured provider or tools, and cannot execute.
 
