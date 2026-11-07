@@ -1,0 +1,8 @@
+.dev.vars
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets.json

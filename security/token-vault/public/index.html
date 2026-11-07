@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000"><meta name="robots" content="noindex,nofollow">
+<title>OCode.js · Token Vault</title>
+<style>
+:root{color-scheme:dark;--bg:#000;--panel:#080808;--line:#444;--text:#f5f5f5;--muted:#999;--font:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font:13px/1.6 var(--font);display:grid;place-items:center;padding:20px}
+main{width:min(100%,420px);border:1px solid var(--line);background:var(--panel);padding:28px}
+.brand{font-size:12px;letter-spacing:.16em;color:#aaa}.brand b{color:#fff}
+h1{font-size:27px;letter-spacing:-.07em;margin:34px 0 4px}.sub{color:var(--muted);font-size:11px;margin:0 0 26px}
+label{display:block;color:#aaa;font-size:10px;letter-spacing:.12em;margin:0 0 8px}
+input{width:100%;height:46px;border:1px solid #555;border-radius:0;background:#000;color:#fff;padding:0 12px;font:inherit;outline:none}
+input:focus{border-color:#fff;box-shadow:0 0 0 1px #fff}
+button{width:100%;height:44px;margin-top:14px;border:1px solid #777;background:#f5f5f5;color:#000;font:inherit;font-weight:700;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+.msg{min-height:24px;margin-top:14px;color:#aaa;font-size:11px}.foot{border-top:1px solid #292929;margin-top:28px;padding-top:14px;color:#666;font-size:9px}
+</style>
+</head>
+<body><main>
+<div class="brand"><b>OCode.js</b> / SECURITY</div>
+<h1>Token Vault</h1><p class="sub">Protected credential workspace · Authorized access only</p>
+<form id="login">
+<label for="password">MASTER PASSWORD</label>
+<input id="password" name="password" type="password" autocomplete="current-password" required minlength="12" autofocus>
+<button id="submit" type="submit">Unlock Vault</button>
+<div class="msg" id="message" role="status" aria-live="polite"></div>
+</form>
+<div class="foot">Identity: TOKEN · Password-only sign-in · Session protected</div>
+</main>
+<script>
+const form=document.querySelector("#login"),button=document.querySelector("#submit"),message=document.querySelector("#message");
+form.addEventListener("submit",async event=>{
+ event.preventDefault();button.disabled=true;message.textContent="Authenticating…";
+ try{
+  const response=await fetch("/api/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password:document.querySelector("#password").value})});
+  if(!response.ok)throw new Error("Authentication failed");
+  location.assign("/vault");
+ }catch{message.textContent="Không thể xác thực. Kiểm tra mật khẩu hoặc thử lại sau."}
+ finally{button.disabled=false;form.reset()}
+});
+</script></body></html>
