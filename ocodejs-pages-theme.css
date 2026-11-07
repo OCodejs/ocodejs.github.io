@@ -1,9 +1,9 @@
 /* OCode.js Pages visual system — aligned with zskbot/ocodejs-cli */
 :root{
   color-scheme:dark;
-  --bg:#05070d;--panel:#0a101c;--panel-2:#080e19;--line:#26364f;--line-strong:#36577f;
-  --fg:#f2f5fb;--muted:#a3afc2;--blue:#347cff;--cyan:#55c8ff;--purple:#a34cff;
-  --yellow:#f3d44e;--pink:#e45ac8;--green:#57d6a2;
+  --bg:#000;--panel:#080808;--panel-2:#080808;--line:#444;--line-strong:#777;
+  --fg:#f5f5f5;--muted:#aaa;--blue:#f5f5f5;--cyan:#f5f5f5;--purple:#aaa;
+  --yellow:#ddd;--pink:#ccc;--green:#eee;
   --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
   --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;
   --content-max:1440px;--mobile-gutter:16px;--safe-bottom:env(safe-area-inset-bottom,0px);
@@ -164,3 +164,49 @@ body.nav-open .mobile-menu{border-color:var(--cyan)!important;color:var(--cyan)!
   .content{padding:20px 14px 28px}
 }
 @media(prefers-reduced-motion:reduce){.sidebar,.nav-scrim{transition:none!important}}
+
+
+/* Canonical MCP visual layer — source: https://mcp.ocodejs.dev/pages/mcp.html
+   Keep application semantics and layout behavior; normalize presentation to the MCP reference. */
+:root{
+  color-scheme:dark;
+  --ocds-version:"1.0.0";
+  --ocds-bg:#000;
+  --ocds-surface:#080808;
+  --ocds-border:#444;
+  --ocds-border-strong:#777;
+  --ocds-text:#f5f5f5;
+  --ocds-muted:#aaa;
+  --ocds-font:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  --ocds-radius:0;
+  --ocds-space-unit:4px;
+  --bg:var(--ocds-bg);--panel:var(--ocds-surface);--panel-2:var(--ocds-surface);
+  --line:var(--ocds-border);--line-strong:var(--ocds-border-strong);
+  --fg:var(--ocds-text);--muted:var(--ocds-muted);
+  --blue:var(--ocds-text);--cyan:var(--ocds-text);--purple:var(--ocds-muted);
+}
+html,body{background:var(--ocds-bg)!important;color:var(--ocds-text)!important;font-family:var(--ocds-font)!important}
+.app,.main,.sidebar,.topbar{background:#000!important}
+.app{background:#000!important}
+.sidebar{border-color:#444!important}
+.topbar{border-color:#444!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.brand-mark,.ico,.eyebrow,.crumb b,.table code,.api-path{color:#f5f5f5!important;text-shadow:none!important}
+.nav button{border-radius:0!important;background:transparent!important;border-color:transparent!important;color:#aaa!important}
+.nav button:hover,.nav button.active{background:#171717!important;border-color:#fff!important;color:#fff!important}
+.panel,.stat,.tile,.doc,.connection,.notice,.modal,.field input,.field select,.field textarea,.search{
+  border-radius:0!important;box-shadow:none!important;background:#080808!important;border-color:#555!important;color:#f5f5f5!important
+}
+.panel-head,.service,.table th,.table td,.log{border-color:#444!important}
+.btn,.mobile-menu,.drawer-close,.icon-button{
+  min-height:40px;border-radius:0!important;background:#080808!important;border:1px solid #777!important;color:#f5f5f5!important;box-shadow:none!important
+}
+.btn:hover,.mobile-menu:hover,.drawer-close:hover,.icon-button:hover{background:#171717!important;border-color:#fff!important;color:#fff!important}
+.btn.primary,.btn.danger{background:#080808!important;border-color:#777!important;color:#f5f5f5!important}
+.state,.tag,.demo-pill{border-radius:0!important;background:#080808!important;color:#ddd!important;border-color:#777!important}
+.state.ok,.state.warn,.state.off{color:#eee!important;border-color:#777!important}
+.notice{color:#ddd!important}
+.search::placeholder,.field label,.panel-head small,.page-head p,.service small,.tile p,.doc p,.agent-row small{color:#aaa!important}
+.table td{color:#f5f5f5!important}
+.drawer-head,.drawer-close{border-color:#444!important}
+.nav-scrim{background:rgba(0,0,0,.72)!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}

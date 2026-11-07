@@ -4,10 +4,12 @@ This repository uses the same visual language and responsive shell as the public
 
 ## Source of truth
 
-- Reference implementation: https://github.com/zskbot/ocodejs-cli
-- Reference shell: `index.html` and `_layouts/default.html`
+- **Canonical visual reference:** https://mcp.ocodejs.dev/ (the MCP page at `/pages/mcp.html` is the visual authority).
+- Reference source: https://github.com/zskbot/ocodejs-cli/blob/main/pages/mcp.html
+- Reference shell: `pages/mcp.html` (black canvas, monochrome borders/text, system monospace typography, square geometry).
 - Server Control Center shell: `index.html`
-- Shared theme layer: `ocodejs-pages-theme.css`
+- Shared design tokens/primitives: `ocodejs-design-system.css`
+- Shared application shell/theme: `ocodejs-pages-theme.css`
 
 The theme is a companion layer. It does not replace the existing Control API, view renderers, service probes, modal behavior or MCP client code.
 
@@ -16,7 +18,8 @@ The theme is a companion layer. It does not replace the existing Control API, vi
 ```text
 /
 ├── index.html                    # App shell + existing view router
-├── ocodejs-pages-theme.css       # Shared OCode.js Pages design tokens and responsive shell
+├── ocodejs-design-system.css     # Canonical MCP tokens and reusable primitives (v1.0.0)
+├── ocodejs-pages-theme.css       # Shared application shell and responsive behavior
 ├── docs/
 │   ├── ui-framework.md           # This architecture contract
 │   ├── api-contract.md
@@ -31,18 +34,17 @@ The theme is a companion layer. It does not replace the existing Control API, vi
 
 | Token | Value | Usage |
 |---|---|---|
-| `--bg` | `#05070d` | App canvas |
-| `--panel` | `#0a101c` | Cards and panels |
-| `--line` | `#26364f` | Structural borders |
-| `--line-strong` | `#36577f` | Interactive borders |
-| `--fg` | `#f2f5fb` | Primary text |
-| `--muted` | `#a3afc2` | Secondary text |
-| `--blue` | `#347cff` | Primary action |
-| `--cyan` | `#55c8ff` | Focus and highlights |
-| `--purple` | `#a34cff` | Secondary accent |
-| `--green` | `#57d6a2` | Healthy state |
+| `--ocds-bg` | `#000` | Canonical page canvas |
+| `--ocds-surface` | `#080808` | Panels and cards |
+| `--ocds-border` | `#444` | Structural borders |
+| `--ocds-border-strong` | `#777` | Buttons and controls |
+| `--ocds-text` | `#f5f5f5` | Primary text |
+| `--ocds-muted` | `#aaa` | Secondary text |
+| `--ocds-font` | System monospace stack | All typography |
+| `--ocds-radius` | `0` | Square geometry |
+| `--ocds-space-unit` | `4px` | Base spacing unit |
 
-Spacing uses a 4px base scale. Corners remain square to match the CLI Hub. Typography uses a system monospace stack and does not require a remote font request.
+Spacing uses a 4px base scale. Corners remain square. The canonical MCP page is monochrome; do not introduce product-specific accent palettes, rounded cards, gradients or remote fonts. Semantic status indicators may use text labels, but must not change the core palette.
 
 ## Layout contract
 
@@ -107,3 +109,16 @@ The workspace includes read-only operational views backed by the staging Control
 These pages are registered in the same navigation registry as the original seven sections. Their Refresh controls perform fresh `GET` requests with `cache: no-store`. Errors are shown as errors; the UI does not substitute sample data or claim an unavailable service is healthy.
 
 No write or deployment action is exposed by these views. Provider inference and agent execution remain disabled until server-side bindings, a run store, quota enforcement, authentication and explicit approval controls are in place.
+
+
+## Canonical design system adoption
+
+All OCode.js ecosystem Pages must use the MCP page as the single visual source of truth. Import the shared stylesheet before application-specific CSS:
+
+```html
+<link rel="stylesheet" href="https://raw.githubusercontent.com/OCodejs/ocodejs.github.io/main/ocodejs-design-system.css">
+```
+
+For production consumers, pin a release tag rather than tracking `main`. The Control Center pairs this base layer with `ocodejs-pages-theme.css`; product-specific styles may add layout and behavior but must not redefine the canonical tokens.
+
+The canonical reference is `https://mcp.ocodejs.dev/pages/mcp.html`. If the reference page changes, update the tokens and version here first, validate the Control Center, then migrate downstream Pages in separate reviewed changes. Never overwrite a downstream app's routes, API contracts, authentication, or business logic as part of a visual migration.
