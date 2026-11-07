@@ -296,7 +296,9 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
         result: {
           tools: [
             { name: "get_control_api_health", description: "Read health" },
-            { name: "list_services", description: "List services" }
+            { name: "list_services", description: "List services" },
+            { name: "list_agents", description: "List agent definitions" },
+            { name: "get_agent_definition", description: "Read one agent definition" }
           ]
         }
       });
@@ -352,7 +354,9 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
         result: {
           tools: [
             { name: "get_control_api_health", description: "Read health" },
-            { name: "list_services", description: "List services" }
+            { name: "list_services", description: "List services" },
+            { name: "list_agents", description: "List agent definitions" },
+            { name: "get_agent_definition", description: "Read one agent definition" }
           ]
         }
       });
