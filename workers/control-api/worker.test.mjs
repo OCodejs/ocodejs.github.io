@@ -234,6 +234,35 @@ test("telemetry reports partial structured logging without claiming metrics stor
 });
 
 
+
+
+test("provider registry lists only catalogued adapters and keeps inference disabled", async () => {
+  const response = await call("/api/v1/providers");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.count, 1);
+  assert.equal(body.providers[0].id, "cloudflare-workers-ai");
+  assert.equal(body.providers[0].state, "not_configured");
+  assert.equal(body.providers[0].executionEnabled, false);
+  assert.equal(body.providers[0].requiresExplicitEnablement, true);
+  assert.deepEqual(body.providers[0].capabilities, ["text_generation"]);
+});
+
+test("single provider lookup returns catalog metadata without enabling runtime", async () => {
+  const response = await call("/api/v1/providers/cloudflare-workers-ai");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.provider.id, "cloudflare-workers-ai");
+  assert.equal(body.provider.executionEnabled, false);
+});
+
+test("unknown provider lookup returns a stable 404 envelope", async () => {
+  const response = await call("/api/v1/providers/not-registered");
+  const body = await response.json();
+  assert.equal(response.status, 404);
+  assert.equal(body.error.code, "NOT_FOUND");
+});
+
 test("agent registry returns versioned draft definitions with execution disabled", async () => {
   const response = await call("/api/v1/agents");
   const body = await response.json();
@@ -375,4 +404,29 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+
+test("runtime readiness reports catalogued providers as disabled without inference", async () => {
+  const response = await call("/api/v1/runtime/status");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.runtime.state, "not_configured");
+  assert.deepEqual(body.runtime.provider, { id: null, state: "not_configured" });
+  assert.deepEqual(body.runtime.availableProviders, []);
+  assert.equal(body.runtime.runStore.state, "not_configured");
+  assert.equal(body.runtime.executionEnabled, false);
+  assert.equal(body.runtime.runLifecycle, "disabled");
+  assert.equal(body.runtime.approvalRequired, true);
+  assert.match(body.runtime.reason, /No server-side model provider/);
+  assert.ok(body.checkedAt);
+  assert.ok(body.requestId);
+});
+
+test("agent run mutation remains rejected while the API is read-only", async () => {
+  const response = await call("/api/v1/agents/ocodejs-builder/runs", { method: "POST" });
+  const body = await response.json();
+  assert.equal(response.status, 405);
+  assert.equal(body.error.code, "METHOD_NOT_ALLOWED");
+  assert.equal(response.headers.get("Allow"), "GET, OPTIONS");
 });

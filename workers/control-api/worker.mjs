@@ -1,5 +1,5 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.5.0";
+const API_VERSION = "1.7.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
@@ -40,6 +40,19 @@ const AGENTS = [
     tools: [],
     executionEnabled: false,
     approvalRequired: true
+  }
+];
+
+const PROVIDERS = [
+  {
+    id: "cloudflare-workers-ai",
+    name: "Cloudflare Workers AI",
+    kind: "managed_inference",
+    state: "not_configured",
+    description: "Provider adapter is catalogued but no AI binding or explicit runtime enable flag is configured in staging.",
+    capabilities: ["text_generation"],
+    executionEnabled: false,
+    requiresExplicitEnablement: true
   }
 ];
 
@@ -312,6 +325,9 @@ async function handleRequest(request, env, url, headers, id) {
           "GET /api/v1/health/ready",
           "GET /api/v1/services",
           "GET /api/v1/services/{serviceId}",
+          "GET /api/v1/runtime/status",
+          "GET /api/v1/providers",
+          "GET /api/v1/providers/{providerId}",
           "GET /api/v1/agents",
           "GET /api/v1/agents/{agentId}",
           "GET /api/v1/mcp/connections",
@@ -373,6 +389,54 @@ async function handleRequest(request, env, url, headers, id) {
 
       return json({
         service: await serviceSnapshot(service, new Date().toISOString()),
+        requestId: id
+      }, 200, headers);
+    }
+
+    if (url.pathname === API_PREFIX + "/runtime/status") {
+      return json({
+        runtime: {
+          state: "not_configured",
+          provider: { id: null, state: "not_configured" },
+          availableProviders: PROVIDERS.filter((provider) => provider.state === "ready").map((provider) => provider.id),
+          runStore: { state: "not_configured" },
+          executionEnabled: false,
+          runLifecycle: "disabled",
+          approvalRequired: true,
+          reason: "No server-side model provider or isolated run store has been configured."
+        },
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
+    if (url.pathname === API_PREFIX + "/providers") {
+      const providers = PROVIDERS.map((provider) => ({
+        ...provider,
+        capabilities: [...provider.capabilities]
+      }));
+      return json({
+        providers,
+        count: providers.length,
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
+    const providerMatch = url.pathname.match(/^\/api\/v1\/providers\/([a-z0-9-]+)$/);
+    if (providerMatch) {
+      const provider = PROVIDERS.find((item) => item.id === providerMatch[1]);
+      if (!provider) {
+        return errorResponse(
+          "NOT_FOUND",
+          "The requested provider is not registered.",
+          404,
+          id,
+          headers
+        );
+      }
+      return json({
+        provider: { ...provider, capabilities: [...provider.capabilities] },
         requestId: id
       }, 200, headers);
     }

@@ -51,6 +51,8 @@ This roadmap separates the static control center from the multi-service platform
 
 ## Phase 5 — AI agent operations
 - [x] Add a read-only Agent Registry with versioned draft definitions; no model provider or execution enabled.
+- [x] Add a read-only Provider Registry catalog; Workers AI remains not configured and inference requires explicit enablement.
+- [x] Add a read-only AI Runtime readiness endpoint for provider/run-store state; keep inference and run lifecycle disabled until explicit configuration.
 - [ ] Server-side provider adapters.
 - [ ] Run lifecycle, cancellation, quotas and usage telemetry.
 - [ ] Tool permission snapshots and approval gates.

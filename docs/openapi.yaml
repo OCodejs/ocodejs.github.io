@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: OCodeJS Control API
-  version: 1.5.0
+  version: 1.7.0
   description: Read-only health and service registry API with structured request logging. Staging implementation.
 servers:
   - url: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
@@ -75,6 +75,88 @@ paths:
                   count: { type: integer }
                   checkedAt: { type: string, format: date-time }
                   requestId: { type: string }
+  /api/v1/runtime/status:
+    get:
+      summary: Read AI runtime readiness without executing agents
+      responses:
+        "200":
+          description: Provider and run-store readiness; inference and run lifecycle are disabled until configured
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [runtime, checkedAt, requestId]
+                properties:
+                  runtime:
+                    type: object
+                    required: [state, provider, availableProviders, runStore, executionEnabled, runLifecycle, approvalRequired, reason]
+                    properties:
+                      state: { type: string, enum: [not_configured] }
+                      provider:
+                        type: object
+                        required: [id, state]
+                        properties:
+                          id: { type: [string, "null"] }
+                          state: { type: string, enum: [not_configured] }
+                      availableProviders:
+                        type: array
+                        items: { type: string }
+                      runStore:
+                        type: object
+                        required: [state]
+                        properties:
+                          state: { type: string, enum: [not_configured] }
+                      executionEnabled: { type: boolean, const: false }
+                      runLifecycle: { type: string, enum: [disabled] }
+                      approvalRequired: { type: boolean, const: true }
+                      reason: { type: string }
+                  checkedAt: { type: string, format: date-time }
+                  requestId: { type: string }
+  /api/v1/providers:
+    get:
+      summary: List AI provider adapter catalog
+      responses:
+        "200":
+          description: Read-only provider catalog; inference remains disabled
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [providers, count, checkedAt, requestId]
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Provider"
+                  count: { type: integer }
+                  checkedAt: { type: string, format: date-time }
+                  requestId: { type: string }
+  /api/v1/providers/{providerId}:
+    get:
+      summary: Get one provider adapter
+      parameters:
+        - in: path
+          name: providerId
+          required: true
+          schema: { type: string, pattern: "^[a-z0-9-]+$" }
+      responses:
+        "200":
+          description: Provider metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [provider, requestId]
+                properties:
+                  provider:
+                    $ref: "#/components/schemas/Provider"
+                  requestId: { type: string }
+        "404":
+          description: Provider is not registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/agents:
     get:
       summary: List versioned agent definitions
@@ -216,6 +298,20 @@ components:
         source: { type: string, enum: [self, unverified, remote_probe] }
         checkedAt: { type: [string, "null"], format: date-time }
         latencyMs: { type: [integer, "null"], minimum: 0 }
+    Provider:
+      type: object
+      required: [id, name, kind, state, description, capabilities, executionEnabled, requiresExplicitEnablement]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        kind: { type: string, enum: [managed_inference] }
+        state: { type: string, enum: [not_configured] }
+        description: { type: string }
+        capabilities:
+          type: array
+          items: { type: string }
+        executionEnabled: { type: boolean, const: false }
+        requiresExplicitEnablement: { type: boolean, const: true }
     AgentDefinition:
       type: object
       required: [id, name, version, status, description, provider, capabilities, tools, executionEnabled, approvalRequired]
