@@ -146,6 +146,9 @@ export default {
     try { message = JSON.parse(raw); }
     catch { return rpcError(null, -32700, "Parse error"); }
     if (Array.isArray(message)) return rpcError(null, -32600, "Batch requests are not supported");
+    if (message?.method !== "initialize" && request.headers.get("mcp-protocol-version") !== PROTOCOL_VERSION) {
+      return json({ error: "Missing or unsupported MCP-Protocol-Version header" }, 400);
+    }
     return handleRpc(message);
   }
 };
