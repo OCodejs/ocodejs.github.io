@@ -232,3 +232,38 @@ test("telemetry reports partial structured logging without claiming metrics stor
   assert.equal(body.service.source, "self");
   assert.match(body.service.description, /metrics aggregation/i);
 });
+
+
+test("agent registry returns versioned draft definitions with execution disabled", async () => {
+  const response = await call("/api/v1/agents");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.count, 3);
+  assert.deepEqual(body.agents.map((agent) => agent.id), [
+    "ocodejs-builder", "ocodejs-reviewer", "ocodejs-docs"
+  ]);
+  for (const agent of body.agents) {
+    assert.equal(agent.version, "0.1.0");
+    assert.equal(agent.status, "draft");
+    assert.equal(agent.provider.state, "not_configured");
+    assert.equal(agent.executionEnabled, false);
+    assert.equal(agent.approvalRequired, true);
+    assert.deepEqual(agent.tools, []);
+  }
+});
+
+test("single agent lookup returns a versioned definition", async () => {
+  const response = await call("/api/v1/agents/ocodejs-builder");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.agent.id, "ocodejs-builder");
+  assert.equal(body.agent.version, "0.1.0");
+  assert.equal(body.agent.executionEnabled, false);
+});
+
+test("unknown agent lookup returns the stable 404 envelope", async () => {
+  const response = await call("/api/v1/agents/does-not-exist");
+  const body = await response.json();
+  assert.equal(response.status, 404);
+  assert.equal(body.error.code, "NOT_FOUND");
+});
