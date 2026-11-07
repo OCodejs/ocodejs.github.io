@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: OCodeJS Control API
-  version: 1.0.0
+  version: 1.1.0
   description: Read-only health and service registry API. Phase 1 staging implementation.
 servers:
   - url: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
@@ -123,7 +123,7 @@ components:
         state:
           type: string
           enum: [healthy, degraded, unavailable, not_configured, unknown]
-        source: { type: string, enum: [self, unverified] }
+        source: { type: string, enum: [self, unverified, remote_probe] }
         checkedAt: { type: [string, "null"], format: date-time }
         latencyMs: { type: [integer, "null"], minimum: 0 }
     Error:
