@@ -32,3 +32,10 @@ for (const marker of [
 ]) assert.ok(css.includes(marker), "Navigation drawer theme rule missing: " + marker);
 
 process.stdout.write("OCode.js Pages theme and scaffold checks passed.\n");
+
+for (const marker of [
+  'data-navigation-registry', 'const navigationRegistry=[', 'function registerNavigationItem(item)',
+  'function registerWorkspacePage(page)', 'function renderNavigation()', 'window.OCodeNavigation',
+  'registerItem:registerNavigationItem', 'registerPage:registerWorkspacePage',
+  'root.innerHTML=groups.map', 'renderNavigation();'
+]) assert.ok(html.includes(marker), "Dynamic navigation registry missing: " + marker);
