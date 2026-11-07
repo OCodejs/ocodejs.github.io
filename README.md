@@ -5,6 +5,7 @@ OCodeJS Server Control Center and public technical documentation.
 - **Live frontend:** https://ocodejs.github.io/
 - **Control Center source:** [index.html](index.html)
 - **Project Registry:** [projects/](projects/index.html) · [registry JSON](projects.registry.json)
+- **OCode.js Profile spec:** [multi-user architecture](docs/profile-system.md) · [API contract](docs/profile-api-contract.md) · [UI preview](profile/preview.html)
 - **Ecosystem sync architecture:** [docs/ecosystem-registry.md](docs/ecosystem-registry.md)
 - **Technical documentation:** [docs/](docs/index.md)
 - **Architecture:** [docs/architecture.md](docs/architecture.md)
