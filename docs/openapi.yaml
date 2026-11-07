@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: OCodeJS Control API
-  version: 1.4.0
+  version: 1.5.0
   description: Read-only health and service registry API with structured request logging. Staging implementation.
 servers:
   - url: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
