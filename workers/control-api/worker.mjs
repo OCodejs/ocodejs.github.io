@@ -1,5 +1,5 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.4.0";
+const API_VERSION = "1.5.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
@@ -252,12 +252,12 @@ async function probeMcpServer() {
     }
     const listed = await toolsResponse.json();
     const toolNames = (listed?.result?.tools || []).map((tool) => tool.name).sort();
-    if (JSON.stringify(toolNames) !== JSON.stringify(["get_control_api_health", "list_services"])) {
+    if (JSON.stringify(toolNames) !== JSON.stringify(["get_agent_definition", "get_control_api_health", "list_agents", "list_services"])) {
       return { state: "unknown", description: "MCP tools/list did not return the expected read-only tool allowlist.", checkedAt, latencyMs: Date.now() - startedAt };
     }
     return {
       state: "healthy",
-      description: "MCP initialize and tools/list passed; two read-only tools discovered. Tool execution is not part of this probe.",
+      description: "MCP initialize and tools/list passed; four read-only tools discovered. Tool execution is not part of this probe.",
       checkedAt,
       latencyMs: Date.now() - startedAt,
       toolCount: toolNames.length
