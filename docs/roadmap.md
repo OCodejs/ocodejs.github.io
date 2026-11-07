@@ -75,3 +75,19 @@ This roadmap separates the static control center from the multi-service platform
 
 ## Release gate
 A feature is not complete because its UI exists. Mark it Done only after backend implementation, automated tests, authorization checks, operational telemetry and user-visible error states are verified. Keep staging and production credentials/data isolated.
+
+ 
+## Phase 8 — OCode.js Profile (multi-user)
+- [x] Define per-account profile ownership, public route, privacy boundary and product sections.
+- [x] Draft public and owner-only Profile API contract.
+- [x] Add a responsive static UI preview with explicit sample-data labeling.
+- [ ] Verify Account Portal repository access, database ownership, session subject and registration lifecycle.
+- [ ] Implement profile schema/migrations and idempotent profile provisioning in the Account Portal.
+- [ ] Implement username reservation, public profile reads, owner-only updates and CSRF/RBAC tests.
+- [ ] Implement README sanitization, pinned repositories, privacy controls and pagination.
+- [ ] Add follows, projects, packages, stars, contribution aggregation and verified activity sources.
+- [ ] Connect optional GitHub integration with least-privilege scopes and token revocation.
+- [ ] Run end-to-end staging tests and accessibility/browser verification.
+- [ ] Production release only after explicit approval.
+
+The preview at `profile/preview.html` is static and uses sample data. It is not an authenticated application, does not persist changes and must not be presented as a live profile service.
