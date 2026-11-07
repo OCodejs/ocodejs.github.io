@@ -1,6 +1,6 @@
 # OCodeJS Server — Delivery Roadmap
 
-This roadmap separates a static control center from a real multi-service platform. Items are proposals until implemented, tested and deployed.
+This roadmap separates the static control center from the multi-service platform. Items are complete only when code, automated tests and the relevant deployment evidence exist.
 
 ## Phase 0 — Static control center
 - [x] Seven workspace sections.
@@ -14,45 +14,45 @@ This roadmap separates a static control center from a real multi-service platfor
 - [x] API contract draft.
 - [x] Security baseline.
 - [x] Delivery roadmap.
-- [x] OpenAPI 3.1 contract for Control API Phase 1.
+- [x] OpenAPI 3.1 contract for Control API.
 - [x] Automated Node test workflow for the Control API.
+- [x] Isolated staging Worker with Logs and Traces enabled.
 - [ ] Environment configuration schema and deployment runbook.
-- [ ] Automated HTML validation, link checking and accessibility checks.
+- [ ] Automated link checking and accessibility checks.
 
 ## Phase 2 — Read-only backend integration
-- [ ] Verify the authoritative API endpoint with external HTTP smoke tests.
 - [x] Implement liveness/readiness and read-only service registry.
-- [ ] Add authenticated read-only service status to dashboard.
 - [x] Add request IDs, stable error envelopes and restrictive CORS handling.
-- [x] Deploy an isolated staging Worker with Logs and Traces enabled.
-- [ ] Configure the exact staging frontend origin and complete browser integration.
-- [ ] Keep production disconnected until explicit approval.
+- [x] Deploy the isolated staging Control API.
+- [x] Add the official GitHub Pages origin to the staging API CORS allowlist.
+- [x] Merge Dashboard integration and align the Pages shell with OCode.js CLI theme.\n- [ ] Verify browser-side cross-origin requests from GitHub Pages.
+- [ ] Add authenticated read-only service status after Account Portal Auth.js is ready.
+- [ ] Keep Production disconnected until explicit approval.
 
 ## Phase 3 — Identity and access
-- [x] Add a non-sensitive Auth.js runtime readiness endpoint.
-- [ ] Deploy an isolated Preview with dedicated database and OAuth credentials, then verify registration/login/session/logout end to end.
-- [ ] Add account profile, session list and logout.
+- [x] Add a read-only health probe for the separate OCodeJS CLI GitHub OAuth/PAT Worker (PR #6; staging deployment updated).
+- [x] Document the separation between CLI OAuth and Account Portal Auth.js.
+- [ ] Deploy Account Portal Auth.js to an isolated Preview runtime.
+- [ ] Configure a dedicated Preview PostgreSQL database and Google/GitHub OAuth callbacks.
+- [ ] Verify registration, login, OAuth callbacks, session persistence and logout end-to-end.
 - [ ] Implement server-side RBAC and project/environment scopes.
-- [ ] Add CSRF, audit events and session revocation tests.
+- [ ] Add CSRF, audit events, session revocation and rate-limit tests.
+- [ ] Enable sign-in controls only after the Preview release gate passes.
 
 ## Phase 4 — MCP management
 - [ ] Register and validate MCP endpoints.
-- [x] Implement initialize/capability negotiation and tools/list on an isolated staging Worker.
-- [x] Add browser controls to run MCP initialize and tools/list against staging.
-- [ ] Complete external browser smoke test and verify backend tool calls.
+- [ ] Implement initialize/capability negotiation and tools/list.
 - [ ] Add server-side secret storage, SSRF protection and tool allowlists.
-- [x] Add MCP protocol error handling and a read-only tool allowlist.
-- [ ] Add authenticated connection health, secret storage and protocol error telemetry.
+- [ ] Add connection health and protocol error reporting.
 
 ## Phase 5 — AI agent operations
 - [ ] Agent registry and versioned definitions.
-- [ ] Implement a server-side AI provider adapter after a provider and authorized credentials/quota are selected.
+- [ ] Server-side provider adapters.
 - [ ] Run lifecycle, cancellation, quotas and usage telemetry.
 - [ ] Tool permission snapshots and approval gates.
 
 ## Phase 6 — Developer Console and integrations
-- [x] Enable Cloudflare Worker logs and traces for the staging Control API and MCP Worker.
-- [ ] Centralize structured logs, metrics, distributed traces and retention.
+- [ ] Structured logs, metrics, distributed traces.
 - [ ] Role-based audit event explorer.
 - [ ] GitHub, Cloudflare and Vercel status adapters with least-privilege access.
 - [ ] Alert rules, retention policies and incident playbooks.
