@@ -119,3 +119,48 @@ button,.btn,.mobile-menu,.search,.nav button,.state,.tag,.panel,.stat,.notice,.d
 }
 @media(max-width:360px){.nav button{font-size:8px}.crumb{font-size:9px}.search{width:38vw}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* Global navigation drawer: one consistent menu on desktop and mobile. */
+.app{display:block!important;min-height:100vh}
+.sidebar{
+  position:fixed!important;inset:0 auto 0 0!important;z-index:60!important;
+  width:min(320px,calc(100vw - 52px))!important;height:100dvh!important;min-height:0!important;
+  padding:18px 16px calc(18px + var(--safe-bottom))!important;
+  overflow-y:auto!important;overscroll-behavior:contain;
+  background:rgba(5,8,15,.985)!important;border-right:1px solid var(--line-strong)!important;
+  box-shadow:24px 0 80px rgba(0,0,0,.55);
+  transform:translateX(-105%);transition:transform .22s ease!important;
+}
+.sidebar.open{transform:translateX(0)!important}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px 20px;border-bottom:1px solid var(--line)}
+.drawer-head .brand{display:flex!important;align-items:center;min-width:0;padding:0;border:0}
+.drawer-close{display:grid;place-items:center;width:38px;height:38px;flex:none;border:1px solid var(--line-strong);background:#080e19;color:var(--fg);font-size:23px;line-height:1}
+.nav-label{display:block!important;padding:22px 10px 9px!important;color:#7f91ad!important}
+.nav{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:6px!important;margin:0!important}
+.nav button{display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;gap:13px!important;width:100%;min-width:0;min-height:48px!important;padding:10px 12px!important;text-align:left!important;white-space:normal!important;font-size:12px!important;line-height:1.3!important}
+.nav button .ico{width:20px!important;flex:none;text-align:center;font-size:16px!important;line-height:1!important}
+.side-bottom{display:block!important;margin-top:auto;padding-top:24px}
+.mobile-menu{display:inline-flex!important;align-items:center;justify-content:center;width:42px;height:40px;min-width:42px;padding:0!important;border:1px solid var(--line-strong)!important;background:#080e19!important;color:var(--fg)!important;font-size:19px!important}
+.topbar{z-index:45!important;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-inline:clamp(12px,2.5vw,28px)!important}
+.topbar>.top-actions:first-child{min-width:0;gap:12px}
+.crumb{display:block!important;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-scrim{display:block;position:fixed;inset:0;z-index:50;width:100%;height:100%;padding:0;border:0;background:rgba(0,0,0,.62);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}
+body.nav-open{overflow:hidden!important}
+body.nav-open .nav-scrim{opacity:1;visibility:visible;pointer-events:auto}
+body.nav-open .mobile-menu{border-color:var(--cyan)!important;color:var(--cyan)!important}
+@media(max-width:680px){
+  body{padding-bottom:0!important;min-height:100svh}
+  .app{display:block!important;min-height:100svh}
+  .sidebar{inset:0 auto 0 0!important;width:min(320px,calc(100vw - 52px))!important;height:100svh!important;padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(16px + var(--safe-bottom))!important}
+  .brand,.nav-label,.side-bottom{display:block!important}
+  .drawer-head .brand{display:flex!important}
+  .nav{display:grid!important;grid-template-columns:minmax(0,1fr)!important}
+  .nav button{display:flex!important;flex-direction:row!important;min-height:48px!important;font-size:12px!important}
+  .mobile-menu{display:inline-flex!important}
+  .topbar{height:auto;min-height:60px;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px!important}
+  .top-actions{gap:7px}
+  .search{width:min(42vw,180px);min-height:38px}
+  .content{padding:20px 14px 28px}
+}
+@media(prefers-reduced-motion:reduce){.sidebar,.nav-scrim{transition:none!important}}
