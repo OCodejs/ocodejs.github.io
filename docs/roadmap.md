@@ -44,6 +44,7 @@ This roadmap separates the static control center from the multi-service platform
 - [x] Deploy isolated staging MCP Worker and register its endpoint.
 - [x] Implement initialize/capability negotiation and tools/list.
 - [x] Add protocol error handling and a fixed read-only tool allowlist.
+- [x] Add a read-only MCP connection registry for the fixed staging endpoint; no arbitrary URL or mutation support.
 - [ ] Add authenticated connection management, secret storage and expanded SSRF protections.
 - [ ] Complete external browser smoke test; outbound verification is blocked by the integration runner.
 
