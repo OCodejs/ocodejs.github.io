@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "workers/control-api/**"
+      - "workers/mcp-server/**"
       - "index.html"
       - "scripts/check-control-center.mjs"
       - "scripts/check-pages-theme.mjs"
@@ -15,6 +16,7 @@ on:
     branches: [main]
     paths:
       - "workers/control-api/**"
+      - "workers/mcp-server/**"
       - "index.html"
       - "scripts/check-control-center.mjs"
       - "scripts/check-pages-theme.mjs"
@@ -38,6 +40,8 @@ jobs:
           node-version: 22
       - name: Run Control API tests
         run: node --test workers/control-api/worker.test.mjs
+      - name: Run MCP server tests
+        run: node --test workers/mcp-server/worker.test.mjs
       - name: Validate Control Center JavaScript
         run: node scripts/check-control-center.mjs
       - name: Validate OCode.js Pages theme
