@@ -1,0 +1,35 @@
+/* OCode.js Design System — canonical tokens extracted from mcp.ocodejs.dev/pages/mcp.html
+ * Version: 1.0.0 | License: MIT | No remote font or runtime dependency.
+ */
+:root{
+  color-scheme:dark;
+  --ocds-version:"1.0.0";
+  --ocds-bg:#000;
+  --ocds-surface:#080808;
+  --ocds-border:#444;
+  --ocds-border-strong:#777;
+  --ocds-text:#f5f5f5;
+  --ocds-muted:#aaa;
+  --ocds-font:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  --ocds-radius:0;
+  --ocds-space-unit:4px;
+  --ocds-content-max:1440px;
+  --ocds-bg-hover:#171717;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ocds-bg);color-scheme:dark;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ocds-bg);color:var(--ocds-text);font:14px/1.6 var(--ocds-font)}
+button,input,select,textarea{font:inherit}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;color:inherit}
+:where(button,a,input,select,textarea):focus-visible{outline:2px solid var(--ocds-text);outline-offset:3px}
+:where(.ocds-panel,.ocds-card){border:1px solid #555;border-radius:0;background:var(--ocds-surface);padding:16px}
+.ocds-muted{color:var(--ocds-muted)}
+.ocds-eyebrow{color:var(--ocds-muted);font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.ocds-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 12px;border:1px solid var(--ocds-border-strong);border-radius:0;background:var(--ocds-surface);color:var(--ocds-text);font:11px/1.4 var(--ocds-font);cursor:pointer}
+.ocds-btn:hover{background:var(--ocds-bg-hover);border-color:var(--ocds-text)}
+.ocds-input{width:100%;min-height:40px;padding:8px 10px;border:1px solid #555;border-radius:0;background:var(--ocds-bg);color:var(--ocds-text)}
+.ocds-grid{display:grid;gap:12px}
+.ocds-container{width:min(100%,var(--ocds-content-max));margin-inline:auto;padding:clamp(16px,4vw,48px)}
+@media(max-width:760px){.ocds-container{padding:22px 14px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
