@@ -5,7 +5,7 @@ const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const errors = [];
 
 const attr = (source, name) => {
-  const match = [...source.matchAll(/([^\\s=]+)\\s*=\\s*(["'])(.*?)\\2/g)]
+  const match = [...source.matchAll(/([^\s=]+)\s*=\s*(["'])(.*?)\2/g)]
     .find(([, key]) => key.toLowerCase() === name.toLowerCase());
   return match?.[3] ?? null;
 };
