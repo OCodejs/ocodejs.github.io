@@ -6,6 +6,8 @@ on:
       - "workers/control-api/**"
       - "index.html"
       - "scripts/check-control-center.mjs"
+      - "docs/**"
+      - "README.md"
       - ".github/workflows/control-api-tests.yml"
   push:
     branches: [main]
