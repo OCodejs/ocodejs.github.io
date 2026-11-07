@@ -1,203 +1,74 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#050505">
-  <meta name="description" content="OCodeJS Server — trung tâm điều phối cho ứng dụng, AI agents, công cụ developer và tích hợp MCP trong hệ sinh thái OCode.js.">
-  <meta property="og:title" content="OCodeJS Server — Build. Connect. Ship.">
-  <meta property="og:description" content="Một điểm điều phối cho AI agents, developer tools và ứng dụng trong hệ sinh thái OCode.js.">
-  <meta property="og:type" content="website">
-  <title>OCodeJS Server — Build. Connect. Ship.</title>
-  <style>
-    :root{color-scheme:dark;--bg:#050505;--panel:#0b0b0b;--panel2:#101010;--line:#242424;--muted:#8b8b8b;--text:#f5f5f5;--blue:#6d8cff;--green:#a7f3d0;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth;background:var(--bg)}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14px;line-height:1.65;letter-spacing:-.025em}
-    a{color:inherit;text-decoration:none}
-    button{font:inherit}
-    .wrap{width:min(1200px,calc(100% - 48px));margin:auto}
-    .topline{height:3px;background:linear-gradient(90deg,#5276ff,#9b8cff 45%,#74e5c0)}
-    header{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.07em;font-size:17px}
-    .mark{width:30px;height:30px;border:1px solid #555;display:grid;place-items:center;background:#101010;color:white;font-size:12px;letter-spacing:-.1em}
-    .brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:.12em;font-weight:500;margin-top:-3px}
-    .navlinks{display:flex;align-items:center;gap:26px;color:#aaa;font-size:11px}
-    .navlinks a:hover,.textlink:hover{color:white}
-    .navcta{border:1px solid #555;padding:10px 14px;color:#fff;font-size:11px}
-    .menu{display:none;background:none;border:1px solid #444;color:#fff;padding:8px 11px}
-    .hero{padding:100px 0 78px;position:relative;overflow:hidden}
-    .hero:before{content:"";position:absolute;width:560px;height:560px;right:-170px;top:-280px;border:1px solid #1b1b1b;border-radius:50%;box-shadow:0 0 0 60px #080808,0 0 0 61px #171717,0 0 0 130px #080808,0 0 0 131px #151515;pointer-events:none}
-    .eyebrow{display:flex;align-items:center;gap:10px;color:#aaa;text-transform:uppercase;font-size:10px;letter-spacing:.16em}
-    .dot{width:7px;height:7px;background:#8ef0c2;box-shadow:0 0 14px #8ef0c288}
-    h1{font-size:clamp(48px,8vw,92px);line-height:.98;letter-spacing:-.095em;max-width:900px;margin:28px 0 24px;font-weight:800}
-    h1 span{color:#777}
-    .hero-copy{max-width:620px;color:#aaa;font-size:14px;line-height:1.9}
-    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
-    .btn{min-height:48px;padding:0 19px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #555;background:#f3f3f3;color:#050505;font-weight:800;font-size:11px;transition:.2s}
-    .btn:hover{background:#cbd5ff;border-color:#cbd5ff;transform:translateY(-2px)}
-    .btn.secondary{background:transparent;color:#eee;border-color:#383838}
-    .btn.secondary:hover{border-color:#aaa;background:#111}
-    .hero-meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:54px;color:#777;font-size:10px;text-transform:uppercase;letter-spacing:.12em}
-    .hero-meta b{color:#ddd;font-weight:500}
-    .section{padding:76px 0;border-top:1px solid var(--line)}
-    .section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:32px}
-    .kicker{color:#7f96ff;font-size:10px;letter-spacing:.16em;text-transform:uppercase}
-    h2{font-size:clamp(28px,4vw,46px);line-height:1.08;letter-spacing:-.075em;margin:12px 0 0}
-    .section-intro{max-width:390px;color:#888;font-size:12px;line-height:1.9}
-    .overview{display:grid;grid-template-columns:1.1fr .9fr;border:1px solid var(--line);background:#080808}
-    .overview-copy{padding:34px}
-    .overview-copy h3{font-size:22px;letter-spacing:-.06em;margin:0 0 14px}
-    .overview-copy p{color:#999;font-size:12px;line-height:1.9;margin:0}
-    .architecture{border-left:1px solid var(--line);padding:26px;background:radial-gradient(ellipse at 100% 0%,#17203c55,transparent 60%),#090909}
-    .arch-label{font-size:9px;color:#777;letter-spacing:.15em;margin-bottom:18px}
-    .layer{border:1px solid #303030;background:#0d0d0d;padding:13px 15px;margin-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-    .layer strong{font-size:11px;font-weight:600}
-    .layer span{font-size:9px;color:#777;text-align:right}
-    .connector{height:12px;width:1px;background:#555;margin:auto}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
-    .card{min-height:210px;padding:24px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:#080808;transition:background .2s}
-    .card:hover{background:#101010}
-    .card-num{font-size:10px;color:#718cff}
-    .card h3{font-size:16px;letter-spacing:-.05em;margin:25px 0 8px}
-    .card p{font-size:11px;color:#888;line-height:1.85;margin:0}
-    .tag{display:inline-block;margin-top:18px;border:1px solid #303030;color:#aaa;padding:4px 7px;font-size:9px}
-    .ecosystem{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    .repo{border:1px solid var(--line);padding:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;background:#080808}
-    .repo:hover{border-color:#666;background:#0d0d0d}
-    .repo strong{font-size:12px;display:block}
-    .repo small{color:#777;font-size:10px}
-    .arrow{color:#888;font-size:18px}
-    .cta{border:1px solid #333;background:linear-gradient(120deg,#0d0d0d,#0a0d18);padding:42px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-    .cta h2{font-size:clamp(25px,4vw,38px);margin:0}
-    .cta p{color:#888;font-size:11px;margin:12px 0 0;max-width:500px}
-    footer{padding:30px 0;border-top:1px solid var(--line);color:#777;font-size:10px}
-    .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
-    .footlinks{display:flex;gap:18px}
-    @media(max-width:760px){
-      .wrap{width:calc(100% - 32px)}
-      .nav{height:64px}.menu{display:block}
-      .navlinks{display:none;position:absolute;top:64px;left:0;right:0;background:#080808;border-bottom:1px solid var(--line);padding:18px 16px;flex-direction:column;align-items:stretch;gap:0}
-      .navlinks.open{display:flex}.navlinks a{padding:13px 0;border-bottom:1px solid #1e1e1e}.navcta{margin-top:12px;text-align:center}
-      .hero{padding:76px 0 54px}h1{font-size:clamp(46px,13vw,68px)}
-      .hero:before{right:-350px;opacity:.6}.hero-meta{gap:12px 18px;margin-top:40px}
-      .section{padding:54px 0}.section-head{display:block}.section-intro{margin-top:16px}
-      .overview{grid-template-columns:1fr}.architecture{border-left:0;border-top:1px solid var(--line)}
-      .overview-copy{padding:24px}.grid{grid-template-columns:1fr}
-      .card{min-height:0;padding:22px}.card h3{margin-top:17px}
-      .ecosystem{grid-template-columns:1fr}.cta{padding:26px;display:block}.cta .btn{margin-top:22px;width:100%}
-      .actions .btn{flex:1 1 100%}
-    }
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07090d">
+<meta name="description" content="OCodeJS Server Control Center — dashboard giao diện quản trị cho services, AI agents, API, authentication, MCP, logs và tài liệu.">
+<title>OCodeJS Server — Control Center</title>
+<style>
+:root{color-scheme:dark;--bg:#07090d;--side:#090c12;--panel:#0d1119;--panel2:#111722;--line:#202938;--text:#eef2f8;--muted:#8390a3;--blue:#7194ff;--cyan:#6dd6dc;--green:#63d6a2;--amber:#f2bd68;--red:#f07f86;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px}button,input,select,textarea{font:inherit}a{color:inherit;text-decoration:none}button{cursor:pointer;color:inherit}.app{min-height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr)}.sidebar{background:var(--side);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh}.brand{display:flex;gap:11px;align-items:center;padding:0 10px 25px;border-bottom:1px solid var(--line)}.logo{width:34px;height:34px;border:1px solid #53617a;background:#111a2b;display:grid;place-items:center;color:#b9caff;font-weight:900}.brand strong{font-size:14px;letter-spacing:-.06em}.brand small{display:block;font-size:9px;color:var(--muted);letter-spacing:.14em;margin-top:4px}.nav-label{font-size:9px;color:#647187;letter-spacing:.16em;padding:22px 10px 8px}.nav{display:grid;gap:4px}.nav button{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid transparent;background:transparent;color:#9ba7b9;padding:11px 10px;border-radius:5px;font-size:11px}.nav button:hover{background:#101722;color:#fff}.nav button.active{background:#142039;border-color:#253b65;color:#dce6ff}.ico{width:17px;text-align:center;color:#8ea9f5;font-size:14px}.side-bottom{margin-top:auto}.connection{border:1px solid var(--line);background:#0d131c;padding:12px;border-radius:5px}.connection small{color:var(--muted);font-size:9px;display:block}.connection strong{font-size:11px;display:block;margin:7px 0}.demo-pill{display:inline-flex;align-items:center;gap:6px;color:var(--amber);font-size:9px;border:1px solid #59482e;padding:4px 7px}.main{min-width:0}.topbar{height:68px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;gap:18px;background:#080b10;position:sticky;top:0;z-index:10}.crumb{color:var(--muted);font-size:10px}.crumb b{color:#edf2fb;font-weight:600}.top-actions{display:flex;align-items:center;gap:10px}.search{background:#0d131c;border:1px solid var(--line);padding:9px 11px;color:#eaf0fb;width:min(250px,32vw);outline:none}.search:focus,input:focus,textarea:focus{border-color:#5577d2!important;outline:none}.avatar{width:30px;height:30px;border:1px solid #3a4b69;background:#15223a;color:#c9d8ff;display:grid;place-items:center;font-size:10px}.content{max-width:1440px;padding:30px;margin:auto}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:24px}.eyebrow{font-size:9px;letter-spacing:.16em;color:var(--blue);text-transform:uppercase}.page-head h1{font-size:25px;letter-spacing:-.07em;margin:8px 0 6px}.page-head p{color:var(--muted);font-size:11px;margin:0;line-height:1.7}.btn{border:1px solid #3b4f75;background:#172642;color:#e5edff;padding:10px 13px;border-radius:4px;font-size:10px}.btn:hover{background:#20365e}.btn.ghost{background:transparent;border-color:var(--line);color:#aeb9ca}.btn.danger{border-color:#63363d;background:#271419;color:#ffb9bf}.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:5px;min-width:0}.stat{padding:17px}.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}.stat-value{font-size:25px;letter-spacing:-.07em;margin:14px 0 5px}.stat-foot{font-size:9px;color:var(--muted)}.stat-foot em{font-style:normal;color:var(--cyan)}.cols{grid-template-columns:minmax(0,1.5fr) minmax(260px,.9fr)}.panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.panel-head strong{font-size:11px}.panel-head small{font-size:9px;color:var(--muted)}.panel-body{padding:17px}.service-list{display:grid}.service{display:grid;grid-template-columns:1fr auto auto;gap:18px;align-items:center;padding:13px 0;border-bottom:1px solid #1b2431}.service:last-child{border:0}.service b{font-size:11px}.service small{display:block;color:var(--muted);font-size:9px;margin-top:5px}.state{font-size:9px;padding:4px 7px;border:1px solid #39465a;color:#b4c0d3;white-space:nowrap}.state.ok{color:var(--green);border-color:#275744}.state.warn{color:var(--amber);border-color:#604d2d}.state.off{color:#a1adbf;border-color:#39465a}.latency{font-size:10px;color:#aab6c8;white-space:nowrap}.chart{height:160px;display:flex;align-items:end;gap:8px;padding:15px 4px 22px;border-bottom:1px solid var(--line);background:repeating-linear-gradient(to bottom,transparent 0,transparent 38px,#1a2330 39px)}.bar{flex:1;min-width:4px;background:linear-gradient(180deg,#7798ff,#354d88);border-radius:2px 2px 0 0;position:relative}.bar:after{content:attr(data-label);position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:8px;color:#738096}.feed{display:grid;gap:13px}.feed-item{display:flex;gap:10px;align-items:flex-start}.feed-dot{width:7px;height:7px;border-radius:50%;background:#667b9c;margin-top:4px;flex:none}.feed-item b{font-size:10px;font-weight:500}.feed-item small{display:block;color:var(--muted);font-size:9px;margin-top:4px}.notice{padding:11px 13px;border:1px solid #54452b;background:#17140e;color:#d7bd8b;font-size:10px;line-height:1.7;margin-bottom:16px}.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.tile{padding:18px}.tile h3{font-size:12px;margin:0 0 7px}.tile p{font-size:10px;color:var(--muted);line-height:1.7;margin:0 0 14px}.tile-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}.tag{font-size:8px;color:#a9b7ce;border:1px solid #303d52;padding:4px 6px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:620px}.table th,.table td{text-align:left;padding:13px 15px;border-bottom:1px solid #1d2735;font-size:10px;white-space:nowrap}.table th{color:#718097;font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.1em}.table td{color:#c4cede}.table code{color:#9db6ff;font-family:var(--mono)}.table tr:last-child td{border:0}.filters{display:flex;gap:8px;flex-wrap:wrap}.filters button{background:#0d131c;border:1px solid var(--line);padding:7px 10px;color:#8e9bb0;font-size:9px}.filters button.active{border-color:#536fae;color:#dce7ff;background:#14213a}.agent-icon{width:34px;height:34px;border:1px solid #344866;background:#121d30;display:grid;place-items:center;color:#a9c0ff}.agent-row{display:flex;gap:12px;align-items:center}.agent-row strong{font-size:11px}.agent-row small{display:block;color:var(--muted);font-size:9px;margin-top:4px}.api-path{color:#b8caff;font-size:10px}.method{font-size:8px;padding:4px 6px;border:1px solid #315b4a;color:#81dcb1}.method.post{border-color:#66512c;color:#e7c17e}.method.delete{border-color:#633b40;color:#f19ba2}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:9px;color:#91a0b5}.field input,.field select,.field textarea{width:100%;background:#080d14;border:1px solid #293548;color:#e6edf8;padding:10px;border-radius:3px}.field textarea{min-height:90px;resize:vertical}.modal-backdrop{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:30}.modal-backdrop.show{display:flex}.modal{width:min(520px,100%);background:#0d131c;border:1px solid #33415a;border-radius:6px;box-shadow:0 25px 90px #000;padding:20px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head strong{font-size:13px}.close{background:none;border:0;color:#93a0b4;font-size:20px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.empty{padding:28px;text-align:center;color:var(--muted);font-size:10px}.doc-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.doc{border:1px solid var(--line);background:#0b1018;padding:17px;display:block}.doc:hover{border-color:#506a9d}.doc strong{font-size:11px}.doc p{font-size:9px;color:var(--muted);line-height:1.7}.doc span{font-size:9px;color:#9db6ff}.log{font-size:10px;color:#9cabc0;padding:9px 0;border-bottom:1px solid #1b2532;display:grid;grid-template-columns:75px 55px 1fr;gap:10px}.log code{color:#a9bfff}.mobile-menu{display:none}
+@media(max-width:900px){.app{grid-template-columns:210px minmax(0,1fr)}.content{padding:22px}.stats{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.app{display:block}.sidebar{position:fixed;z-index:25;left:-260px;top:0;width:248px;transition:left .2s;box-shadow:15px 0 50px #0008}.sidebar.open{left:0}.mobile-menu{display:inline-flex;background:transparent;border:1px solid var(--line);padding:8px 10px}.topbar{height:60px;padding:0 14px}.crumb{display:none}.search{width:42vw}.content{padding:20px 14px}.page-head{display:block}.page-head>.btn{margin-top:14px}.stats{gap:9px}.stat{padding:13px}.stat-value{font-size:21px}.cols,.cards,.doc-list{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.service{gap:8px;grid-template-columns:1fr auto}.latency{display:none}.log{grid-template-columns:58px 45px 1fr;font-size:9px}.panel-body{padding:13px}}
+</style>
 </head>
 <body>
-  <div class="topline"></div>
-  <header>
-    <div class="wrap nav">
-      <a class="brand" href="#" aria-label="OCodeJS Server home"><span class="mark">O/</span><span>OCodeJS<small>SERVER ECOSYSTEM</small></span></a>
-      <button class="menu" id="menu" aria-label="Mở điều hướng" aria-expanded="false">MENU</button>
-      <nav class="navlinks" id="navlinks" aria-label="Điều hướng chính">
-        <a href="#platform">Nền tảng</a><a href="#architecture">Kiến trúc</a><a href="#ecosystem">Hệ sinh thái</a><a href="#start">Bắt đầu</a>
-        <a class="navcta" href="https://github.com/OCodejs" target="_blank" rel="noreferrer">GITHUB ↗</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="wrap">
-        <div class="eyebrow"><span class="dot"></span> Developer infrastructure · Open ecosystem</div>
-        <h1>Build your tools.<br><span>Run your ideas.</span></h1>
-        <p class="hero-copy">OCodeJS là hệ sinh thái hạ tầng dành cho developer — kết nối ứng dụng, AI agents, công cụ lập trình và dịch vụ backend trong một trải nghiệm thống nhất. Từ một điểm điều phối, đưa ý tưởng thành sản phẩm có thể phát triển và mở rộng.</p>
-        <div class="actions">
-          <a class="btn" href="#platform">KHÁM PHÁ NỀN TẢNG <span aria-hidden="true">&nbsp;↘</span></a>
-          <a class="btn secondary" href="https://github.com/OCodejs" target="_blank" rel="noreferrer">XEM SOURCE CODE ↗</a>
-        </div>
-        <div class="hero-meta"><span><b>01</b> / AI WORKFLOWS</span><span><b>02</b> / DEVELOPER TOOLS</span><span><b>03</b> / CONNECTED SERVICES</span></div>
-      </div>
-    </section>
-
-    <section class="section" id="platform">
-      <div class="wrap">
-        <div class="section-head">
-          <div><div class="kicker">01 — Platform overview</div><h2>Một nền tảng.<br>Nhiều khả năng kết nối.</h2></div>
-          <p class="section-intro">OCodeJS hướng đến việc giảm phân mảnh giữa môi trường phát triển, lớp điều phối AI và các dịch vụ vận hành ứng dụng.</p>
-        </div>
-        <div class="overview" id="architecture">
-          <div class="overview-copy">
-            <h3>Developer-first infrastructure</h3>
-            <p>Thiết kế theo hướng module: mỗi thành phần có trách nhiệm rõ ràng, có thể tích hợp qua API hoặc giao thức phù hợp. Trang này giới thiệu định hướng kiến trúc của hệ sinh thái; trạng thái khả dụng của từng dịch vụ phụ thuộc vào repository và cấu hình triển khai tương ứng.</p>
-          </div>
-          <div class="architecture">
-            <div class="arch-label">CONCEPTUAL SYSTEM MAP / 04 LAYERS</div>
-            <div class="layer"><strong>01&nbsp; Developer Interface</strong><span>CLI · Workspace</span></div><div class="connector"></div>
-            <div class="layer"><strong>02&nbsp; Control & API Layer</strong><span>Routing · Identity</span></div><div class="connector"></div>
-            <div class="layer"><strong>03&nbsp; Agent Runtime</strong><span>Providers · Orchestration</span></div><div class="connector"></div>
-            <div class="layer"><strong>04&nbsp; Connected Services</strong><span>MCP · Cloud · Data</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <div class="section-head">
-          <div><div class="kicker">02 — Core capabilities</div><h2>Hạ tầng cho<br>developer hiện đại.</h2></div>
-          <p class="section-intro">Các nhóm năng lực được tổ chức để hỗ trợ vòng đời phát triển — từ viết code, điều phối agent đến kết nối dịch vụ.</p>
-        </div>
-        <div class="grid">
-          <article class="card"><div class="card-num">CAPABILITY / 01</div><h3>AI Agent Orchestration</h3><p>Kết nối nhiều AI provider và thiết kế luồng làm việc đa agent cho các tác vụ phát triển phần mềm.</p><span class="tag">MULTI-PROVIDER</span></article>
-          <article class="card"><div class="card-num">CAPABILITY / 02</div><h3>Developer Workspace</h3><p>Không gian làm việc tập trung cho công cụ, dự án, tài liệu và quy trình xây dựng ứng dụng.</p><span class="tag">WORKSPACE</span></article>
-          <article class="card"><div class="card-num">CAPABILITY / 03</div><h3>CLI & Automation</h3><p>Đưa thao tác phát triển và quản lý dự án vào workflow có thể lặp lại, kiểm tra và tự động hóa.</p><span class="tag">CLI TOOLING</span></article>
-          <article class="card"><div class="card-num">CAPABILITY / 04</div><h3>Identity & Access</h3><p>Lớp định danh và xác thực cho trải nghiệm tài khoản, quyền truy cập và tích hợp dịch vụ.</p><span class="tag">AUTH INTEGRATION</span></article>
-          <article class="card"><div class="card-num">CAPABILITY / 05</div><h3>MCP Connectivity</h3><p>Kết nối công cụ và nguồn dữ liệu qua Model Context Protocol trong các workflow tương thích.</p><span class="tag">MCP ECOSYSTEM</span></article>
-          <article class="card"><div class="card-num">CAPABILITY / 06</div><h3>Cloud Deployment</h3><p>Tích hợp với nền tảng triển khai hiện đại để xây dựng, phát hành và vận hành ứng dụng.</p><span class="tag">CLOUD INTEGRATIONS</span></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="ecosystem">
-      <div class="wrap">
-        <div class="section-head">
-          <div><div class="kicker">03 — Open ecosystem</div><h2>Khám phá các<br>thành phần OCode.js.</h2></div>
-          <p class="section-intro">Truy cập mã nguồn và theo dõi tiến độ phát triển trực tiếp tại các repository của hệ sinh thái.</p>
-        </div>
-        <div class="ecosystem">
-          <a class="repo" href="https://github.com/OCodejs/OCodejs" target="_blank" rel="noreferrer"><span><strong>OCodejs / OCodejs</strong><small>Core developer tooling & packages</small></span><span class="arrow">↗</span></a>
-          <a class="repo" href="https://github.com/OCodejs/ask-chatbot" target="_blank" rel="noreferrer"><span><strong>OCodejs / ask-chatbot</strong><small>AI assistant & agent orchestration</small></span><span class="arrow">↗</span></a>
-          <a class="repo" href="https://github.com/OCodejs/ocodejs-legal" target="_blank" rel="noreferrer"><span><strong>OCodejs / ocodejs-legal</strong><small>Legal information center</small></span><span class="arrow">↗</span></a>
-          <a class="repo" href="https://github.com/zskbot/ocodejs-cli" target="_blank" rel="noreferrer"><span><strong>zskbot / ocodejs-cli</strong><small>OCode.js CLI Hub</small></span><span class="arrow">↗</span></a>
-          <a class="repo" href="https://github.com/zskbot/ask-ocodejs" target="_blank" rel="noreferrer"><span><strong>zskbot / ask-ocodejs</strong><small>Ask OCode.js application</small></span><span class="arrow">↗</span></a>
-          <a class="repo" href="https://github.com/OCodejs" target="_blank" rel="noreferrer"><span><strong>OCode.js Organization</strong><small>All public repositories</small></span><span class="arrow">↗</span></a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="start">
-      <div class="wrap">
-        <div class="cta">
-          <div><div class="kicker">04 — Get involved</div><h2>Build the next layer<br>of OCode.js.</h2><p>Khám phá mã nguồn, đọc tài liệu và tham gia đóng góp để cùng phát triển hệ sinh thái developer mở.</p></div>
-          <a class="btn" href="https://github.com/OCodejs" target="_blank" rel="noreferrer">EXPLORE GITHUB ↗</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer><div class="wrap foot"><span>© <span id="year">2026</span> OCode.js — Developer infrastructure ecosystem.</span><div class="footlinks"><a href="https://github.com/OCodejs" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/OCodejs/ocodejs-legal" target="_blank" rel="noreferrer">Legal</a></div></div></footer>
-  <script>
-    const menu = document.getElementById('menu');
-    const nav = document.getElementById('navlinks');
-    menu.addEventListener('click', () => {
-      const open = nav.classList.toggle('open');
-      menu.setAttribute('aria-expanded', String(open));
-    });
-    nav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-      nav.classList.remove('open');
-      menu.setAttribute('aria-expanded', 'false');
-    }));
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+ <div class="brand"><div class="logo">O/</div><div><strong>OCodeJS Server</strong><small>CONTROL CENTER</small></div></div>
+ <div class="nav-label">WORKSPACE</div>
+ <nav class="nav" aria-label="Dashboard navigation">
+  <button class="active" data-view="overview"><span class="ico">▦</span>Server Dashboard</button>
+  <button data-view="agents"><span class="ico">✳</span>AI Agents</button>
+  <button data-view="api"><span class="ico">⌘</span>API Gateway</button>
+  <button data-view="auth"><span class="ico">◈</span>Authentication</button>
+  <button data-view="mcp"><span class="ico">⛓</span>MCP Server</button>
+  <button data-view="console"><span class="ico">▤</span>Developer Console</button>
+  <button data-view="docs"><span class="ico">▧</span>Documentation</button>
+ </nav>
+ <div class="side-bottom"><div class="connection"><small>ENVIRONMENT</small><strong>Static preview · no backend</strong><span class="demo-pill">● DEMO MODE</span></div></div>
+</aside>
+<main class="main">
+ <header class="topbar"><div class="top-actions"><button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button><div class="crumb">OCodeJS / <b id="crumb">Server Dashboard</b></div></div><div class="top-actions"><input class="search" id="globalSearch" placeholder="Tìm trong trang hiện tại..." aria-label="Tìm kiếm"><div class="avatar" title="Preview">OC</div></div></header>
+ <div class="content" id="view"></div>
+</main>
+</div>
+<div class="modal-backdrop" id="modal"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><strong id="modalTitle">Thêm kết nối</strong><button class="close" id="closeModal" aria-label="Đóng">×</button></div><form id="connectionForm"><div class="form-grid"><div class="field full"><label for="connName">Tên kết nối</label><input id="connName" required placeholder="Ví dụ: Local MCP"></div><div class="field"><label for="connType">Loại kết nối</label><select id="connType"><option>MCP Server</option><option>AI Provider</option><option>API Service</option></select></div><div class="field"><label for="connUrl">Endpoint URL</label><input id="connUrl" type="url" placeholder="https://..."></div><div class="field full"><label for="connNote">Ghi chú</label><textarea id="connNote" placeholder="Mô tả mục đích kết nối (không nhập token hoặc secret)"></textarea></div></div><p style="font-size:9px;color:#8c9ab0;line-height:1.7">Bản preview chỉ lưu trạng thái tạm trong trình duyệt hiện tại. Chưa gửi dữ liệu tới máy chủ.</p><div class="modal-actions"><button type="button" class="btn ghost" id="cancelModal">Hủy</button><button class="btn" type="submit">Thêm vào bản preview</button></div></form></section></div>
+<script>
+const viewRoot=document.getElementById('view');
+const names={overview:'Server Dashboard',agents:'AI Agents',api:'API Gateway',auth:'Authentication',mcp:'MCP Server',console:'Developer Console',docs:'Documentation'};
+let current='overview',connections=[];
+const services=[['AI Agent Runtime','Điều phối tác vụ agent','Chưa kết nối','off','—'],['API Gateway','Định tuyến API & rate limits','Chưa kết nối','off','—'],['Identity / Auth','OAuth · session · account','Chưa kết nối','off','—'],['MCP Registry','Quản lý MCP endpoints','Chưa kết nối','off','—'],['Developer Telemetry','Logs · metrics · traces','Chưa kết nối','off','—']];
+const agents=[['Code Assistant','Lập trình & review mã nguồn','Provider chưa cấu hình','off'],['Build Agent','Build và kiểm tra ứng dụng','Runtime chưa kết nối','off'],['Research Agent','Tìm kiếm và tổng hợp tài liệu','Provider chưa cấu hình','off'],['Automation Agent','Điều phối workflow tự động','Runtime chưa kết nối','off'],['Support Agent','Hỗ trợ người dùng','Provider chưa cấu hình','off'],['Security Agent','Phân tích rủi ro mã nguồn','Runtime chưa kết nối','off']];
+const endpoints=[['GET','/v1/health','Kiểm tra trạng thái gateway','Chưa triển khai'],['POST','/v1/agents/run','Khởi chạy một agent task','Chưa triển khai'],['GET','/v1/agents','Danh sách AI agents','Chưa triển khai'],['GET','/v1/mcp/connections','Danh sách MCP connections','Chưa triển khai'],['POST','/v1/auth/session','Tạo phiên đăng nhập','Chưa triển khai'],['GET','/v1/usage','Thống kê mức sử dụng API','Chưa triển khai']];
+function header(kicker,title,desc,action=''){return '<div class="page-head"><div><div class="eyebrow">'+kicker+'</div><h1>'+title+'</h1><p>'+desc+'</p></div>'+action+'</div>'}
+function panel(title,body,extra=''){return '<section class="panel"><div class="panel-head"><strong>'+title+'</strong>'+extra+'</div>'+body+'</section>'}
+function overview(){return header('SYSTEM OVERVIEW / 00','Server Dashboard','Tổng quan các thành phần OCodeJS Server. Trạng thái bên dưới phản ánh cấu hình preview, không phải health check máy chủ.')+
+'<div class="notice">DEMO / FRONTEND PREVIEW — Dashboard hiện chưa kết nối backend, database, OAuth provider hoặc telemetry. Không có số liệu vận hành thực được giả lập.</div>'+
+'<div class="grid stats"><div class="stat"><div class="stat-top">Services <span>◌</span></div><div class="stat-value">0 / 5</div><div class="stat-foot">Đã xác thực kết nối</div></div><div class="stat"><div class="stat-top">AI Agents <span>✳</span></div><div class="stat-value">0 / 6</div><div class="stat-foot">Runtime chưa cấu hình</div></div><div class="stat"><div class="stat-top">API Endpoints <span>⌘</span></div><div class="stat-value">06</div><div class="stat-foot">Danh mục thiết kế · chưa publish</div></div><div class="stat"><div class="stat-top">MCP Connections <span>⛓</span></div><div class="stat-value">'+connections.length+'</div><div class="stat-foot">Preview local only</div></div></div>'+
+'<div class="grid cols">'+panel('SERVICE STATUS','<div class="panel-body service-list">'+services.map(s=>'<div class="service"><div><b>'+s[0]+'</b><small>'+s[1]+'</small></div><span class="state '+s[3]+'">'+s[2]+'</span><span class="latency">'+s[4]+'</span></div>').join('')+'</div>','<small>LIVE CHECK: OFF</small>')+
+panel('REQUEST VOLUME','<div class="panel-body"><div class="chart">'+[24,35,28,45,38,53,42,31,48,37,57,44].map((n,i)=>'<div class="bar" style="height:'+n+'%" data-label="'+(i+1)+'"></div>').join('')+'</div><p style="font-size:9px;color:var(--muted);margin:12px 0 0">Biểu đồ minh họa bố cục · không phải dữ liệu traffic.</p></div>','<small>ILLUSTRATION</small>')+
+'</div><div style="height:14px"></div><div class="grid cols">'+panel('RECENT ACTIVITY','<div class="panel-body feed"><div class="feed-item"><i class="feed-dot"></i><div><b>Control Center preview initialized</b><small>Giao diện tĩnh · chưa có event stream</small></div></div><div class="feed-item"><i class="feed-dot"></i><div><b>API catalog loaded</b><small>6 endpoint mẫu · chưa có API server</small></div></div><div class="feed-item"><i class="feed-dot"></i><div><b>Backend integration pending</b><small>Cần cấu hình service endpoints và auth</small></div></div></div>')+panel('QUICK ACCESS','<div class="panel-body feed"><button class="btn ghost" data-go="agents">Mở AI Agents →</button><button class="btn ghost" data-go="api">Xem API Catalog →</button><button class="btn ghost" data-go="mcp">Quản lý MCP →</button><button class="btn ghost" data-go="docs">Đọc tài liệu →</button></div>')+'</div>'}
+function agentView(){return header('AI PLATFORM / 01','AI Agents','Danh mục agent dự kiến và trạng thái cấu hình provider/runtime. Chưa có agent nào được kết nối backend.')+'<div class="notice">Các agent bên dưới là cấu hình mẫu cho giao diện quản trị. Chưa thể chạy tác vụ hoặc gọi model trong bản GitHub Pages này.</div><div class="grid cards">'+agents.map((a,i)=>'<article class="panel tile"><div class="agent-row"><div class="agent-icon">'+['✳','⌘','⌕','↻','◉','◇'][i]+'</div><div><strong>'+a[0]+'</strong><small>'+a[1]+'</small></div></div><p style="margin-top:16px">'+a[2]+'</p><div class="tile-foot"><span class="state off">NOT CONNECTED</span><button class="btn ghost" data-connect="'+a[0]+'">Cấu hình</button></div></article>').join('')+'</div>'}
+function apiView(){return header('NETWORK / 02','API Gateway','Danh mục endpoint đề xuất cho OCodeJS Server. Method và route là thiết kế tham chiếu, chưa được publish.')+'<div class="notice">API chưa có base URL hoặc backend implementation được xác minh. Không gửi request thật từ trang này.</div>'+panel('ENDPOINT CATALOG','<div class="table-wrap"><table class="table"><thead><tr><th>Method</th><th>Endpoint</th><th>Mô tả</th><th>Availability</th></tr></thead><tbody>'+endpoints.map(e=>'<tr><td><span class="method '+(e[0]==='POST'?'post':e[0]==='DELETE'?'delete':'')+'">'+e[0]+'</span></td><td class="api-path">'+e[1]+'</td><td>'+e[2]+'</td><td><span class="state off">'+e[3]+'</span></td></tr>').join('')+'</tbody></table></div>','<small>6 ROUTES</small>')+'<div style="height:14px"></div><div class="grid cards"><article class="panel tile"><h3>Authentication</h3><p>Bearer token hoặc session cookie; cần triển khai middleware và policy.</p><span class="tag">DESIGN REQUIRED</span></article><article class="panel tile"><h3>Rate limiting</h3><p>Giới hạn theo API key, user hoặc client ID; cấu hình Redis/edge storage.</p><span class="tag">DESIGN REQUIRED</span></article><article class="panel tile"><h3>Observability</h3><p>Request ID, structured logs, latency và error metrics.</p><span class="tag">DESIGN REQUIRED</span></article></div>'}
+function authView(){return header('IDENTITY / 03','Authentication','Khu vực tài khoản và đăng nhập. Bản preview chỉ mô phỏng layout, không xử lý thông tin xác thực.')+'<div class="notice">BẢO MẬT: Không nhập mật khẩu, OAuth secret hoặc token thật tại đây. Form đăng nhập đang bị vô hiệu hóa cho đến khi kết nối Auth backend.</div><div class="grid cols"><section class="panel"><div class="panel-head"><strong>ACCOUNT SIGN IN</strong><span class="state off">BACKEND OFFLINE</span></div><div class="panel-body"><div class="field"><label>Email address</label><input disabled placeholder="you@example.com"></div><div class="field" style="margin-top:12px"><label>Password</label><input disabled type="password" placeholder="••••••••••"></div><button class="btn" disabled style="width:100%;margin-top:16px;opacity:.45">Đăng nhập · chưa khả dụng</button><div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" disabled style="flex:1;opacity:.45">Continue with GitHub</button><button class="btn ghost" disabled style="flex:1;opacity:.45">Continue with Google</button></div></div></section><section class="panel"><div class="panel-head"><strong>IDENTITY CONFIGURATION</strong></div><div class="panel-body feed"><div class="service"><div><b>Credentials provider</b><small>Email / password</small></div><span class="state off">NOT SET</span></div><div class="service"><div><b>GitHub OAuth</b><small>OAuth application</small></div><span class="state off">NOT SET</span></div><div class="service"><div><b>Google OAuth</b><small>OAuth application</small></div><span class="state off">NOT SET</span></div><div class="service"><div><b>Session storage</b><small>Database / KV</small></div><span class="state off">NOT SET</span></div></div></section></div>'}
+function mcpView(){return header('CONNECTIVITY / 04','MCP Server','Quản lý danh sách Model Context Protocol endpoints và kết nối công cụ.', '<button class="btn" id="addConnection">＋ Thêm connection</button>')+'<div class="notice">Kết nối thêm ở đây chỉ được lưu tạm trong state của trang preview. Chưa thực hiện handshake MCP initialize, tools/list hoặc lưu credential.</div>'+panel('MCP CONNECTIONS',connections.length?'<div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Type</th><th>Endpoint</th><th>Status</th></tr></thead><tbody>'+connections.map(c=>'<tr><td>'+escapeHtml(c.name)+'</td><td>'+escapeHtml(c.type)+'</td><td><code>'+escapeHtml(c.url||'Not provided')+'</code></td><td><span class="state warn">PREVIEW ONLY</span></td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Chưa có MCP connection trong phiên preview.<br><br><button class="btn" id="addConnectionEmpty">＋ Tạo kết nối mẫu</button></div>','<small>'+connections.length+' LOCAL ITEMS</small>')+'<div style="height:14px"></div><div class="grid cards"><article class="panel tile"><h3>Transport</h3><p>Streamable HTTP hoặc stdio tùy môi trường runtime.</p><span class="tag">MCP TRANSPORT</span></article><article class="panel tile"><h3>Handshake</h3><p>Initialize, protocol negotiation và capability exchange.</p><span class="tag">INITIALIZE</span></article><article class="panel tile"><h3>Tool discovery</h3><p>Liệt kê tools, schemas và quyền gọi công cụ.</p><span class="tag">TOOLS / LIST</span></article></div>'}
+function consoleView(){return header('OBSERVABILITY / 05','Developer Console','Logs, monitoring và integrations. Chưa có telemetry pipeline hoặc log stream kết nối.')+'<div class="notice">Không có log hệ thống thật được truy xuất. Dòng bên dưới là event trạng thái của giao diện preview.</div><div class="grid stats"><div class="stat"><div class="stat-top">Error rate</div><div class="stat-value">N/A</div><div class="stat-foot">No telemetry source</div></div><div class="stat"><div class="stat-top">P95 latency</div><div class="stat-value">N/A</div><div class="stat-foot">No request metrics</div></div><div class="stat"><div class="stat-top">Events</div><div class="stat-value">03</div><div class="stat-foot">Local preview events</div></div><div class="stat"><div class="stat-top">Integrations</div><div class="stat-value">0</div><div class="stat-foot">Not configured</div></div></div><div class="grid cols">'+panel('PREVIEW EVENT LOG','<div class="panel-body"><div class="log"><span>LOCAL</span><code>INFO</code><span>Control Center interface mounted</span></div><div class="log"><span>LOCAL</span><code>INFO</code><span>API catalog rendered</span></div><div class="log"><span>LOCAL</span><code>WARN</code><span>Backend telemetry adapter not configured</span></div><div class="log"><span>LOCAL</span><code>WARN</code><span>Authentication provider unavailable</span></div></div>','<small>LOCAL ONLY</small>')+panel('INTEGRATIONS','<div class="panel-body service-list">'+[['GitHub','Repository & CI status'],['Cloudflare','Workers / Pages'],['Vercel','Preview deployments'],['OpenTelemetry','Logs · metrics · traces'],['PostgreSQL / Redis','Persistence & cache']].map(x=>'<div class="service"><div><b>'+x[0]+'</b><small>'+x[1]+'</small></div><span class="state off">NOT CONNECTED</span></div>').join('')+'</div>')+'</div>'}
+function docsView(){const docs=[['Getting Started','Tổng quan kiến trúc, yêu cầu runtime và cách khởi tạo môi trường.','/docs/getting-started'],['Server Architecture','Control plane, API layer, agent runtime và service adapters.','/docs/architecture'],['API Reference','Quy ước endpoint, request schema, auth và error response.','/docs/api'],['AI Agents','Provider configuration, agent lifecycle và orchestration.','/docs/agents'],['Authentication','OAuth, session management, account và access policy.','/docs/authentication'],['MCP Integration','MCP transport, initialize, tools/list và connection security.','/docs/mcp'],['Observability','Structured logging, metrics, tracing và alerting.','/docs/observability'],['Deployment','Environment variables, secrets, staging và production release.','/docs/deployment']];return header('KNOWLEDGE BASE / 06','Documentation','Tài liệu kỹ thuật và hướng dẫn tích hợp. Các trang con là cấu trúc đề xuất; nội dung chi tiết đang được xây dựng.')+'<div class="notice">Tài liệu trong danh mục này chưa được publish thành các trang riêng. Liên kết hiện mở repository để theo dõi source và cập nhật.</div><div class="doc-list">'+docs.map(d=>'<a class="doc" href="https://github.com/OCodejs/ocodejs.github.io" target="_blank" rel="noreferrer"><strong>'+d[0]+'</strong><p>'+d[1]+'</p><span>'+d[2]+' ↗</span></a>').join('')+'</div><div style="height:14px"></div>'+panel('PROJECT LINKS','<div class="panel-body feed"><a href="https://github.com/OCodejs" target="_blank" rel="noreferrer">OCode.js organization ↗</a><a href="https://github.com/OCodejs/ocodejs.github.io" target="_blank" rel="noreferrer">Control Center source ↗</a><a href="https://github.com/zskbot/ocodejs-cli" target="_blank" rel="noreferrer">OCode.js CLI ↗</a></div>')}
+const renderers={overview,agents:agentView,api:apiView,auth:authView,mcp:mcpView,console:consoleView,docs:docsView};
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function navigate(key){if(!renderers[key])return;current=key;document.getElementById('crumb').textContent=names[key];document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===key));viewRoot.innerHTML=renderers[key]();document.getElementById('globalSearch').value='';document.getElementById('sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'});bindView()}
+function bindView(){viewRoot.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));const add=document.getElementById('addConnection')||document.getElementById('addConnectionEmpty');if(add)add.addEventListener('click',openModal);viewRoot.querySelectorAll('[data-connect]').forEach(b=>b.addEventListener('click',()=>{navigate('mcp');openModal();document.getElementById('connName').value=b.dataset.connect+' provider'}))}
+function openModal(){document.getElementById('modal').classList.add('show');document.getElementById('connName').focus()}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.view)));
+document.getElementById('mobileMenu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('closeModal').addEventListener('click',closeModal);document.getElementById('cancelModal').addEventListener('click',closeModal);
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.getElementById('connectionForm').addEventListener('submit',e=>{e.preventDefault();connections.push({name:document.getElementById('connName').value,type:document.getElementById('connType').value,url:document.getElementById('connUrl').value});closeModal();e.target.reset();navigate('mcp')});
+document.getElementById('globalSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase();viewRoot.querySelectorAll('.service,.tile,.doc,.table tbody tr,.feed-item,.log').forEach(el=>el.style.display=el.textContent.toLowerCase().includes(q)?'':'none')});
+navigate('overview');
+</script>
 </body>
 </html>
