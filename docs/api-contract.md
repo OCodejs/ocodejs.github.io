@@ -7,7 +7,7 @@ Base path: /api/v1
 ## Conventions
 - HTTPS outside local development; JSON bodies.
 - Secure session cookie for browser control-plane calls; scoped bearer/API tokens for machine clients.
-- Include requestId in every response; timestamps use ISO-8601 UTC.
+- Include requestId in every response and the `X-Request-Id` response header; timestamps use ISO-8601 UTC. The Control API also returns `Server-Timing` and emits structured request logs without query strings, bodies, cookies or authorization headers.
 - Cursor pagination; Idempotency-Key for retryable mutations.
 - Stable machine-readable error codes. Never return stack traces or secrets.
 
