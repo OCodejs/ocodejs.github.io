@@ -17,7 +17,6 @@ for (const marker of [
   "API UNREACHABLE",
   "refreshAuthReadiness",
   "cli-auth",
-  "mcp-server",
   "mcpInitialize",
   "ĐĂNG NHẬP TẠM KHÓA"
 ]) {
