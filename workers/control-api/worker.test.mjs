@@ -65,7 +65,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     assert.equal(body.services.find((item) => item.id === "cli-auth").state, "healthy");
     assert.equal(body.services.find((item) => item.id === "cli-auth").source, "remote_probe");
     assert.equal(body.services.find((item) => item.id === "mcp-server").state, "healthy");
-    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 4);
+    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 6);
     assert.equal(body.count, body.services.length);
   } finally {
     globalThis.fetch = originalFetch;
@@ -327,7 +327,9 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
             { name: "get_control_api_health", description: "Read health" },
             { name: "list_services", description: "List services" },
             { name: "list_agents", description: "List agent definitions" },
-            { name: "get_agent_definition", description: "Read one agent definition" }
+            { name: "get_agent_definition", description: "Read one agent definition" },
+            { name: "list_providers", description: "List provider definitions" },
+            { name: "get_provider_definition", description: "Read one provider definition" }
           ]
         }
       });
@@ -342,7 +344,7 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
     assert.equal(calls, 3);
     assert.equal(body.connections[0].id, "ocodejs-mcp-staging");
     assert.equal(body.connections[0].state, "healthy");
-    assert.equal(body.connections[0].toolCount, 4);
+    assert.equal(body.connections[0].toolCount, 6);
     assert.equal(body.connections[0].access, "read_only");
     assert.equal(body.connections[0].managed, false);
   } finally {
@@ -385,7 +387,9 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
             { name: "get_control_api_health", description: "Read health" },
             { name: "list_services", description: "List services" },
             { name: "list_agents", description: "List agent definitions" },
-            { name: "get_agent_definition", description: "Read one agent definition" }
+            { name: "get_agent_definition", description: "Read one agent definition" },
+            { name: "list_providers", description: "List provider definitions" },
+            { name: "get_provider_definition", description: "Read one provider definition" }
           ]
         }
       });
@@ -399,9 +403,27 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
     assert.equal(body.connection.id, "ocodejs-mcp-staging");
     assert.equal(body.connection.environment, "staging");
     assert.equal(body.connection.state, "healthy");
-    assert.equal(body.connection.toolCount, 4);
+    assert.equal(body.connection.toolCount, 6);
     assert.equal(body.connection.managed, false);
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+
+test("runtime readiness explicitly keeps provider inference and agent execution disabled", async () => {
+  const response = await call("/api/v1/runtime/status");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.runtime.state, "not_configured");
+  assert.deepEqual(body.runtime.provider, { id: null, state: "not_configured" });
+  assert.deepEqual(body.runtime.cataloguedProviders, ["cloudflare-workers-ai"]);
+  assert.deepEqual(body.runtime.configuredProviders, []);
+  assert.deepEqual(body.runtime.runStore, { state: "not_configured" });
+  assert.equal(body.runtime.executionEnabled, false);
+  assert.equal(body.runtime.inferenceEnabled, false);
+  assert.equal(body.runtime.runLifecycle, "disabled");
+  assert.equal(body.runtime.approvalRequired, true);
+  assert.ok(body.checkedAt);
+  assert.ok(body.requestId);
 });
