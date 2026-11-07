@@ -27,6 +27,21 @@ const TOOLS = [
       required: ["agentId"],
       additionalProperties: false
     }
+  },
+  {
+    name: "list_providers",
+    description: "List catalogued AI provider adapters and their configuration states. This tool never invokes inference.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false }
+  },
+  {
+    name: "get_provider_definition",
+    description: "Read one catalogued AI provider adapter by ID. This tool never invokes inference.",
+    inputSchema: {
+      type: "object",
+      properties: { providerId: { type: "string", pattern: "^[a-z0-9-]+$" } },
+      required: ["providerId"],
+      additionalProperties: false
+    }
   }
 ];
 
@@ -80,7 +95,7 @@ async function callTool(name, args) {
   if (!args || typeof args !== "object" || Array.isArray(args)) {
     throw new TypeError("Tool arguments must be an object");
   }
-  if (name === "get_control_api_health" || name === "list_services" || name === "list_agents") {
+  if (name === "get_control_api_health" || name === "list_services" || name === "list_agents" || name === "list_providers") {
     if (Object.keys(args).length) throw new TypeError("This read-only tool accepts an empty arguments object");
   }
   if (name === "get_agent_definition") {
@@ -88,6 +103,15 @@ async function callTool(name, args) {
       throw new TypeError("agentId must match ^[a-z0-9-]+$ and no extra arguments are allowed");
     }
     return await getJson("/api/v1/agents/" + encodeURIComponent(args.agentId));
+  }
+  if (name === "get_provider_definition") {
+    if (Object.keys(args).length !== 1 || typeof args.providerId !== "string" || !/^[a-z0-9-]+$/.test(args.providerId)) {
+      throw new TypeError("providerId must match ^[a-z0-9-]+$ and no extra arguments are allowed");
+    }
+    return await getJson("/api/v1/providers/" + encodeURIComponent(args.providerId));
+  }
+  if (name === "list_providers") {
+    return await getJson("/api/v1/providers");
   }
   if (name === "list_agents") {
     return await getJson("/api/v1/agents");
@@ -125,8 +149,8 @@ async function handleRpc(message) {
       result: {
         protocolVersion: PROTOCOL_VERSION,
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "ocodejs-control-center", version: "1.0.0" },
-        instructions: "Read-only access to OCode.js staging health, service registry and versioned agent definitions. Agent execution is disabled."
+        serverInfo: { name: "ocodejs-control-center", version: "1.1.0" },
+        instructions: "Read-only access to OCode.js staging health, services, versioned agent definitions and AI provider catalog. Agent execution and model inference are disabled."
       }
     });
   }

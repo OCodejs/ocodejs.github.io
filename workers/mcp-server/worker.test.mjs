@@ -16,10 +16,10 @@ test("initializes a Streamable HTTP MCP session", async () => {
   assert.equal(data.result.serverInfo.name, "ocodejs-control-center");
 });
 
-test("lists only the four fixed read-only tools", async () => {
+test("lists only the six fixed read-only tools", async () => {
   const response = await worker.fetch(request({ jsonrpc: "2.0", id: 2, method: "tools/list" }));
   const data = await response.json();
-  assert.deepEqual(data.result.tools.map(tool => tool.name), ["get_control_api_health", "list_services", "list_agents", "get_agent_definition"]);
+  assert.deepEqual(data.result.tools.map(tool => tool.name), ["get_control_api_health", "list_services", "list_agents", "get_agent_definition", "list_providers", "get_provider_definition"]);
 });
 
 test("rejects unknown methods", async () => {
@@ -114,4 +114,47 @@ test("get_agent_definition rejects invalid IDs and extra arguments", async () =>
   }));
   const extraData = await extra.json();
   assert.equal(extraData.result.isError, true);
+});
+
+
+test("list_providers reads the fixed provider catalog without invoking inference", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init = {}) => {
+    assert.equal(url, "https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1/providers");
+    assert.equal(init.method, "GET");
+    return Response.json({ providers: [{ id: "cloudflare-workers-ai", state: "not_configured", executionEnabled: false }] });
+  };
+  try {
+    const response = await worker.fetch(request({ jsonrpc: "2.0", id: 40, method: "tools/call", params: { name: "list_providers", arguments: {} } }));
+    const data = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(data.result.structuredContent.providers[0].id, "cloudflare-workers-ai");
+    assert.equal(data.result.structuredContent.providers[0].state, "not_configured");
+    assert.equal(data.result.structuredContent.providers[0].executionEnabled, false);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("get_provider_definition validates ID and reads one fixed provider", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init = {}) => {
+    assert.equal(url, "https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1/providers/cloudflare-workers-ai");
+    assert.equal(init.method, "GET");
+    return Response.json({ provider: { id: "cloudflare-workers-ai", state: "not_configured", executionEnabled: false } });
+  };
+  try {
+    const response = await worker.fetch(request({ jsonrpc: "2.0", id: 41, method: "tools/call", params: { name: "get_provider_definition", arguments: { providerId: "cloudflare-workers-ai" } } }));
+    const data = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(data.result.structuredContent.provider.id, "cloudflare-workers-ai");
+    assert.equal(data.result.structuredContent.provider.executionEnabled, false);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("get_provider_definition rejects invalid IDs and extra arguments", async () => {
+  const invalid = await worker.fetch(request({ jsonrpc: "2.0", id: 42, method: "tools/call", params: { name: "get_provider_definition", arguments: { providerId: "../secrets" } } }));
+  const invalidData = await invalid.json();
+  assert.equal(invalidData.result.isError, true);
+  assert.match(invalidData.result.structuredContent.error, /providerId/);
+  const extra = await worker.fetch(request({ jsonrpc: "2.0", id: 43, method: "tools/call", params: { name: "list_providers", arguments: { invoke: true } } }));
+  assert.equal((await extra.json()).result.isError, true);
 });

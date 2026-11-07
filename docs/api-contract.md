@@ -36,6 +36,9 @@ Example health response:
 ## AI Providers
 The staging Control API exposes a read-only Provider Registry catalog. The Cloudflare Workers AI adapter is listed as a candidate but remains `not_configured`; no AI binding, inference request or model execution is enabled.
 
+## AI Runtime readiness
+`GET /runtime/status` reports the current provider, isolated run-store and execution readiness. At this stage the provider and run store are `not_configured`; both inference and agent execution are explicitly disabled. The route is read-only and does not allocate resources or invoke a model.
+
 | Method | Path | Purpose |
 |---|---|---|
 | GET | /providers | List provider adapters (implemented, read-only) |
@@ -73,6 +76,7 @@ The current Account Portal Auth.js runtime is not configured. The separate OCode
 
 | Method | Path | Purpose |
 |---|---|---|
+| GET | /runtime/status | Read AI provider/run-store readiness (implemented, read-only) |
 | GET | /services/cli-auth | Read-only health snapshot for the CLI GitHub OAuth/PAT Worker |
 | GET | /services/identity | Read-only status for the Account Portal Auth.js integration |
 | GET | /services/mcp-server | Read-only MCP initialize/tools/list protocol probe |
