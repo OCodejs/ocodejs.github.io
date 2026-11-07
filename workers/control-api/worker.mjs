@@ -405,7 +405,7 @@ async function handleRequest(request, env, url, headers, id) {
       }, 200, headers);
     }
 
-    const providerMatch = url.pathname.match(/^\\/api\\/v1\\/providers\\/([a-z0-9-]+)$/);
+    const providerMatch = url.pathname.match(/^\/api\/v1\/providers\/([a-z0-9-]+)$/);
     if (providerMatch) {
       const provider = PROVIDERS.find((item) => item.id === providerMatch[1]);
       if (!provider) {
