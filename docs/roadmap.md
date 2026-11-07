@@ -40,13 +40,10 @@ This roadmap separates the static control center from the multi-service platform
 - [ ] Enable sign-in controls only after the Preview release gate passes.
 
 ## Phase 4 — MCP management
-- [x] Register an isolated staging MCP endpoint and probe its protocol handshake from the Control API.
-- [ ] Add persistent MCP connection registration and management endpoints.
-- [x] Implement initialize/capability negotiation and tools/list on the staging MCP Worker.
-- [x] Verify initialize and tools/list contract with automated Control API probe tests.
+- [ ] Register and validate MCP endpoints.
+- [ ] Implement initialize/capability negotiation and tools/list.
 - [ ] Add server-side secret storage, SSRF protection and tool allowlists.
-- [x] Add read-only protocol health reporting with healthy/unknown/unavailable states.
-- [ ] Add authenticated connection health and protocol error telemetry.
+- [ ] Add connection health and protocol error reporting.
 
 ## Phase 5 — AI agent operations
 - [ ] Agent registry and versioned definitions.
