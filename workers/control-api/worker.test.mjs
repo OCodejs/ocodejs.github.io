@@ -376,3 +376,27 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test("runtime status reports no provider or run store and keeps execution disabled", async () => {
+  const response = await call("/api/v1/runtime/status");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.runtime.state, "not_configured");
+  assert.deepEqual(body.runtime.provider, { id: null, state: "not_configured" });
+  assert.deepEqual(body.runtime.availableProviders, []);
+  assert.equal(body.runtime.runStore.state, "not_configured");
+  assert.equal(body.runtime.executionEnabled, false);
+  assert.equal(body.runtime.runLifecycle, "disabled");
+  assert.equal(body.runtime.approvalRequired, true);
+  assert.ok(body.checkedAt);
+  assert.ok(body.requestId);
+});
+
+test("agent run mutation is rejected while Control API remains read-only", async () => {
+  const response = await call("/api/v1/agents/ocodejs-builder/runs", { method: "POST" });
+  const body = await response.json();
+  assert.equal(response.status, 405);
+  assert.equal(body.error.code, "METHOD_NOT_ALLOWED");
+  assert.equal(response.headers.get("Allow"), "GET, OPTIONS");
+});
