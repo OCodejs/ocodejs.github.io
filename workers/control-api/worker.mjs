@@ -1,5 +1,5 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.4.0";
+const API_VERSION = "1.7.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
@@ -40,6 +40,19 @@ const AGENTS = [
     tools: [],
     executionEnabled: false,
     approvalRequired: true
+  }
+];
+
+const PROVIDERS = [
+  {
+    id: "cloudflare-workers-ai",
+    name: "Cloudflare Workers AI",
+    kind: "managed_inference",
+    state: "not_configured",
+    description: "Provider adapter is catalogued but no AI binding or explicit runtime enable flag is configured in staging.",
+    capabilities: ["text_generation"],
+    executionEnabled: false,
+    requiresExplicitEnablement: true
   }
 ];
 
@@ -252,12 +265,12 @@ async function probeMcpServer() {
     }
     const listed = await toolsResponse.json();
     const toolNames = (listed?.result?.tools || []).map((tool) => tool.name).sort();
-    if (JSON.stringify(toolNames) !== JSON.stringify(["get_control_api_health", "list_services"])) {
+    if (JSON.stringify(toolNames) !== JSON.stringify(["get_agent_definition", "get_control_api_health", "get_provider_definition", "list_agents", "list_providers", "list_services"])) {
       return { state: "unknown", description: "MCP tools/list did not return the expected read-only tool allowlist.", checkedAt, latencyMs: Date.now() - startedAt };
     }
     return {
       state: "healthy",
-      description: "MCP initialize and tools/list passed; two read-only tools discovered. Tool execution is not part of this probe.",
+      description: "MCP initialize and tools/list passed; six read-only tools discovered. Tool execution is not part of this probe.",
       checkedAt,
       latencyMs: Date.now() - startedAt,
       toolCount: toolNames.length
@@ -310,8 +323,11 @@ async function handleRequest(request, env, url, headers, id) {
         routes: [
           "GET /api/v1/health/live",
           "GET /api/v1/health/ready",
+          "GET /api/v1/runtime/status",
           "GET /api/v1/services",
           "GET /api/v1/services/{serviceId}",
+          "GET /api/v1/providers",
+          "GET /api/v1/providers/{providerId}",
           "GET /api/v1/agents",
           "GET /api/v1/agents/{agentId}",
           "GET /api/v1/mcp/connections",
@@ -343,6 +359,25 @@ async function handleRequest(request, env, url, headers, id) {
         requestId: id
       }, 200, headers);
     }
+    if (url.pathname === `${API_PREFIX}/runtime/status`) {
+      return json({
+        runtime: {
+          state: "not_configured",
+          provider: { id: null, state: "not_configured" },
+          cataloguedProviders: PROVIDERS.map((provider) => provider.id),
+          configuredProviders: [],
+          runStore: { state: "not_configured" },
+          executionEnabled: false,
+          inferenceEnabled: false,
+          runLifecycle: "disabled",
+          approvalRequired: true,
+          reason: "No server-side provider binding or isolated run store is configured."
+        },
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
 
     if (url.pathname === `${API_PREFIX}/services`) {
       const checkedAt = new Date().toISOString();
@@ -373,6 +408,37 @@ async function handleRequest(request, env, url, headers, id) {
 
       return json({
         service: await serviceSnapshot(service, new Date().toISOString()),
+        requestId: id
+      }, 200, headers);
+    }
+
+    if (url.pathname === API_PREFIX + "/providers") {
+      const providers = PROVIDERS.map((provider) => ({
+        ...provider,
+        capabilities: [...provider.capabilities]
+      }));
+      return json({
+        providers,
+        count: providers.length,
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
+    const providerMatch = url.pathname.match(/^\/api\/v1\/providers\/([a-z0-9-]+)$/);
+    if (providerMatch) {
+      const provider = PROVIDERS.find((item) => item.id === providerMatch[1]);
+      if (!provider) {
+        return errorResponse(
+          "NOT_FOUND",
+          "The requested provider is not registered.",
+          404,
+          id,
+          headers
+        );
+      }
+      return json({
+        provider: { ...provider, capabilities: [...provider.capabilities] },
         requestId: id
       }, 200, headers);
     }

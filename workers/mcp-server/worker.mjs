@@ -12,6 +12,36 @@ const TOOLS = [
     name: "list_services",
     description: "List registered OCode.js staging services and their reported states. This tool is read-only.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false }
+  },
+  {
+    name: "list_agents",
+    description: "List versioned OCode.js agent definitions. Draft agents cannot execute. This tool is read-only.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false }
+  },
+  {
+    name: "get_agent_definition",
+    description: "Read one versioned OCode.js agent definition by ID. This tool is read-only.",
+    inputSchema: {
+      type: "object",
+      properties: { agentId: { type: "string", pattern: "^[a-z0-9-]+$" } },
+      required: ["agentId"],
+      additionalProperties: false
+    }
+  },
+  {
+    name: "list_providers",
+    description: "List catalogued AI provider adapters and their configuration states. This tool never invokes inference.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false }
+  },
+  {
+    name: "get_provider_definition",
+    description: "Read one catalogued AI provider adapter by ID. This tool never invokes inference.",
+    inputSchema: {
+      type: "object",
+      properties: { providerId: { type: "string", pattern: "^[a-z0-9-]+$" } },
+      required: ["providerId"],
+      additionalProperties: false
+    }
   }
 ];
 
@@ -62,8 +92,29 @@ async function getJson(path) {
 }
 
 async function callTool(name, args) {
-  if (!args || typeof args !== "object" || Array.isArray(args) || Object.keys(args).length) {
-    throw new TypeError("This read-only tool accepts an empty arguments object");
+  if (!args || typeof args !== "object" || Array.isArray(args)) {
+    throw new TypeError("Tool arguments must be an object");
+  }
+  if (name === "get_control_api_health" || name === "list_services" || name === "list_agents" || name === "list_providers") {
+    if (Object.keys(args).length) throw new TypeError("This read-only tool accepts an empty arguments object");
+  }
+  if (name === "get_agent_definition") {
+    if (Object.keys(args).length !== 1 || typeof args.agentId !== "string" || !/^[a-z0-9-]+$/.test(args.agentId)) {
+      throw new TypeError("agentId must match ^[a-z0-9-]+$ and no extra arguments are allowed");
+    }
+    return await getJson("/api/v1/agents/" + encodeURIComponent(args.agentId));
+  }
+  if (name === "get_provider_definition") {
+    if (Object.keys(args).length !== 1 || typeof args.providerId !== "string" || !/^[a-z0-9-]+$/.test(args.providerId)) {
+      throw new TypeError("providerId must match ^[a-z0-9-]+$ and no extra arguments are allowed");
+    }
+    return await getJson("/api/v1/providers/" + encodeURIComponent(args.providerId));
+  }
+  if (name === "list_providers") {
+    return await getJson("/api/v1/providers");
+  }
+  if (name === "list_agents") {
+    return await getJson("/api/v1/agents");
   }
   if (name === "get_control_api_health") {
     const [live, ready] = await Promise.all([
@@ -98,8 +149,8 @@ async function handleRpc(message) {
       result: {
         protocolVersion: PROTOCOL_VERSION,
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "ocodejs-control-center", version: "1.0.0" },
-        instructions: "Read-only access to OCode.js staging Control API health and service registry."
+        serverInfo: { name: "ocodejs-control-center", version: "1.1.0" },
+        instructions: "Read-only access to OCode.js staging health, services, versioned agent definitions and AI provider catalog. Agent execution and model inference are disabled."
       }
     });
   }

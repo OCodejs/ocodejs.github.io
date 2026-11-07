@@ -20,6 +20,8 @@ for (const marker of [
   "mcpInitialize",
   "refreshAgentRegistry",
   "Agent Registry",
+  "Provider Registry",
+  "providerRegistry",
   "RUNTIME DISABLED",
   "refreshMcpConnections",
   "MCP CONNECTIONS",

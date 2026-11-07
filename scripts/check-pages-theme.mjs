@@ -20,4 +20,20 @@ for (const marker of [
 for (const marker of ["zskbot/ocodejs-cli", "Layout contract", "Component contract"])
   assert.ok(docs.includes(marker), "UI framework documentation missing: " + marker);
 
+for (const marker of [
+  'id="mobileMenu"', 'aria-controls="sidebar"', 'aria-expanded="false"',
+  'id="navScrim"', 'id="closeNav"', 'aria-hidden="true" inert', 'sidebar.inert=!open', 'id="workspaceNavigation"', 'function setNavigationOpen(open)', "navScrim.addEventListener('click'", "event.key==='Escape'", "setNavigationOpen(false);window.scrollTo"
+]) assert.ok(html.includes(marker), "Navigation drawer contract missing: " + marker);
+for (const marker of [
+  ".sidebar.open{transform:translateX(0)", ".nav-scrim", "body.nav-open",
+  ".drawer-head", ".mobile-menu{display:inline-flex!important"
+]) assert.ok(css.includes(marker), "Navigation drawer theme rule missing: " + marker);
+
 process.stdout.write("OCode.js Pages theme and scaffold checks passed.\n");
+
+for (const marker of [
+  'data-navigation-registry', 'const navigationRegistry=[', 'function registerNavigationItem(item)',
+  'function registerWorkspacePage(page)', 'function renderNavigation()', 'window.OCodeNavigation',
+  'registerItem:registerNavigationItem', 'registerPage:registerWorkspacePage',
+  'root.innerHTML=groups.map', "id:'overview'", "id:'agents'", "id:'api'", "id:'auth'", "id:'mcp'", "id:'console'", "id:'docs'", 'renderNavigation();'
+]) assert.ok(html.includes(marker), "Dynamic navigation registry missing: " + marker);

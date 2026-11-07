@@ -33,6 +33,17 @@ Example health response:
 }
 ```
 
+## AI Providers
+The staging Control API exposes a read-only Provider Registry catalog. The Cloudflare Workers AI adapter is listed as a candidate but remains `not_configured`; no AI binding, inference request or model execution is enabled.
+
+## AI Runtime readiness
+`GET /runtime/status` reports the current provider, isolated run-store and execution readiness. At this stage the provider and run store are `not_configured`; both inference and agent execution are explicitly disabled. The route is read-only and does not allocate resources or invoke a model.
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | /providers | List provider adapters (implemented, read-only) |
+| GET | /providers/{providerId} | Read provider adapter metadata (implemented, read-only) |
+
 ## AI Agents
 The staging Control API currently exposes a read-only, versioned Agent Registry. Definitions remain `draft`, have no configured provider or tools, and cannot execute.
 
@@ -61,10 +72,11 @@ Check tool permissions server-side on every invocation.
 Never expose stored credentials. Validate destination hosts and resolved IPs to mitigate SSRF, including redirects and DNS rebinding.
 
 ## Identity and telemetry
-The current Account Portal Auth.js runtime is not configured. The separate OCodeJS CLI GitHub OAuth/PAT service is health-probed through the service registry; that probe is not an account login session. The staging MCP server is probed with `initialize` and `tools/list`; the probe does not invoke tools. A fixed read-only MCP Connection Registry is exposed; it does not accept arbitrary URLs or mutations.
+The current Account Portal Auth.js runtime is not configured. The separate OCodeJS CLI GitHub OAuth/PAT service is health-probed through the service registry; that probe is not an account login session. The staging MCP server is probed with `initialize` and `tools/list`; the probe does not invoke tools. Its fixed read-only tool allowlist now includes health, services, agent listing and agent-definition lookup. Agent definitions remain drafts and cannot execute. A fixed read-only MCP Connection Registry is exposed; it does not accept arbitrary URLs or mutations.
 
 | Method | Path | Purpose |
 |---|---|---|
+| GET | /runtime/status | Read AI provider/run-store readiness (implemented, read-only) |
 | GET | /services/cli-auth | Read-only health snapshot for the CLI GitHub OAuth/PAT Worker |
 | GET | /services/identity | Read-only status for the Account Portal Auth.js integration |
 | GET | /services/mcp-server | Read-only MCP initialize/tools/list protocol probe |

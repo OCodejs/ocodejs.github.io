@@ -7,7 +7,7 @@ This roadmap separates the static control center from the multi-service platform
 - [x] Responsive navigation and local preview interactions.
 - [x] Clear preview/not-connected labels.
 - [x] GitHub Pages workflow succeeded for the merged Control Center commit.
-- [ ] Browser visual and accessibility verification on desktop and mobile.
+- [ ] Browser visual and assistive-technology verification on desktop and mobile.
 
 ## Phase 1 — Technical foundation
 - [x] Architecture baseline.
@@ -17,8 +17,8 @@ This roadmap separates the static control center from the multi-service platform
 - [x] OpenAPI 3.1 contract for Control API.
 - [x] Automated Node test workflow for the Control API.
 - [x] Isolated staging Worker with Logs and Traces enabled.
-- [ ] Environment configuration schema and deployment runbook.
-- [ ] Automated link checking and accessibility checks.
+- [x] Environment configuration schema and staging/production deployment runbook.
+- [x] Automated local Markdown link checks and static HTML accessibility checks (not a substitute for browser/assistive-technology review).
 
 ## Phase 2 — Read-only backend integration
 - [x] Implement liveness/readiness and read-only service registry.
@@ -45,11 +45,15 @@ This roadmap separates the static control center from the multi-service platform
 - [x] Implement initialize/capability negotiation and tools/list.
 - [x] Add protocol error handling and a fixed read-only tool allowlist.
 - [x] Add a read-only MCP connection registry for the fixed staging endpoint; no arbitrary URL or mutation support.
+- [x] Expose the versioned Agent Registry through two additional read-only MCP tools; validate agent IDs and keep execution disabled.
+- [x] Expose Provider Registry listing and lookup through two additional read-only MCP tools; inference remains disabled.
 - [ ] Add authenticated connection management, secret storage and expanded SSRF protections.
 - [ ] Complete external browser smoke test; outbound verification is blocked by the integration runner.
 
 ## Phase 5 — AI agent operations
 - [x] Add a read-only Agent Registry with versioned draft definitions; no model provider or execution enabled.
+- [x] Add a read-only Provider Registry catalog; Workers AI remains not configured and inference requires explicit enablement.
+- [x] Add a read-only runtime readiness endpoint that reports provider/run-store state and explicitly disables inference and agent execution.
 - [ ] Server-side provider adapters.
 - [ ] Run lifecycle, cancellation, quotas and usage telemetry.
 - [ ] Tool permission snapshots and approval gates.

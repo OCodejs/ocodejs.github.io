@@ -51,7 +51,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     if (message.method === "notifications/initialized") return new Response(null, { status: 202 });
     if (message.method === "tools/list") {
       return new Response(JSON.stringify({ jsonrpc: "2.0", id: 2, result: { tools: [
-        { name: "get_control_api_health" }, { name: "list_services" }
+        { name: "get_control_api_health" }, { name: "list_services" }, { name: "list_agents" }, { name: "get_agent_definition" }, { name: "list_providers" }, { name: "get_provider_definition" }
       ]}}), { status: 200, headers: { "Content-Type": "application/json" } });
     }
     throw new Error("Unexpected MCP method");
@@ -65,7 +65,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     assert.equal(body.services.find((item) => item.id === "cli-auth").state, "healthy");
     assert.equal(body.services.find((item) => item.id === "cli-auth").source, "remote_probe");
     assert.equal(body.services.find((item) => item.id === "mcp-server").state, "healthy");
-    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 2);
+    assert.equal(body.services.find((item) => item.id === "mcp-server").toolCount, 6);
     assert.equal(body.count, body.services.length);
   } finally {
     globalThis.fetch = originalFetch;
@@ -234,6 +234,35 @@ test("telemetry reports partial structured logging without claiming metrics stor
 });
 
 
+
+
+test("provider registry lists only catalogued adapters and keeps inference disabled", async () => {
+  const response = await call("/api/v1/providers");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.count, 1);
+  assert.equal(body.providers[0].id, "cloudflare-workers-ai");
+  assert.equal(body.providers[0].state, "not_configured");
+  assert.equal(body.providers[0].executionEnabled, false);
+  assert.equal(body.providers[0].requiresExplicitEnablement, true);
+  assert.deepEqual(body.providers[0].capabilities, ["text_generation"]);
+});
+
+test("single provider lookup returns catalog metadata without enabling runtime", async () => {
+  const response = await call("/api/v1/providers/cloudflare-workers-ai");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.provider.id, "cloudflare-workers-ai");
+  assert.equal(body.provider.executionEnabled, false);
+});
+
+test("unknown provider lookup returns a stable 404 envelope", async () => {
+  const response = await call("/api/v1/providers/not-registered");
+  const body = await response.json();
+  assert.equal(response.status, 404);
+  assert.equal(body.error.code, "NOT_FOUND");
+});
+
 test("agent registry returns versioned draft definitions with execution disabled", async () => {
   const response = await call("/api/v1/agents");
   const body = await response.json();
@@ -296,7 +325,11 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
         result: {
           tools: [
             { name: "get_control_api_health", description: "Read health" },
-            { name: "list_services", description: "List services" }
+            { name: "list_services", description: "List services" },
+            { name: "list_agents", description: "List agent definitions" },
+            { name: "get_agent_definition", description: "Read one agent definition" },
+            { name: "list_providers", description: "List provider definitions" },
+            { name: "get_provider_definition", description: "Read one provider definition" }
           ]
         }
       });
@@ -311,7 +344,7 @@ test("MCP connection registry reports only the fixed staging endpoint and valida
     assert.equal(calls, 3);
     assert.equal(body.connections[0].id, "ocodejs-mcp-staging");
     assert.equal(body.connections[0].state, "healthy");
-    assert.equal(body.connections[0].toolCount, 2);
+    assert.equal(body.connections[0].toolCount, 6);
     assert.equal(body.connections[0].access, "read_only");
     assert.equal(body.connections[0].managed, false);
   } finally {
@@ -352,7 +385,11 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
         result: {
           tools: [
             { name: "get_control_api_health", description: "Read health" },
-            { name: "list_services", description: "List services" }
+            { name: "list_services", description: "List services" },
+            { name: "list_agents", description: "List agent definitions" },
+            { name: "get_agent_definition", description: "Read one agent definition" },
+            { name: "list_providers", description: "List provider definitions" },
+            { name: "get_provider_definition", description: "Read one provider definition" }
           ]
         }
       });
@@ -366,9 +403,27 @@ test("single MCP connection lookup returns fixed staging metadata and health", a
     assert.equal(body.connection.id, "ocodejs-mcp-staging");
     assert.equal(body.connection.environment, "staging");
     assert.equal(body.connection.state, "healthy");
-    assert.equal(body.connection.toolCount, 2);
+    assert.equal(body.connection.toolCount, 6);
     assert.equal(body.connection.managed, false);
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+
+test("runtime readiness explicitly keeps provider inference and agent execution disabled", async () => {
+  const response = await call("/api/v1/runtime/status");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.runtime.state, "not_configured");
+  assert.deepEqual(body.runtime.provider, { id: null, state: "not_configured" });
+  assert.deepEqual(body.runtime.cataloguedProviders, ["cloudflare-workers-ai"]);
+  assert.deepEqual(body.runtime.configuredProviders, []);
+  assert.deepEqual(body.runtime.runStore, { state: "not_configured" });
+  assert.equal(body.runtime.executionEnabled, false);
+  assert.equal(body.runtime.inferenceEnabled, false);
+  assert.equal(body.runtime.runLifecycle, "disabled");
+  assert.equal(body.runtime.approvalRequired, true);
+  assert.ok(body.checkedAt);
+  assert.ok(body.requestId);
 });
