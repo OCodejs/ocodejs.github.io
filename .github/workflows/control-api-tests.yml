@@ -8,7 +8,7 @@ on:
       - "scripts/check-control-center.mjs"
       - "scripts/check-pages-theme.mjs"
       - "ocodejs-pages-theme.css"
-      - "docs/ui-framework.md"
+      - "docs/**"\n      - "README.md"
       - ".github/workflows/control-api-tests.yml"
   push:
     branches: [main]
