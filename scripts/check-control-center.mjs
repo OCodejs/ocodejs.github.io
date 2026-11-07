@@ -14,7 +14,11 @@ for (const marker of [
   "api/v1/health/ready",
   "api/v1/services",
   "Không có dữ liệu xác thực",
-  "API UNREACHABLE"
+  "API UNREACHABLE",
+  "refreshAuthReadiness",
+  "cli-auth",
+  "mcpInitialize",
+  "ĐĂNG NHẬP TẠM KHÓA"
 ]) {
   assert.ok(html.includes(marker), "Control Center is missing required integration marker: " + marker);
 }

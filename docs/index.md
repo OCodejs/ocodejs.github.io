@@ -1,21 +1,22 @@
 # OCodeJS Server — Technical Documentation
 
-This repository currently hosts a static GitHub Pages frontend. The architecture and API definitions are implementation proposals, not proof that backend services are running.
+This repository hosts a static GitHub Pages frontend, a separately deployed Cloudflare staging Control API, and technical documentation. The UI and service registry distinguish live checks from unconfigured integrations.
 
 ## Start here
 - [Platform architecture](architecture.md)
 - [API contract](api-contract.md)
+- [Authentication integration status](auth-integration-status.md)
 - [Security baseline](security.md)
 - [Delivery roadmap](roadmap.md)
 
 | Area | Responsibility | Current state |
 |---|---|---|
-| Server Dashboard | Health, uptime, resource and deployment status | UI preview |
-| AI Agents | Registry, provider configuration, task execution | Catalog concept |
-| API Gateway | Routing, auth, quotas, validation | Contract draft |
-| Authentication | Identity, OAuth, sessions, roles | UI preview |
-| MCP Server | Endpoint registry, handshake, tool discovery | UI preview |
-| Developer Console | Logs, metrics, traces, audit | UI preview |
+| Server Dashboard | Health, uptime, resource and deployment status | Live API integration merged; visual browser verification pending |
+| AI Agents | Registry, provider configuration, task execution | Catalog concept; runtime not configured |
+| API Gateway | Routing, auth, quotas, validation | Read-only Control API live on staging |
+| Authentication | Identity, OAuth, sessions, roles | CLI OAuth health and MCP protocol probes integrated; Account Portal Auth.js not configured |
+| MCP Server | Endpoint registry, handshake, tool discovery | Staging handshake + read-only tools/list implemented; external smoke test pending |
+| Developer Console | Logs, metrics, traces, audit | Cloudflare Logs/Traces enabled for staging Control API and MCP Worker; centralized app telemetry not integrated |
 | Documentation | Technical guides and API references | Initial docs |
 
 ## Status vocabulary
