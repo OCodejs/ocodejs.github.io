@@ -21,6 +21,7 @@ The server is intentionally read-only. It has no account, DNS, deployment, secre
 - Requires `MCP-Protocol-Version: 2025-03-26` on all post-initialize requests.
 - `GET` is not used for server-initiated SSE streams; clients should use POST requests.
 - CORS is enabled for cross-origin MCP clients; no credentials are accepted.
+- Cloudflare Worker Logs and Traces are enabled, with query-string redaction.
 
 ## Local tests
 
