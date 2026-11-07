@@ -36,7 +36,7 @@ The current Preview build is protected by the existing Cloudflare Access policy.
 
 - The Control API destination is a fixed source constant pointing to the OCode.js staging Control API.
 - No caller-supplied URL, provider token, OAuth secret, or account credential is accepted.
-- The four exposed tools are read-only: health, service listing, agent listing, and agent-definition lookup.
+- The six exposed tools are read-only: health, service listing, agent listing/lookup, and provider listing/lookup.
 
 ## AI provider and agent runtime
 
