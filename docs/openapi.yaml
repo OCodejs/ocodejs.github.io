@@ -1,0 +1,143 @@
+openapi: 3.1.0
+info:
+  title: OCodeJS Control API
+  version: 1.0.0
+  description: Read-only health and service registry API. Phase 1 staging implementation.
+servers:
+  - url: https://{worker-host}
+    variables:
+      worker-host:
+        default: api-staging.example.workers.dev
+paths:
+  /api/v1:
+    get:
+      summary: API metadata
+      responses:
+        "200":
+          description: API metadata and supported routes
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [name, version, status, routes, requestId]
+                properties:
+                  name: { type: string }
+                  version: { type: string }
+                  status: { type: string, enum: [preview] }
+                  routes:
+                    type: array
+                    items: { type: string }
+                  requestId: { type: string }
+  /api/v1/health/live:
+    get:
+      summary: Liveness probe
+      responses:
+        "200":
+          description: Worker process can respond
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+  /api/v1/health/ready:
+    get:
+      summary: Readiness probe
+      responses:
+        "200":
+          description: Stateless API slice is ready
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [service, state, ready, checkedAt, dependencies, requestId]
+                properties:
+                  service: { type: string }
+                  state: { type: string, enum: [ready] }
+                  ready: { type: boolean, const: true }
+                  checkedAt: { type: string, format: date-time }
+                  dependencies:
+                    type: array
+                    items: { type: object }
+                  note: { type: string }
+                  requestId: { type: string }
+  /api/v1/services:
+    get:
+      summary: List registered service states
+      responses:
+        "200":
+          description: Service registry snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [services, count, checkedAt, requestId]
+                properties:
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
+                  count: { type: integer }
+                  checkedAt: { type: string, format: date-time }
+                  requestId: { type: string }
+  /api/v1/services/{serviceId}:
+    get:
+      summary: Get one registered service
+      parameters:
+        - in: path
+          name: serviceId
+          required: true
+          schema: { type: string, pattern: "^[a-z0-9-]+$" }
+      responses:
+        "200":
+          description: Service metadata and state
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [service, requestId]
+                properties:
+                  service:
+                    $ref: "#/components/schemas/Service"
+                  requestId: { type: string }
+        "404":
+          description: Service is not registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Health:
+      type: object
+      required: [service, state, live, checkedAt, version, requestId]
+      properties:
+        service: { type: string }
+        state: { type: string, enum: [healthy] }
+        live: { type: boolean, const: true }
+        checkedAt: { type: string, format: date-time }
+        version: { type: string }
+        requestId: { type: string }
+    Service:
+      type: object
+      required: [id, name, description, state, source, checkedAt, latencyMs]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        state:
+          type: string
+          enum: [healthy, degraded, unavailable, not_configured, unknown]
+        source: { type: string, enum: [self, unverified] }
+        checkedAt: { type: [string, "null"], format: date-time }
+        latencyMs: { type: [integer, "null"], minimum: 0 }
+    Error:
+      type: object
+      required: [error, requestId]
+      properties:
+        error:
+          type: object
+          required: [code, message, details]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            details: { type: [object, "null"] }
+        requestId: { type: string }
