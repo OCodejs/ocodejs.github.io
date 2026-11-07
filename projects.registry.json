@@ -1,0 +1,654 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "registryVersion": "1.0.0",
+  "organization": "OCodejs",
+  "controlRepository": "OCodejs/ocodejs.github.io",
+  "sourceOfTruth": {
+    "designSystem": "MCP page at https://mcp.ocodejs.dev/",
+    "sharedAssets": "ecosystem/shared/",
+    "policy": "PR-only; never merge or deploy production automatically"
+  },
+  "syncPolicy": {
+    "mode": "pull-request",
+    "targetDirectory": ".ocodejs/shared/",
+    "preserveProjectCode": true,
+    "overwriteOnlyManagedFiles": true,
+    "neverCopySecrets": true,
+    "requireExplicitModuleOptIn": true
+  },
+  "repositories": [
+    {
+      "repository": "OCodejs/ask-chatbot",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "AI assistant application",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/OCodejs",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "platform",
+      "description": "OCode.js core platform",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/THU365",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "THU365 application",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/ocodejs.github.io",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "central",
+      "description": "Central ecosystem control plane",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/skills-agentc",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "kind": "skills",
+      "description": "Agent skill collection",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/Ocode.js",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "framework",
+      "description": "OCode.js framework / package",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/proof-html",
+      "defaultBranch": "master",
+      "visibility": "public",
+      "kind": "experiment",
+      "description": "HTML proof of concept",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/docs-ocodejs",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "documentation",
+      "description": "OCode.js documentation site",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/annotated_implementation_skill",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "skills",
+      "description": "Implementation skill reference",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/opencode",
+      "defaultBranch": "dev",
+      "visibility": "public",
+      "kind": "dependency",
+      "description": "OpenCode upstream / platform source",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+    },
+    {
+      "repository": "OCodejs/demo-repository",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "kind": "experiment",
+      "description": "Demo repository",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/0codejs",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "kind": "application",
+      "description": "OCode.js private project",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/dotfiles.github.com",
+      "defaultBranch": "master",
+      "visibility": "public",
+      "kind": "configuration",
+      "description": "Developer dotfiles",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/github-pages",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "tooling",
+      "description": "GitHub Pages utilities",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/v0-chat",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "kind": "application",
+      "description": "Chat interface",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/docs",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "documentation",
+      "description": "Documentation project",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/spec",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "specification",
+      "description": "Technical specifications",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/.agents-skills-prisma-cli-SKILL.md",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "skills",
+      "description": "Prisma CLI skill reference",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/hello-working",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "experiment",
+      "description": "Working prototype",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/Cloudxx",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "DNS and domain management application",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/probot",
+      "defaultBranch": "master",
+      "visibility": "public",
+      "kind": "dependency",
+      "description": "Probot upstream / automation source",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+    },
+    {
+      "repository": "OCodejs/surge",
+      "defaultBranch": "master",
+      "visibility": "public",
+      "kind": "dependency",
+      "description": "Surge deployment tool source",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+    },
+    {
+      "repository": "OCodejs/OCode-js-pages",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "OCode.js Pages collection",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/chatbot",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "Chatbot application",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/nextjs-boilerplate",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "kind": "template",
+      "description": "Next.js starter template",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/gh-aw",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "dependency",
+      "description": "GitHub Agentic Workflows source",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+    },
+    {
+      "repository": "OCodejs/skills",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "skills",
+      "description": "Skill collection",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/ocodejs-legal",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "Legal Center",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/cli-hub",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "OCode.js CLI Hub",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/Signs",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "unclassified",
+      "description": "Unclassified project",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Repository purpose must be audited before enabling sync."
+    },
+    {
+      "repository": "OCodejs/.github",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "organization-config",
+      "description": "Organization-wide GitHub defaults",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/aitools-agent",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "kind": "application",
+      "description": "AI tools agent",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/documentation",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "documentation",
+      "description": "Documentation repository",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/Spoon-Knife",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "sample",
+      "description": "GitHub sample repository",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+    },
+    {
+      "repository": "OCodejs/pnpm",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "dependency",
+      "description": "pnpm upstream / package manager source",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+    },
+    {
+      "repository": "OCodejs/github-mcp-server",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "dependency",
+      "description": "GitHub MCP server source",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+    },
+    {
+      "repository": "OCodejs/host",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "OCode.js hosting project",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/platform-ocodejs-dev",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "OCode.js developer platform",
+      "sync": {
+        "enabled": true,
+        "modules": [
+          "design-system",
+          "shared-ui",
+          "navigation"
+        ],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    }
+  ]
+}
