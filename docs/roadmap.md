@@ -29,25 +29,30 @@ This roadmap separates a static control center from a real multi-service platfor
 - [ ] Keep production disconnected until explicit approval.
 
 ## Phase 3 — Identity and access
-- [ ] Integrate selected OIDC/Auth service.
+- [x] Add a non-sensitive Auth.js runtime readiness endpoint.
+- [ ] Deploy an isolated Preview with dedicated database and OAuth credentials, then verify registration/login/session/logout end to end.
 - [ ] Add account profile, session list and logout.
 - [ ] Implement server-side RBAC and project/environment scopes.
 - [ ] Add CSRF, audit events and session revocation tests.
 
 ## Phase 4 — MCP management
 - [ ] Register and validate MCP endpoints.
-- [ ] Implement initialize/capability negotiation and tools/list.
+- [x] Implement initialize/capability negotiation and tools/list on an isolated staging Worker.
+- [x] Add browser controls to run MCP initialize and tools/list against staging.
+- [ ] Complete external browser smoke test and verify backend tool calls.
 - [ ] Add server-side secret storage, SSRF protection and tool allowlists.
-- [ ] Add connection health and protocol error reporting.
+- [x] Add MCP protocol error handling and a read-only tool allowlist.
+- [ ] Add authenticated connection health, secret storage and protocol error telemetry.
 
 ## Phase 5 — AI agent operations
 - [ ] Agent registry and versioned definitions.
-- [ ] Server-side provider adapters.
+- [ ] Implement a server-side AI provider adapter after a provider and authorized credentials/quota are selected.
 - [ ] Run lifecycle, cancellation, quotas and usage telemetry.
 - [ ] Tool permission snapshots and approval gates.
 
 ## Phase 6 — Developer Console and integrations
-- [ ] Structured logs, metrics, distributed traces.
+- [x] Enable Cloudflare Worker logs and traces for the staging Control API and MCP Worker.
+- [ ] Centralize structured logs, metrics, distributed traces and retention.
 - [ ] Role-based audit event explorer.
 - [ ] GitHub, Cloudflare and Vercel status adapters with least-privilege access.
 - [ ] Alert rules, retention policies and incident playbooks.
