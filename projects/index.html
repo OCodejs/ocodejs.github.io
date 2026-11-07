@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="OCode.js Ecosystem Project Registry — danh mục và trạng thái đồng bộ các repository.">
+<title>OCode.js — Project Registry</title>
+<style>
+:root{color-scheme:dark;--bg:#000;--panel:#080808;--line:#333;--line2:#555;--text:#f5f5f5;--muted:#999;--soft:#c9c9c9;--font:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.6 var(--font)}a{color:inherit;text-decoration:none}.wrap{max-width:1440px;margin:auto;padding:28px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--line)}.brand{font-weight:800;letter-spacing:-.06em}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:400;letter-spacing:.12em}.back{border:1px solid var(--line2);padding:8px 12px;font-size:11px}.back:hover,.filter:hover{background:#171717}.hero{padding:38px 0 24px}.eyebrow{font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}.hero h1{font-size:clamp(26px,5vw,42px);letter-spacing:-.08em;line-height:1.1;margin:10px 0}.hero p{max-width:680px;color:var(--muted);margin:0}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0}.stat{border:1px solid var(--line);padding:16px;background:var(--panel)}.stat b{display:block;font-size:25px;letter-spacing:-.06em}.stat span{font-size:10px;color:var(--muted)}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.search{flex:1;min-width:220px;background:#050505;border:1px solid var(--line2);padding:11px;color:var(--text);font:inherit}.search:focus{outline:1px solid #aaa;outline-offset:1px}.filter{background:#050505;color:var(--soft);border:1px solid var(--line);padding:9px 11px;font:inherit;font-size:10px;cursor:pointer}.filter[aria-pressed=true]{border-color:#ddd;color:#fff;background:#171717}.list-head{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:10px;padding:10px 0}.projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.project{min-width:0;border:1px solid var(--line);background:var(--panel);padding:15px;display:flex;flex-direction:column;gap:12px}.project:hover{border-color:#888}.project-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.name{font-weight:700;overflow-wrap:anywhere}.kind{font-size:9px;color:var(--muted);border:1px solid var(--line);padding:3px 6px;white-space:nowrap}.desc{color:var(--muted);font-size:11px;min-height:34px}.meta{display:flex;flex-wrap:wrap;gap:6px}.tag{border:1px solid #292929;color:#bbb;font-size:9px;padding:3px 6px}.status{font-size:9px;color:#ddd}.status:before{content:"";display:inline-block;width:6px;height:6px;background:#aaa;margin-right:7px}.status.off:before{background:#555}.project-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #242424;padding-top:10px;color:var(--muted);font-size:9px}.project-foot a{text-decoration:underline;text-underline-offset:3px}.empty{border:1px dashed var(--line);padding:30px;text-align:center;color:var(--muted);grid-column:1/-1}.note{margin-top:24px;padding:14px;border:1px solid var(--line);color:var(--muted);font-size:10px}.note strong{color:var(--text)}footer{padding:24px 0;color:#666;font-size:9px}
+@media(max-width:900px){.projects{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.wrap{padding:18px 14px}.stats{gap:7px}.stat{padding:11px}.stat b{font-size:20px}.projects{grid-template-columns:1fr}.hero{padding-top:28px}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="top"><a class="brand" href="../">OCode.js<small>ECOSYSTEM CONTROL PLANE</small></a><a class="back" href="../">← Control Center</a></header>
+<section class="hero"><div class="eyebrow">Repository directory / 2026</div><h1>Project Registry</h1><p>Danh mục tập trung các repository trong tổ chức OCodejs. Mỗi dự án chỉ nhận những module dùng chung đã đăng ký; mã nguồn và cấu hình riêng được giữ nguyên.</p></section>
+<section class="stats" aria-label="Registry statistics"><div class="stat"><b id="total">—</b><span>Repositories tracked</span></div><div class="stat"><b id="enabled">—</b><span>Opted into shared sync</span></div><div class="stat"><b id="excluded">—</b><span>Review / excluded</span></div></section>
+<section class="toolbar" aria-label="Project filters"><input id="search" class="search" type="search" placeholder="Tìm repository, vai trò hoặc module…" aria-label="Search repositories"><button class="filter" data-filter="all" aria-pressed="true">All</button><button class="filter" data-filter="application" aria-pressed="false">Apps</button><button class="filter" data-filter="documentation" aria-pressed="false">Docs</button><button class="filter" data-filter="platform" aria-pressed="false">Platform</button><button class="filter" data-filter="other" aria-pressed="false">Other</button></section>
+<div class="list-head"><span id="count">Loading registry…</span><span>Source: projects.registry.json</span></div>
+<section id="projects" class="projects" aria-live="polite"><div class="empty">Loading project registry…</div></section>
+<aside class="note"><strong>Sync policy</strong><br>Updates are delivered through individual pull requests. No automatic merge, no Production deployment, no secret transfer, and no overwrite of project-specific code. Cross-repository automation requires the Actions secret <code>OCODEJS_SYNC_TOKEN</code>.</aside>
+<footer>OCode.js · Central Project Registry · Managed from OCodejs/ocodejs.github.io</footer>
+</main>
+<script type="module">
+const root=document.querySelector("#projects"),search=document.querySelector("#search"),count=document.querySelector("#count");
+let projects=[],filter="all";
+const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
+function group(p){if(["application","platform","framework","documentation"].includes(p.kind))return p.kind==="documentation"?"documentation":p.kind==="platform"||p.kind==="framework"?"platform":"application";return"other"}
+function render(){
+ const q=search.value.trim().toLowerCase();
+ const rows=projects.filter(p=>(filter==="all"||group(p)===filter)&&[p.repository,p.description,p.kind,...(p.sync.modules||[])].join(" ").toLowerCase().includes(q));
+ root.replaceChildren();count.textContent=rows.length+" / "+projects.length+" repositories";
+ if(!rows.length){root.append(el("div","empty","Không tìm thấy repository phù hợp."));return}
+ for(const p of rows){
+  const card=el("article","project"),top=el("div","project-top"),name=el("div","name",p.repository),kind=el("span","kind",p.kind);
+  top.append(name,kind);card.append(top,el("div","desc",p.description||"No description"));
+  const tags=el("div","meta");for(const m of p.sync.modules||[])tags.append(el("span","tag",m));if(!(p.sync.modules||[]).length)tags.append(el("span","tag","no shared modules"));
+  card.append(tags,el("div","status "+(p.sync.enabled?"":"off"),p.sync.enabled?"PR sync eligible":"Not opted in"));
+  const foot=el("div","project-foot"),branch=el("span","",p.defaultBranch+" · "+p.visibility),link=el("a","", "Open repository ↗");link.href="https://github.com/"+p.repository;link.target="_blank";link.rel="noopener noreferrer";foot.append(branch,link);card.append(foot);root.append(card);
+ }
+}
+document.querySelectorAll("[data-filter]").forEach(btn=>btn.addEventListener("click",()=>{filter=btn.dataset.filter;document.querySelectorAll("[data-filter]").forEach(b=>b.setAttribute("aria-pressed",String(b===btn)));render()}));
+search.addEventListener("input",render);
+try{
+ const res=await fetch("../projects.registry.json",{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);
+ const data=await res.json();projects=data.repositories||[];
+ document.querySelector("#total").textContent=projects.length;
+ document.querySelector("#enabled").textContent=projects.filter(p=>p.sync.enabled).length;
+ document.querySelector("#excluded").textContent=projects.filter(p=>!p.sync.enabled).length;
+ render();
+}catch(error){root.replaceChildren(el("div","empty","Không tải được projects.registry.json: "+error.message));count.textContent="Registry unavailable"}
+</script>
+</body>
+</html>
