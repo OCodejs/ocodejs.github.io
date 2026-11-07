@@ -1,6 +1,6 @@
 # OCodeJS Server — Delivery Roadmap
 
-This roadmap separates a static control center from a real multi-service platform. Items are proposals until implemented, tested and deployed.
+This roadmap separates the static control center from the multi-service platform. Items are complete only when code, automated tests and the relevant deployment evidence exist.
 
 ## Phase 0 — Static control center
 - [x] Seven workspace sections.
@@ -14,25 +14,30 @@ This roadmap separates a static control center from a real multi-service platfor
 - [x] API contract draft.
 - [x] Security baseline.
 - [x] Delivery roadmap.
-- [x] OpenAPI 3.1 contract for Control API Phase 1.
+- [x] OpenAPI 3.1 contract for Control API.
 - [x] Automated Node test workflow for the Control API.
+- [x] Isolated staging Worker with Logs and Traces enabled.
 - [ ] Environment configuration schema and deployment runbook.
-- [ ] Automated HTML validation, link checking and accessibility checks.
+- [ ] Automated link checking and accessibility checks.
 
 ## Phase 2 — Read-only backend integration
-- [ ] Verify the authoritative API endpoint with external HTTP smoke tests.
 - [x] Implement liveness/readiness and read-only service registry.
-- [ ] Add authenticated read-only service status to dashboard.
 - [x] Add request IDs, stable error envelopes and restrictive CORS handling.
-- [x] Deploy an isolated staging Worker with Logs and Traces enabled.
-- [ ] Configure the exact staging frontend origin and complete browser integration.
-- [ ] Keep production disconnected until explicit approval.
+- [x] Deploy the isolated staging Control API.
+- [x] Add the official GitHub Pages origin to the staging API CORS allowlist.
+- [ ] Merge PR #5 and verify browser-side cross-origin requests from GitHub Pages.
+- [ ] Add authenticated read-only service status after Account Portal Auth.js is ready.
+- [ ] Keep Production disconnected until explicit approval.
 
 ## Phase 3 — Identity and access
-- [ ] Integrate selected OIDC/Auth service.
-- [ ] Add account profile, session list and logout.
+- [x] Add a read-only health probe for the separate OCodeJS CLI GitHub OAuth/PAT Worker (PR #6; staging deployment updated).
+- [x] Document the separation between CLI OAuth and Account Portal Auth.js.
+- [ ] Deploy Account Portal Auth.js to an isolated Preview runtime.
+- [ ] Configure a dedicated Preview PostgreSQL database and Google/GitHub OAuth callbacks.
+- [ ] Verify registration, login, OAuth callbacks, session persistence and logout end-to-end.
 - [ ] Implement server-side RBAC and project/environment scopes.
-- [ ] Add CSRF, audit events and session revocation tests.
+- [ ] Add CSRF, audit events, session revocation and rate-limit tests.
+- [ ] Enable sign-in controls only after the Preview release gate passes.
 
 ## Phase 4 — MCP management
 - [ ] Register and validate MCP endpoints.

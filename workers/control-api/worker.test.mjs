@@ -27,14 +27,30 @@ test("readiness does not claim downstream dependencies are configured", async ()
   assert.match(body.note, /not configured/);
 });
 
-test("service registry distinguishes real API health from unconfigured services", async () => {
-  const response = await call("/api/v1/services");
-  const body = await response.json();
-  assert.equal(response.status, 200);
-  assert.equal(body.services.find((item) => item.id === "control-api").state, "healthy");
-  assert.equal(body.services.find((item) => item.id === "identity").state, "not_configured");
-  assert.equal(body.services.find((item) => item.id === "ai-runtime").state, "not_configured");
-  assert.equal(body.count, body.services.length);
+test("service registry probes CLI Auth and keeps account Auth.js unconfigured", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, "https://auth.ocodejs.dev/health");
+    assert.equal(options.redirect, "error");
+    return new Response(JSON.stringify({
+      ok: true,
+      service: "ocodejs-auth-worker",
+      patConfigured: true,
+      oauthConfigured: true
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const response = await call("/api/v1/services");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.services.find((item) => item.id === "control-api").state, "healthy");
+    assert.equal(body.services.find((item) => item.id === "identity").state, "not_configured");
+    assert.equal(body.services.find((item) => item.id === "cli-auth").state, "healthy");
+    assert.equal(body.services.find((item) => item.id === "cli-auth").source, "remote_probe");
+    assert.equal(body.count, body.services.length);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("single service lookup returns 404 for unknown service IDs", async () => {
@@ -96,4 +112,34 @@ test("GitHub Pages production origin is allowed by the staging API", async () =>
     {}
   );
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://ocodejs.github.io");
+});
+
+
+test("CLI Auth is degraded when required provider bindings are incomplete", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    ok: true, service: "ocodejs-auth-worker", patConfigured: true, oauthConfigured: false
+  }), { status: 200, headers: { "Content-Type": "application/json" } });
+  try {
+    const response = await call("/api/v1/services/cli-auth");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.service.state, "degraded");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("CLI Auth is unavailable when its health endpoint fails", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response("upstream unavailable", { status: 503 });
+  try {
+    const response = await call("/api/v1/services/cli-auth");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.service.state, "unavailable");
+    assert.equal(body.service.latencyMs >= 0, true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
