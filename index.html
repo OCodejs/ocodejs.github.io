@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./ocodejs-pages-theme.css?v=1.0.0">\n</head>
 <body>
 <div class="app">
-<aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+<aside class="sidebar" id="sidebar" aria-label="Điều hướng chính" aria-hidden="true" inert>
  <div class="drawer-head"><div class="brand"><div class="logo">&gt;_</div><div><strong>OCode.js</strong><small>SERVER CONTROL</small></div></div><button class="drawer-close" id="closeNav" type="button" aria-label="Đóng menu">×</button></div>
  <div class="nav-label">WORKSPACE</div>
  <nav class="nav" aria-label="Dashboard navigation">
@@ -187,7 +187,7 @@ function openModal(){document.getElementById('modal').classList.add('show');docu
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.view)));
 const sidebar=document.getElementById('sidebar'),menuButton=document.getElementById('mobileMenu'),navScrim=document.getElementById('navScrim');
-function setNavigationOpen(open){sidebar.classList.toggle('open',open);document.body.classList.toggle('nav-open',open);menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Đóng menu điều hướng':'Mở menu điều hướng');if(open){const first=sidebar.querySelector('.nav button');if(first)first.focus();}else menuButton.focus();}
+function setNavigationOpen(open){sidebar.classList.toggle('open',open);sidebar.setAttribute('aria-hidden',String(!open));sidebar.inert=!open;document.body.classList.toggle('nav-open',open);menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Đóng menu điều hướng':'Mở menu điều hướng');if(open){const first=sidebar.querySelector('.nav button');if(first)first.focus();}else menuButton.focus();}
 menuButton.addEventListener('click',()=>setNavigationOpen(!sidebar.classList.contains('open')));
 document.getElementById('closeNav').addEventListener('click',()=>setNavigationOpen(false));
 navScrim.addEventListener('click',()=>setNavigationOpen(false));
