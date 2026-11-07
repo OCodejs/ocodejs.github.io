@@ -87,3 +87,5 @@ Run node security/token-vault/scripts/check-source.mjs for source validation and
 Schema validation is executed against an in-memory SQLite database in CI before the Worker integration suite.
 
 Cloudflare Workers exposes authenticated Access identity through ctx.access; the Worker uses the verified email claim and then checks the matching active D1 identity before assigning application permissions. See the official Cloudflare Workers Access integration guide: https://developers.cloudflare.com/workers/configuration/cloudflare-access/.
+
+Staff Access identity is checked against the active D1 identity record on every authenticated request.
