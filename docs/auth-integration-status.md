@@ -18,6 +18,7 @@
 - The current Cloudflare `mcp-server-auth` script is a placeholder returning HTTP 503 with a “Preview deployment is being prepared” response.
 - Its current Worker bindings show only `AUTH_SECRET`; no verified account portal database/provider bindings are attached.
 - No Vercel project linked to `zskbot/mcp.server.auth` was found in the AITools team project inventory.
+- A staging project creation attempt for the private repository was rejected by Vercel with `repo_not_found`; no project or deployment was created. The Git repository must be made visible to the Vercel team integration before Preview deployment can proceed.
 
 ## Integration boundary
 
