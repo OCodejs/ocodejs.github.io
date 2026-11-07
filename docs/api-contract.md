@@ -51,9 +51,9 @@ Check tool permissions server-side on every invocation.
 ## MCP connections
 | Method | Path | Purpose |
 |---|---|---|
-| GET | /mcp/connections | List connections without secrets |
+| GET | /mcp/connections | List fixed staging connection metadata and live protocol probe (implemented, read-only) |
 | POST | /mcp/connections | Register connection |
-| GET | /mcp/connections/{connectionId} | Read metadata |
+| GET | /mcp/connections/{connectionId} | Read one fixed connection (implemented, read-only) |
 | POST | /mcp/connections/{connectionId}/connect | Connect and initialize |
 | POST | /mcp/connections/{connectionId}/discover | Refresh tool metadata |
 | DELETE | /mcp/connections/{connectionId} | Remove connection |
@@ -61,7 +61,7 @@ Check tool permissions server-side on every invocation.
 Never expose stored credentials. Validate destination hosts and resolved IPs to mitigate SSRF, including redirects and DNS rebinding.
 
 ## Identity and telemetry
-The current Account Portal Auth.js runtime is not configured. The separate OCodeJS CLI GitHub OAuth/PAT service is health-probed through the service registry; that probe is not an account login session. The staging MCP server is probed with `initialize` and `tools/list`; the probe does not invoke tools.
+The current Account Portal Auth.js runtime is not configured. The separate OCodeJS CLI GitHub OAuth/PAT service is health-probed through the service registry; that probe is not an account login session. The staging MCP server is probed with `initialize` and `tools/list`; the probe does not invoke tools. A fixed read-only MCP Connection Registry is exposed; it does not accept arbitrary URLs or mutations.
 
 | Method | Path | Purpose |
 |---|---|---|
