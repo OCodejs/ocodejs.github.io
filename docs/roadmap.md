@@ -48,7 +48,7 @@ This roadmap separates the static control center from the multi-service platform
 - [ ] Complete external browser smoke test; outbound verification is blocked by the integration runner.
 
 ## Phase 5 — AI agent operations
-- [ ] Agent registry and versioned definitions.
+- [x] Add a read-only Agent Registry with versioned draft definitions; no model provider or execution enabled.
 - [ ] Server-side provider adapters.
 - [ ] Run lifecycle, cancellation, quotas and usage telemetry.
 - [ ] Tool permission snapshots and approval gates.
