@@ -1,5 +1,5 @@
 const API_PREFIX = "/api/v1";
-const API_VERSION = "1.6.0";
+const API_VERSION = "1.7.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
@@ -265,12 +265,12 @@ async function probeMcpServer() {
     }
     const listed = await toolsResponse.json();
     const toolNames = (listed?.result?.tools || []).map((tool) => tool.name).sort();
-    if (JSON.stringify(toolNames) !== JSON.stringify(["get_agent_definition", "get_control_api_health", "list_agents", "list_services"])) {
+    if (JSON.stringify(toolNames) !== JSON.stringify(["get_agent_definition", "get_control_api_health", "get_provider_definition", "list_agents", "list_providers", "list_services"])) {
       return { state: "unknown", description: "MCP tools/list did not return the expected read-only tool allowlist.", checkedAt, latencyMs: Date.now() - startedAt };
     }
     return {
       state: "healthy",
-      description: "MCP initialize and tools/list passed; four read-only tools discovered. Tool execution is not part of this probe.",
+      description: "MCP initialize and tools/list passed; six read-only tools discovered. Tool execution is not part of this probe.",
       checkedAt,
       latencyMs: Date.now() - startedAt,
       toolCount: toolNames.length
@@ -323,6 +323,7 @@ async function handleRequest(request, env, url, headers, id) {
         routes: [
           "GET /api/v1/health/live",
           "GET /api/v1/health/ready",
+          "GET /api/v1/runtime/status",
           "GET /api/v1/services",
           "GET /api/v1/services/{serviceId}",
           "GET /api/v1/providers",
@@ -358,6 +359,25 @@ async function handleRequest(request, env, url, headers, id) {
         requestId: id
       }, 200, headers);
     }
+    if (url.pathname === `${API_PREFIX}/runtime/status`) {
+      return json({
+        runtime: {
+          state: "not_configured",
+          provider: { id: null, state: "not_configured" },
+          cataloguedProviders: PROVIDERS.map((provider) => provider.id),
+          configuredProviders: [],
+          runStore: { state: "not_configured" },
+          executionEnabled: false,
+          inferenceEnabled: false,
+          runLifecycle: "disabled",
+          approvalRequired: true,
+          reason: "No server-side provider binding or isolated run store is configured."
+        },
+        checkedAt: new Date().toISOString(),
+        requestId: id
+      }, 200, headers);
+    }
+
 
     if (url.pathname === `${API_PREFIX}/services`) {
       const checkedAt = new Date().toISOString();
