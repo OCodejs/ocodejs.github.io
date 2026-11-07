@@ -78,10 +78,11 @@ async function audit(env, actor, action, resource, outcome = "success") {
 }
 async function currentUser(req, env, ctx) {
   const id = await verify(cookieValue(req), env.SESSION_SIGNING_KEY);
-  if (!id) return null;
-  const row = await env.DB.prepare("SELECT s.subject,i.role,s.expires_at,i.active FROM sessions s JOIN identities i ON i.subject=s.subject WHERE s.id_hash=? AND s.revoked=0")
-    .bind(await hash(id)).first();
-  if (row && row.active && row.expires_at > Math.floor(Date.now() / 1000)) return { subject: row.subject, role: row.role, auth: "session" };
+  if (id) {
+    const row = await env.DB.prepare("SELECT s.subject,i.role,s.expires_at,i.active FROM sessions s JOIN identities i ON i.subject=s.subject WHERE s.id_hash=? AND s.revoked=0")
+      .bind(await hash(id)).first();
+    if (row && row.active && row.expires_at > Math.floor(Date.now() / 1000)) return { subject: row.subject, role: row.role, auth: "session" };
+  }
   if (ctx?.access && typeof ctx.access.getIdentity === "function") {
     const identity = await ctx.access.getIdentity();
     const email = typeof identity?.email === "string" ? identity.email.trim().toLowerCase() : "";
