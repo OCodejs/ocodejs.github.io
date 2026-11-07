@@ -77,3 +77,4 @@ The bootstrap TOKEN identity is currently the only human login. Individual staff
 ## Validation and deployment
 
 Run node security/token-vault/scripts/check-source.mjs for source validation and node --test security/token-vault/tests/*.test.mjs for Worker smoke tests. This repository change is not a deployment. No Worker, D1 database, Access policy, secrets, or live tokens have been created or configured. Keep the service behind Cloudflare Access before any staging exposure.
+
