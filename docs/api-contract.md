@@ -50,7 +50,7 @@ The staging Control API currently exposes a read-only, versioned Agent Registry.
 | POST | /agents | Create agent definition |
 | GET | /agents/{agentId} | Read one agent definition (implemented, read-only) |
 | PATCH | /agents/{agentId} | Update definition |
-| POST | /agents/{agentId}/runs | Start a run |
+| POST | /agents/{agentId}/runs | Not implemented; rejected by the read-only API |
 | GET | /runs/{runId} | Read run state and sanitized output |
 | POST | /runs/{runId}/cancel | Cancel a run |
 
