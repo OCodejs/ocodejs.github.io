@@ -35,6 +35,7 @@ The current staging API routes are read-only. The runtime readiness route must r
 - `GET /api/v1/services`
 - `GET /api/v1/agents`
 - `GET /api/v1/providers`
+- `GET /api/v1/providers/{providerId}`
 - `GET /api/v1/runtime/status`
 - `GET /api/v1/mcp/connections`
 
@@ -47,7 +48,7 @@ Perform MCP checks in this order:
 1. `initialize` with protocol version `2025-03-26`.
 2. Send `notifications/initialized`.
 3. Call `tools/list`.
-4. Confirm the exact read-only allowlist: `get_control_api_health`, `list_services`, `list_agents`, `get_agent_definition`.
+4. Confirm the exact six-tool read-only allowlist: `get_control_api_health`, `list_services`, `list_agents`, `get_agent_definition`, `list_providers`, `get_provider_definition`.
 5. Do not invoke a write tool; none should be exposed.
 
 The connected execution runner currently blocks outbound HTTP requests to Workers.dev hostnames. Therefore, a successful upload/deployment is not equivalent to a successful external HTTP smoke test. Keep that distinction in release notes.
