@@ -15,7 +15,7 @@
 - The Preview intentionally has no database or production secrets: Workers Previews do not inherit production settings. A dedicated Preview PostgreSQL database, `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, GitHub OAuth credentials and Google OAuth credentials are still required before the health endpoint can report ready or sign-in can be enabled.
 
 ## CI / Preview status
-- GitHub Actions in the private Auth repository repeatedly reports `startup_failure` with zero jobs on both feature and main refs. TypeScript checking and Next.js build have not executed.
+- GitHub Actions in the private Auth repository still reports `startup_failure` with zero jobs; this is a runner/workflow startup blocker, not a reported source-code failure. Separately, Cloudflare Workers Builds successfully ran `npm run build:cloudflare`, Prisma Client generation, Next.js compilation, lint/type checks, static page generation, OpenNext bundling and the Preview deploy command.
 - Vercel project discovery for the private repository previously returned `repo_not_found`; the isolated Cloudflare Workers Preview is the current staging target. The build completed successfully, but HTTP route verification is blocked by the connected runner's outbound-host restriction.
 - No credentials or secrets are stored in this repository.
 
