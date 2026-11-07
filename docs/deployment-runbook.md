@@ -28,13 +28,14 @@
 
 ## Staging smoke checks
 
-The current staging API routes are read-only:
+The current staging API routes are read-only. The runtime readiness route must report `not_configured`, `executionEnabled: false`, and `runLifecycle: disabled` until a provider and isolated run store are deliberately configured:
 
 - `GET /api/v1/health/live`
 - `GET /api/v1/health/ready`
 - `GET /api/v1/services`
 - `GET /api/v1/agents`
 - `GET /api/v1/providers`
+- `GET /api/v1/runtime/status`
 - `GET /api/v1/mcp/connections`
 
 The MCP staging endpoint is:
