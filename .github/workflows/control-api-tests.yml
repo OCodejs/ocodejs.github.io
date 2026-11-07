@@ -8,6 +8,8 @@ on:
       - "index.html"
       - "scripts/check-control-center.mjs"
       - "scripts/check-pages-theme.mjs"
+      - "scripts/check-accessibility.mjs"
+      - "scripts/check-doc-links.mjs"
       - "ocodejs-pages-theme.css"
       - "docs/**"
       - "README.md"
@@ -46,3 +48,7 @@ jobs:
         run: node scripts/check-control-center.mjs
       - name: Validate OCode.js Pages theme
         run: node scripts/check-pages-theme.mjs
+      - name: Validate static accessibility requirements
+        run: node scripts/check-accessibility.mjs
+      - name: Validate local Markdown links
+        run: node scripts/check-doc-links.mjs
