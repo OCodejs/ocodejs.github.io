@@ -17,7 +17,7 @@ This repository hosts a static GitHub Pages frontend, a separately deployed Clou
 | AI Agents | Registry, provider configuration, task execution | Read-only Agent/Provider catalogs staged; runtime not configured |
 | API Gateway | Routing, auth, quotas, validation | Read-only Control API live on staging |
 | Authentication | Identity, OAuth, sessions, roles | CLI OAuth health probe integrated; Account Auth Preview build succeeded, but DB/provider secrets and E2E auth remain pending |
-| MCP Server | Endpoint registry, handshake, tool discovery | Staging handshake and four fixed read-only tools deployed; external smoke test pending |
+| MCP Server | Endpoint registry, handshake, tool discovery | Staging handshake and six fixed read-only tools deployed; external smoke test pending |
 | Developer Console | Logs, metrics, traces, audit | Cloudflare Logs/Traces enabled for staging Control API and MCP Worker; centralized app telemetry not integrated |
 | Documentation | Technical guides and API references | Initial docs |
 
