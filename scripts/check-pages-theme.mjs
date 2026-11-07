@@ -6,10 +6,12 @@ const html = await readFile(new URL("index.html", root), "utf8");
 const css = await readFile(new URL("ocodejs-pages-theme.css", root), "utf8");
 const docs = await readFile(new URL("docs/ui-framework.md", root), "utf8");
 
+assert.match(html, /<link rel="stylesheet" href="\.\/ocodejs-design-system\.css\?v=1\.0\.0">/, "Canonical design system must be linked");
 assert.match(html, /<link rel="stylesheet" href="\.\/ocodejs-pages-theme\.css\?v=/, "Pages theme stylesheet must be linked");
+const design = await readFile(new URL("ocodejs-design-system.css", root), "utf8");
+for (const marker of ["--ocds-bg:#000", "--ocds-surface:#080808", "--ocds-border:#444", "--ocds-text:#f5f5f5", "--ocds-font:", ".ocds-btn", ".ocds-panel"]) assert.ok(design.includes(marker), "Missing canonical MCP design token or primitive: " + marker);
 for (const token of [
-  "--bg:#05070d", "--panel:#0a101c", "--blue:#347cff", "--cyan:#55c8ff",
-  "--purple:#a34cff", "--green:#57d6a2", "--space-1:4px"
+  "--bg:#000", "--panel:#080808", "--line:#444", "--fg:#f5f5f5", "--muted:#aaa", "--ocds-version:\"1.0.0\""
 ]) assert.ok(css.includes(token), "Missing OCode.js CLI theme token: " + token);
 
 for (const marker of [
@@ -17,7 +19,7 @@ for (const marker of [
   "prefers-reduced-motion", ".sidebar", ".nav button.active"
 ]) assert.ok(css.includes(marker), "Missing responsive/accessibility rule: " + marker);
 
-for (const marker of ["zskbot/ocodejs-cli", "Layout contract", "Component contract"])
+for (const marker of ["mcp.ocodejs.dev", "Canonical design system adoption", "Layout contract", "Component contract"])
   assert.ok(docs.includes(marker), "UI framework documentation missing: " + marker);
 
 for (const marker of [
