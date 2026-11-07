@@ -4,7 +4,7 @@ import worker from "./worker.mjs";
 
 const request = (body, method = "POST") => new Request("https://mcp-staging.example.workers.dev/mcp", {
   method,
-  headers: { "content-type": "application/json", accept: "application/json" },
+  headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2025-03-26" },
   ...(body === undefined ? {} : { body: JSON.stringify(body) })
 });
 
@@ -45,4 +45,15 @@ test("returns a JSON-RPC parse error for malformed JSON", async () => {
   const response = await worker.fetch(new Request("https://mcp-staging.example.workers.dev/mcp", { method: "POST", body: "{" }));
   const data = await response.json();
   assert.equal(data.error.code, -32700);
+});
+
+test("requires the negotiated protocol version after initialize", async () => {
+  const response = await worker.fetch(new Request("https://mcp-staging.example.workers.dev/mcp", {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 22, method: "tools/list" })
+  }));
+  assert.equal(response.status, 400);
+  const data = await response.json();
+  assert.match(data.error, /MCP-Protocol-Version/);
 });
