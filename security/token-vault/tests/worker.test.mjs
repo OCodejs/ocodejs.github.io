@@ -51,3 +51,21 @@ test("same-origin login fails closed when secrets are not configured", async () 
   }), {});
   assert.equal(response.status, 503);
 });
+
+test("agent API rejects requests that carry a browser Origin header", async () => {
+  const response = await worker.fetch(new Request("https://vault.example/api/agent/tokens?project_id=ocodejs-core", {
+    headers: { origin: "https://vault.example" }
+  }), {});
+  assert.equal(response.status, 403);
+});
+
+test("agent API requires an independent bearer credential", async () => {
+  const env = {
+    DB: { prepare() { throw new Error("DB must not be queried without a bearer key"); } },
+    BOOTSTRAP_PASSWORD_HASH: "configured",
+    SESSION_SIGNING_KEY: "s".repeat(32),
+    TOKEN_ENCRYPTION_KEY: Buffer.alloc(32).toString("base64")
+  };
+  const response = await worker.fetch(new Request("https://vault.example/api/agent/tokens?project_id=ocodejs-core"), env);
+  assert.equal(response.status, 401);
+});
