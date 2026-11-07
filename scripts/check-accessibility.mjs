@@ -5,8 +5,9 @@ const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const errors = [];
 
 const attr = (source, name) => {
-  const match = source.match(new RegExp("(?:^|\\s)" + name + "\\s*=\\s*([\"'])(.*?)\\1", "i"));
-  return match?.[2] ?? null;
+  const match = [...source.matchAll(/([^\\s=]+)\\s*=\\s*(["'])(.*?)\\2/g)]
+    .find(([, key]) => key.toLowerCase() === name.toLowerCase());
+  return match?.[3] ?? null;
 };
 
 if (!/<html\b[^>]*\blang=["']vi["']/i.test(html)) errors.push("HTML root must declare lang=vi");
