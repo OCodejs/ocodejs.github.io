@@ -325,3 +325,50 @@ test("unknown MCP connection lookup returns a stable 404 envelope", async () => 
   assert.equal(response.status, 404);
   assert.equal(body.error.code, "NOT_FOUND");
 });
+
+
+test("single MCP connection lookup returns fixed staging metadata and health", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, init = {}) => {
+    const payload = JSON.parse(init.body || "{}");
+    if (payload.method === "initialize") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          protocolVersion: "2025-03-26",
+          serverInfo: { name: "ocodejs-control-center", version: "1.0.0" },
+          capabilities: {}
+        }
+      });
+    }
+    if (payload.method === "notifications/initialized") {
+      return new Response(null, { status: 202 });
+    }
+    if (payload.method === "tools/list") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          tools: [
+            { name: "get_control_api_health", description: "Read health" },
+            { name: "list_services", description: "List services" }
+          ]
+        }
+      });
+    }
+    return new Response("unexpected", { status: 400 });
+  };
+  try {
+    const response = await call("/api/v1/mcp/connections/ocodejs-mcp-staging");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.connection.id, "ocodejs-mcp-staging");
+    assert.equal(body.connection.environment, "staging");
+    assert.equal(body.connection.state, "healthy");
+    assert.equal(body.connection.toolCount, 2);
+    assert.equal(body.connection.managed, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
