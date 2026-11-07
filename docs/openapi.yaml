@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: OCodeJS Control API
-  version: 1.2.0
+  version: 1.4.0
   description: Read-only health and service registry API with structured request logging. Staging implementation.
 servers:
   - url: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
@@ -75,6 +75,96 @@ paths:
                   count: { type: integer }
                   checkedAt: { type: string, format: date-time }
                   requestId: { type: string }
+  /api/v1/agents:
+    get:
+      summary: List versioned agent definitions
+      responses:
+        "200":
+          description: Read-only Agent Registry snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [agents, count, checkedAt, requestId]
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AgentDefinition"
+                  count: { type: integer }
+                  checkedAt: { type: string, format: date-time }
+                  requestId: { type: string }
+  /api/v1/agents/{agentId}:
+    get:
+      summary: Get one versioned agent definition
+      parameters:
+        - in: path
+          name: agentId
+          required: true
+          schema: { type: string, pattern: "^[a-z0-9-]+$" }
+      responses:
+        "200":
+          description: Agent definition
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [agent, requestId]
+                properties:
+                  agent:
+                    $ref: "#/components/schemas/AgentDefinition"
+                  requestId: { type: string }
+        "404":
+          description: Agent is not registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/mcp/connections:
+    get:
+      summary: List fixed, read-only MCP connection registry
+      responses:
+        "200":
+          description: Staging MCP connection metadata and live protocol probe
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [connections, count, checkedAt, requestId]
+                properties:
+                  connections:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/McpConnection"
+                  count: { type: integer }
+                  checkedAt: { type: string, format: date-time }
+                  requestId: { type: string }
+  /api/v1/mcp/connections/{connectionId}:
+    get:
+      summary: Read one fixed MCP connection
+      parameters:
+        - in: path
+          name: connectionId
+          required: true
+          schema: { type: string, pattern: "^[a-z0-9-]+$" }
+      responses:
+        "200":
+          description: MCP connection metadata and live protocol probe
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [connection, requestId]
+                properties:
+                  connection:
+                    $ref: "#/components/schemas/McpConnection"
+                  requestId: { type: string }
+        "404":
+          description: MCP connection is not registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/services/{serviceId}:
     get:
       summary: Get one registered service
@@ -126,6 +216,45 @@ components:
         source: { type: string, enum: [self, unverified, remote_probe] }
         checkedAt: { type: [string, "null"], format: date-time }
         latencyMs: { type: [integer, "null"], minimum: 0 }
+    AgentDefinition:
+      type: object
+      required: [id, name, version, status, description, provider, capabilities, tools, executionEnabled, approvalRequired]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        version: { type: string, pattern: "^\\d+\\.\\d+\\.\\d+$" }
+        status: { type: string, enum: [draft] }
+        description: { type: string }
+        provider:
+          type: object
+          required: [id, state]
+          properties:
+            id: { type: [string, "null"] }
+            state: { type: string, enum: [not_configured] }
+        capabilities:
+          type: array
+          items: { type: string }
+        tools:
+          type: array
+          items: { type: string }
+        executionEnabled: { type: boolean, const: false }
+        approvalRequired: { type: boolean, const: true }
+    McpConnection:
+      type: object
+      required: [id, name, endpoint, transport, environment, access, managed, state, description, checkedAt, latencyMs]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        endpoint: { type: string, format: uri }
+        transport: { type: string, enum: [streamable-http] }
+        environment: { type: string, enum: [staging] }
+        access: { type: string, enum: [read_only] }
+        managed: { type: boolean, const: false }
+        state: { type: string, enum: [healthy, unknown, unavailable] }
+        description: { type: string }
+        checkedAt: { type: string, format: date-time }
+        latencyMs: { type: integer, minimum: 0 }
+        toolCount: { type: integer, minimum: 0 }
     Error:
       type: object
       required: [error, requestId]

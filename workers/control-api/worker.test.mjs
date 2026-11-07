@@ -232,3 +232,143 @@ test("telemetry reports partial structured logging without claiming metrics stor
   assert.equal(body.service.source, "self");
   assert.match(body.service.description, /metrics aggregation/i);
 });
+
+
+test("agent registry returns versioned draft definitions with execution disabled", async () => {
+  const response = await call("/api/v1/agents");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.count, 3);
+  assert.deepEqual(body.agents.map((agent) => agent.id), [
+    "ocodejs-builder", "ocodejs-reviewer", "ocodejs-docs"
+  ]);
+  for (const agent of body.agents) {
+    assert.equal(agent.version, "0.1.0");
+    assert.equal(agent.status, "draft");
+    assert.equal(agent.provider.state, "not_configured");
+    assert.equal(agent.executionEnabled, false);
+    assert.equal(agent.approvalRequired, true);
+    assert.deepEqual(agent.tools, []);
+  }
+});
+
+test("single agent lookup returns a versioned definition", async () => {
+  const response = await call("/api/v1/agents/ocodejs-builder");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.agent.id, "ocodejs-builder");
+  assert.equal(body.agent.version, "0.1.0");
+  assert.equal(body.agent.executionEnabled, false);
+});
+
+test("unknown agent lookup returns the stable 404 envelope", async () => {
+  const response = await call("/api/v1/agents/does-not-exist");
+  const body = await response.json();
+  assert.equal(response.status, 404);
+  assert.equal(body.error.code, "NOT_FOUND");
+});
+
+
+test("MCP connection registry reports only the fixed staging endpoint and validates handshake", async () => {
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async (_url, init = {}) => {
+    calls += 1;
+    const payload = JSON.parse(init.body || "{}");
+    if (payload.method === "initialize") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          protocolVersion: "2025-03-26",
+          serverInfo: { name: "ocodejs-control-center", version: "1.0.0" },
+          capabilities: {}
+        }
+      });
+    }
+    if (payload.method === "notifications/initialized") {
+      return new Response(null, { status: 202 });
+    }
+    if (payload.method === "tools/list") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          tools: [
+            { name: "get_control_api_health", description: "Read health" },
+            { name: "list_services", description: "List services" }
+          ]
+        }
+      });
+    }
+    return new Response("unexpected", { status: 400 });
+  };
+  try {
+    const response = await call("/api/v1/mcp/connections");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.count, 1);
+    assert.equal(calls, 3);
+    assert.equal(body.connections[0].id, "ocodejs-mcp-staging");
+    assert.equal(body.connections[0].state, "healthy");
+    assert.equal(body.connections[0].toolCount, 2);
+    assert.equal(body.connections[0].access, "read_only");
+    assert.equal(body.connections[0].managed, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("unknown MCP connection lookup returns a stable 404 envelope", async () => {
+  const response = await call("/api/v1/mcp/connections/not-registered");
+  const body = await response.json();
+  assert.equal(response.status, 404);
+  assert.equal(body.error.code, "NOT_FOUND");
+});
+
+
+test("single MCP connection lookup returns fixed staging metadata and health", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_url, init = {}) => {
+    const payload = JSON.parse(init.body || "{}");
+    if (payload.method === "initialize") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          protocolVersion: "2025-03-26",
+          serverInfo: { name: "ocodejs-control-center", version: "1.0.0" },
+          capabilities: {}
+        }
+      });
+    }
+    if (payload.method === "notifications/initialized") {
+      return new Response(null, { status: 202 });
+    }
+    if (payload.method === "tools/list") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          tools: [
+            { name: "get_control_api_health", description: "Read health" },
+            { name: "list_services", description: "List services" }
+          ]
+        }
+      });
+    }
+    return new Response("unexpected", { status: 400 });
+  };
+  try {
+    const response = await call("/api/v1/mcp/connections/ocodejs-mcp-staging");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.connection.id, "ocodejs-mcp-staging");
+    assert.equal(body.connection.environment, "staging");
+    assert.equal(body.connection.state, "healthy");
+    assert.equal(body.connection.toolCount, 2);
+    assert.equal(body.connection.managed, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
