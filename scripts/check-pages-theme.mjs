@@ -37,3 +37,12 @@ for (const marker of [
   'registerItem:registerNavigationItem', 'registerPage:registerWorkspacePage',
   'root.innerHTML=groups.map', "id:'overview'", "id:'agents'", "id:'api'", "id:'auth'", "id:'mcp'", "id:'console'", "id:'docs'", 'renderNavigation();'
 ]) assert.ok(html.includes(marker), "Dynamic navigation registry missing: " + marker);
+
+for (const marker of [
+  "function serviceRegistryView()", "function refreshServiceRegistry()", "CONTROL_API_BASE+'/services'",
+  "function providersView()", "function refreshProviders()", "CONTROL_API_BASE+'/providers'",
+  "function runtimeView()", "function refreshRuntime()", "CONTROL_API_BASE+'/runtime/status'",
+  "id:'service-registry'", "id:'providers'", "id:'runtime'",
+  "serviceRegistryView,providers:providersView,runtime:runtimeView",
+  "if(key==='service-registry')refreshServiceRegistry()", "if(key==='providers')refreshProviders()", "if(key==='runtime')refreshRuntime()"
+]) assert.ok(html.includes(marker), "Live platform page missing: " + marker);
