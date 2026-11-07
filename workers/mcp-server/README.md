@@ -18,6 +18,7 @@ The server is intentionally read-only. It has no account, DNS, deployment, secre
 - JSON-RPC 2.0 over Streamable HTTP.
 - Protocol version: `2025-03-26`.
 - Supports `initialize`, `ping`, `tools/list`, `tools/call`, and initialization notifications.
+- Requires `MCP-Protocol-Version: 2025-03-26` on all post-initialize requests.
 - `GET` is not used for server-initiated SSE streams; clients should use POST requests.
 - CORS is enabled for cross-origin MCP clients; no credentials are accepted.
 
