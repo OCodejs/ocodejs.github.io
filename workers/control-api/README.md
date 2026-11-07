@@ -41,7 +41,7 @@ node --test workers/control-api/worker.test.mjs
 4. Configure the exact staging Control Center origin in `ALLOWED_ORIGINS` before browser integration.
 5. Verify the CLI Auth health probe and distinguish it from the Account Portal Auth.js backend.
 6. Verify the MCP protocol probe reports healthy only after initialize and tools/list both pass.
-7. Keep sign-in controls disabled until the account portal has a dedicated Preview runtime, database and OAuth callbacks.
+7. Keep sign-in controls disabled until the existing Access-protected Preview has a dedicated PostgreSQL database, Preview-only secrets, verified health response and end-to-end OAuth/session tests.
 
 No production routes are attached. This Worker is isolated from existing OCodeJS Worker scripts.
 
