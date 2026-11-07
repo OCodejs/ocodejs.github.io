@@ -234,6 +234,35 @@ test("telemetry reports partial structured logging without claiming metrics stor
 });
 
 
+
+
+test("provider registry lists only catalogued adapters and keeps inference disabled", async () => {
+  const response = await call("/api/v1/providers");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.count, 1);
+  assert.equal(body.providers[0].id, "cloudflare-workers-ai");
+  assert.equal(body.providers[0].state, "not_configured");
+  assert.equal(body.providers[0].executionEnabled, false);
+  assert.equal(body.providers[0].requiresExplicitEnablement, true);
+  assert.deepEqual(body.providers[0].capabilities, ["text_generation"]);
+});
+
+test("single provider lookup returns catalog metadata without enabling runtime", async () => {
+  const response = await call("/api/v1/providers/cloudflare-workers-ai");
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.provider.id, "cloudflare-workers-ai");
+  assert.equal(body.provider.executionEnabled, false);
+});
+
+test("unknown provider lookup returns a stable 404 envelope", async () => {
+  const response = await call("/api/v1/providers/not-registered");
+  const body = await response.json();
+  assert.equal(response.status, 404);
+  assert.equal(body.error.code, "NOT_FOUND");
+});
+
 test("agent registry returns versioned draft definitions with execution disabled", async () => {
   const response = await call("/api/v1/agents");
   const body = await response.json();
