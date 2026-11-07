@@ -4,10 +4,7 @@ info:
   version: 1.0.0
   description: Read-only health and service registry API. Phase 1 staging implementation.
 servers:
-  - url: https://{worker-host}
-    variables:
-      worker-host:
-        default: api-staging.example.workers.dev
+  - url: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
 paths:
   /api/v1:
     get:
