@@ -33,7 +33,7 @@ This roadmap separates the static control center from the multi-service platform
 ## Phase 3 — Identity and access
 - [x] Add a read-only health probe for the separate OCodeJS CLI GitHub OAuth/PAT Worker (PR #6; staging deployment updated).
 - [x] Document the separation between CLI OAuth and Account Portal Auth.js.
-- [ ] Deploy Account Portal Auth.js to an isolated Preview runtime.
+- [x] Build and deploy the Account Portal Auth.js code to an isolated, Access-protected Cloudflare Preview (build success; no database or OAuth secrets configured).
 - [ ] Configure a dedicated Preview PostgreSQL database and Google/GitHub OAuth callbacks.
 - [ ] Verify registration, login, OAuth callbacks, session persistence and logout end-to-end.
 - [ ] Implement server-side RBAC and project/environment scopes.
@@ -54,8 +54,9 @@ This roadmap separates the static control center from the multi-service platform
 - [ ] Tool permission snapshots and approval gates.
 
 ## Phase 6 — Developer Console and integrations
-- [x] Enable persisted Cloudflare Worker logs and traces for staging Control API and MCP Worker (query strings redacted).\n- [x] Emit structured Control API request events and correlation headers; keep metric aggregation and queryable audit storage explicitly pending.
-- [x] Emit structured request events to Cloudflare Workers Logs with request ID, method, normalized path, status and latency; exclude query strings and request credentials.\n- [ ] Centralize application metrics, distributed traces and retention policies.
+- [x] Enable persisted Cloudflare Worker logs and traces for staging Control API and MCP Worker (query strings redacted).
+- [x] Emit structured Control API request events and correlation headers; keep metric aggregation and queryable audit storage explicitly pending.
+- [ ] Centralize application metrics, distributed traces and retention policies.
 - [ ] Role-based audit event explorer.
 - [ ] GitHub, Cloudflare and Vercel status adapters with least-privilege access.
 - [ ] Alert rules, retention policies and incident playbooks.
