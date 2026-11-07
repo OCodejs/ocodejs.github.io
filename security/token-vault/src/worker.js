@@ -173,7 +173,7 @@ async function route(req, env) {
       ).bind(projectId).all();
       return json({ tokens: rows.results, permission: grant.permission });
     }
-    const agentReveal = path.match(/^\\/api\\/agent\\/tokens\\/([0-9a-f-]+)\\/reveal$/i);
+    const agentReveal = path.match(/^\/api\/agent\/tokens\/([0-9a-f-]+)\/reveal$/i);
     if (req.method === "POST" && agentReveal) {
       const row = await env.DB.prepare("SELECT id,project_id,ciphertext,iv FROM vault_tokens WHERE id=?")
         .bind(agentReveal[1]).first();
@@ -228,7 +228,7 @@ async function route(req, env) {
     await audit(env, user.subject, "agent.create", agentId);
     return json({ subject, api_key: apiKey, expires_at: expiresAt }, 201);
   }
-  const agentGrantPath = path.match(/^\\/api\\/agents\\/([a-zA-Z0-9._-]{3,64})\\/grants$/);
+  const agentGrantPath = path.match(/^\/api\/agents\/([a-zA-Z0-9._-]{3,64})\/grants$/);
   if (agentGrantPath && req.method === "GET") {
     if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
     const subject = agentGrantPath[1];
@@ -252,7 +252,7 @@ async function route(req, env) {
     await audit(env, user.subject, "agent.grant", agent.id + ":" + body.project_id);
     return json({ ok: true });
   }
-  const agentPath = path.match(/^\\/api\\/agents\\/([a-zA-Z0-9._-]{3,64})$/);
+  const agentPath = path.match(/^\/api\/agents\/([a-zA-Z0-9._-]{3,64})$/);
   if (agentPath && req.method === "DELETE") {
     if (user.role !== "owner") return json({ error: "Forbidden" }, 403);
     const subject = agentPath[1];
