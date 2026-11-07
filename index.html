@@ -96,7 +96,7 @@ async function refreshDashboard(){
   notice.style.borderColor='#633b40';notice.style.background='#1b1013';notice.style.color='#f3a5ad';
  }finally{if(button){button.disabled=false;button.textContent='↻ Refresh';}}
 }
-function agentView(){return header('AI PLATFORM / 01','AI Agents','Agent Registry và Provider Registry từ Control API; runtime chỉ được bật sau cấu hình và phê duyệt rõ ràng.','<button class="btn ghost" id="refreshAgents" type="button">↻ Refresh</button>')+'<div class="notice">Các agent đang ở trạng thái DRAFT. Provider Registry chỉ hiển thị adapter khả dụng; chưa có AI binding, chưa có lượt inference và chưa phát sinh chi phí model.</div><h3 class="section-title">PROVIDER REGISTRY</h3><div id="providerRegistry" class="grid cards"><div class="empty">Đang tải Provider Registry…</div></div><h3 class="section-title" style="margin-top:22px">AGENT DEFINITIONS</h3><div id="agentRegistry" class="grid cards"><div class="empty">Đang tải Agent Registry từ staging Control API…</div></div>'}
+function agentView(){return header('AI PLATFORM / 01','AI Agents','Agent Registry và Provider Registry từ Control API; runtime chỉ được bật sau cấu hình và phê duyệt rõ ràng.','<button class="btn ghost" id="refreshAgents" type="button">↻ Refresh</button>')+'<div class="notice">Các agent đang ở trạng thái DRAFT. Provider Registry chỉ hiển thị adapter khả dụng; chưa có AI binding, chưa có lượt inference và chưa phát sinh chi phí model.</div><div id="runtimeReadiness" class="notice">Đang kiểm tra trạng thái runtime…</div><h3 class="section-title">PROVIDER REGISTRY</h3><div id="providerRegistry" class="grid cards"><div class="empty">Đang tải Provider Registry…</div></div><h3 class="section-title" style="margin-top:22px">AGENT DEFINITIONS</h3><div id="agentRegistry" class="grid cards"><div class="empty">Đang tải Agent Registry từ staging Control API…</div></div>'}
 
 async function refreshAgentRegistry(){
  const target=document.getElementById('agentRegistry');
@@ -106,13 +106,16 @@ async function refreshAgentRegistry(){
  if(button){button.disabled=true;button.textContent='… Loading';}
  try{
   const options={method:'GET',cache:'no-store',headers:{'Accept':'application/json'}};
-  const [agentResponse,providerResponse]=await Promise.all([
+  const [agentResponse,providerResponse,runtimeResponse]=await Promise.all([
    fetch(CONTROL_API_BASE+'/agents',options),
-   fetch(CONTROL_API_BASE+'/providers',options)
+   fetch(CONTROL_API_BASE+'/providers',options),
+   fetch(CONTROL_API_BASE+'/runtime/status',options)
   ]);
-  if(!agentResponse.ok||!providerResponse.ok)throw new Error('HTTP '+agentResponse.status+'/'+providerResponse.status);
-  const [body,providerBody]=await Promise.all([agentResponse.json(),providerResponse.json()]);
-  if(!Array.isArray(body.agents)||!Array.isArray(providerBody.providers))throw new Error('Registry schema không hợp lệ');
+  if(!agentResponse.ok||!providerResponse.ok||!runtimeResponse.ok)throw new Error('HTTP '+agentResponse.status+'/'+providerResponse.status+'/'+runtimeResponse.status);
+  const [body,providerBody,runtimeBody]=await Promise.all([agentResponse.json(),providerResponse.json(),runtimeResponse.json()]);
+  if(!Array.isArray(body.agents)||!Array.isArray(providerBody.providers)||!runtimeBody.runtime)throw new Error('Registry schema không hợp lệ');
+  const runtimeTarget=document.getElementById('runtimeReadiness');
+  if(runtimeTarget){const runtime=runtimeBody.runtime;runtimeTarget.textContent='AI Runtime: '+runtime.state.toUpperCase()+' · Provider: '+runtime.provider.state+' · Run store: '+runtime.runStore.state+' · Inference: DISABLED';}
   if(providerTarget)providerTarget.innerHTML=providerBody.providers.map(provider=>'<article class="panel tile"><div class="agent-row"><div class="agent-icon">◈</div><div><strong>'+escapeHtml(provider.name)+'</strong><small>'+escapeHtml(provider.id)+' · '+escapeHtml(provider.kind)+'</small></div></div><p style="margin-top:16px">'+escapeHtml(provider.description)+'</p><div class="tile-foot"><span class="state off">'+escapeHtml(provider.state.toUpperCase().replace('_',' '))+'</span><span class="tag">INFERENCE DISABLED</span></div><p style="font-size:10px;color:var(--muted);margin-top:12px">Capabilities: '+provider.capabilities.map(escapeHtml).join(' · ')+'</p><p style="font-size:10px;color:var(--muted)">Explicit enablement required: '+(provider.requiresExplicitEnablement?'YES':'NO')+'</p></article>').join('')||'<div class="empty">Chưa có provider adapter nào được catalog.</div>';
   target.innerHTML=body.agents.map((agent,i)=>'<article class="panel tile"><div class="agent-row"><div class="agent-icon">'+['✳','⌘','◇'][i%3]+'</div><div><strong>'+escapeHtml(agent.name)+'</strong><small>'+escapeHtml(agent.id)+' · v'+escapeHtml(agent.version)+'</small></div></div><p style="margin-top:16px">'+escapeHtml(agent.description)+'</p><div class="tile-foot"><span class="state warn">'+escapeHtml(agent.status.toUpperCase())+'</span><span class="tag">RUNTIME DISABLED</span></div><p style="font-size:10px;color:var(--muted);margin-top:12px">Capabilities: '+agent.capabilities.map(escapeHtml).join(' · ')+'</p><p style="font-size:10px;color:var(--muted)">Provider: '+escapeHtml(agent.provider.state)+' · Tools: '+agent.tools.length+' · Approval required: '+(agent.approvalRequired?'YES':'NO')+'</p></article>').join('')||'<div class="empty">Agent Registry chưa có định nghĩa nào.</div>';
  }catch(error){
