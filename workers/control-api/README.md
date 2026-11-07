@@ -1,4 +1,4 @@
-# OCodeJS Control API — Phase 1.4
+# OCodeJS Control API — Phase 1.7
 
 This Worker is the first read-only backend slice for the OCodeJS Server Control Center.
 
@@ -20,6 +20,7 @@ The deployment API confirmed the Worker script and its 100% deployment version. 
 | GET | `/api/v1` | API metadata and route index |
 | GET | `/api/v1/health/live` | Confirms this Worker process can respond |
 | GET | `/api/v1/health/ready` | Confirms this stateless API slice is ready |
+| GET | `/api/v1/runtime/status` | Reports provider/run-store readiness; inference and execution remain disabled |
 | GET | `/api/v1/services` | Lists service states without exposing credentials |
 | GET | `/api/v1/services/{serviceId}` | Reads one registered service |
 | GET | `/api/v1/agents` | Lists versioned, read-only agent definitions |
