@@ -20,6 +20,13 @@
 - No Vercel project linked to `zskbot/mcp.server.auth` was found in the AITools team project inventory.
 - A staging project creation attempt for the private repository was rejected by Vercel with `repo_not_found`; no project or deployment was created. The Git repository must be made visible to the Vercel team integration before Preview deployment can proceed.
 
+## CI and Preview blockers
+
+- The private Auth repository workflow `.github/workflows/ci.yml` is configured to install dependencies, generate Prisma Client, run TypeScript checking and build.
+- GitHub Actions runs on both the feature branch and `main` repeatedly returned `startup_failure` with zero jobs. No TypeScript check or Next.js build was executed, so this is not evidence of a source build failure.
+- Vercel rejected creation of a staging project for the private repository with `repo_not_found`; no Vercel project or deployment was created.
+- Preview remains blocked until the Git provider grants the Vercel team integration access and GitHub Actions starts jobs successfully.
+
 ## Integration boundary
 
 The CLI GitHub Auth Worker and the Account Portal Auth.js application are different systems. Do not label the CLI OAuth health probe as the account sign-in backend.
