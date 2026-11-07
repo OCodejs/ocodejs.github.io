@@ -267,3 +267,61 @@ test("unknown agent lookup returns the stable 404 envelope", async () => {
   assert.equal(response.status, 404);
   assert.equal(body.error.code, "NOT_FOUND");
 });
+
+
+test("MCP connection registry reports only the fixed staging endpoint and validates handshake", async () => {
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async (_url, init = {}) => {
+    calls += 1;
+    const payload = JSON.parse(init.body || "{}");
+    if (payload.method === "initialize") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          protocolVersion: "2025-03-26",
+          serverInfo: { name: "ocodejs-control-center", version: "1.0.0" },
+          capabilities: {}
+        }
+      });
+    }
+    if (payload.method === "notifications/initialized") {
+      return new Response(null, { status: 202 });
+    }
+    if (payload.method === "tools/list") {
+      return Response.json({
+        jsonrpc: "2.0",
+        id: payload.id,
+        result: {
+          tools: [
+            { name: "get_control_api_health", description: "Read health" },
+            { name: "list_services", description: "List services" }
+          ]
+        }
+      });
+    }
+    return new Response("unexpected", { status: 400 });
+  };
+  try {
+    const response = await call("/api/v1/mcp/connections");
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.count, 1);
+    assert.equal(calls, 3);
+    assert.equal(body.connections[0].id, "ocodejs-mcp-staging");
+    assert.equal(body.connections[0].state, "healthy");
+    assert.equal(body.connections[0].toolCount, 2);
+    assert.equal(body.connections[0].access, "read_only");
+    assert.equal(body.connections[0].managed, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("unknown MCP connection lookup returns a stable 404 envelope", async () => {
+  const response = await call("/api/v1/mcp/connections/not-registered");
+  const body = await response.json();
+  assert.equal(response.status, 404);
+  assert.equal(body.error.code, "NOT_FOUND");
+});
