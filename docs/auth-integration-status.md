@@ -11,12 +11,12 @@
 ### OCodeJS Account Portal Auth.js
 - Canonical source: private repository `zskbot/mcp.server.auth`.
 - Auth.js source includes GitHub OAuth, Google OAuth, email/password Credentials, Prisma/PostgreSQL and JWT sessions.
-- The Account Portal runtime is not deployed as a verified Preview. The separate `mcp-server-auth` Worker remains a 503 preparation placeholder.
-- The Account Portal requires a dedicated Preview runtime, isolated PostgreSQL database, Auth.js secret and provider callback configuration before sign-in can be enabled.
+- A Cloudflare Workers Preview build for branch `feat/auth-account-preview` completed successfully on commit `b25cef3198c3110dd6b3ccc098904c9b2a61c36e` (build `03a68bdf-1e01-4daf-8df5-31891c270a59`). The Preview URL is protected by the existing `Cloudflare Workers Preview URLs` Access policy. The build compiled and deployed, but the runtime health endpoint has not been independently verified.
+- The Preview intentionally has no database or production secrets: Workers Previews do not inherit production settings. A dedicated Preview PostgreSQL database, `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, GitHub OAuth credentials and Google OAuth credentials are still required before the health endpoint can report ready or sign-in can be enabled.
 
 ## CI / Preview status
 - GitHub Actions in the private Auth repository repeatedly reports `startup_failure` with zero jobs on both feature and main refs. TypeScript checking and Next.js build have not executed.
-- Vercel project discovery for the private repository previously returned `repo_not_found`; no Preview deployment is verified.
+- Vercel project discovery for the private repository previously returned `repo_not_found`; the isolated Cloudflare Workers Preview is the current staging target. The build completed successfully, but HTTP route verification is blocked by the connected runner's outbound-host restriction.
 - No credentials or secrets are stored in this repository.
 
 ## Integration boundary
