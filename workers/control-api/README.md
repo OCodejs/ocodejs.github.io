@@ -23,7 +23,7 @@ The deployment API confirmed the Worker script and its 100% deployment version. 
 | GET | `/api/v1/services` | Lists service states without exposing credentials |
 | GET | `/api/v1/services/{serviceId}` | Reads one registered service |
 
-Service Registry now probes `https://auth.ocodejs.dev/health` for the separate OCodeJS CLI GitHub OAuth/PAT service. The probe only reports endpoint reachability and the presence of required bindings; it does not claim an end-to-end OAuth login succeeded. The Account Portal Auth.js service remains `not_configured`: its source exists in the private `zskbot/mcp.server.auth` repository, but the current `mcp-server-auth` Worker script is a 503 preparation stub and has no verified account-portal runtime. AI runtime, MCP manager and telemetry also remain `not_configured`.
+Service Registry probes `https://auth.ocodejs.dev/health` for the separate OCodeJS CLI GitHub OAuth/PAT service and performs an MCP `initialize` + `tools/list` handshake against the isolated `ocodejs-mcp-staging` Worker. The MCP probe validates the protocol version and the two-tool read-only allowlist; it does not invoke tools. The Account Portal Auth.js service remains `not_configured`: its source exists in the private `zskbot/mcp.server.auth` repository, but the current `mcp-server-auth` Worker script is a 503 preparation stub and has no verified account-portal runtime. AI runtime, MCP connection manager and telemetry persistence remain `not_configured`.
 
 ## Local tests
 
@@ -40,6 +40,7 @@ node --test workers/control-api/worker.test.mjs
 3. Confirm `/api/v1/services` marks only `control-api` as healthy.
 4. Configure the exact staging Control Center origin in `ALLOWED_ORIGINS` before browser integration.
 5. Verify the CLI Auth health probe and distinguish it from the Account Portal Auth.js backend.
+6. Verify the MCP protocol probe reports healthy only after initialize and tools/list both pass.
 6. Keep sign-in controls disabled until the account portal has a dedicated Preview runtime, database and OAuth callbacks.
 
 No production routes are attached. This Worker is isolated from existing OCodeJS Worker scripts.
