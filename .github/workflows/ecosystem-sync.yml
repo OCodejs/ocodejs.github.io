@@ -29,26 +29,21 @@ jobs:
       - name: Checkout control repository
         uses: actions/checkout@v4
 
-      - name: Validate registry and shared payload
-        shell: bash
-        run: |
-          set -euo pipefail
-          jq -e '.registryVersion and .controlRepository and (.repositories | type == "array")' projects.registry.json >/dev/null
-          jq -e '[.repositories[].repository] | length == (unique | length)' projects.registry.json >/dev/null
-          test -d ecosystem/shared
-          echo "Registry valid: $(jq '.repositories | length' projects.registry.json) repositories"
+      - name: Validate project registry
+        run: node scripts/check-project-registry.mjs
 
       - name: Synchronize opted-in repositories through pull requests
         env:
           GH_TOKEN: ${{ secrets.OCODEJS_SYNC_TOKEN }}
           INPUT_DRY_RUN: ${{ inputs.dry_run }}
           EVENT_NAME: ${{ github.event_name }}
+          SOURCE_SHA: ${{ github.sha }}
         shell: bash
         run: |
           set -euo pipefail
           if [[ -z "${GH_TOKEN:-}" ]]; then
-            echo "::error::Missing OCODEJS_SYNC_TOKEN. Add a fine-grained token with Contents (read/write) and Pull requests (read/write) on intended target repositories."
-            exit 1
+            echo "::warning::OCODEJS_SYNC_TOKEN is not configured. Registry validation passed; cross-repository sync is safely skipped."
+            exit 0
           fi
 
           dry_run=false
@@ -56,30 +51,42 @@ jobs:
             dry_run=true
           fi
 
-          while IFS= read -r repo; do
-            [[ -z "$repo" ]] && continue
-            branch="bot/ecosystem-sync-${GITHUB_RUN_ID}"
+          while IFS= read -r entry; do
+            repo="$(jq -r '.repository' <<< "$entry")"
+            modules="$(jq -r '.sync.modules[]' <<< "$entry")"
+            branch="bot/ecosystem-sync-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
             workdir="$(mktemp -d)"
             echo "::group::${repo}"
+
             if ! git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" "$workdir/repo"; then
-              echo "::warning::Unable to clone ${repo}; check token access and repository availability."
-              echo "::endgroup::"
+              echo "::warning::Unable to clone ${repo}; check token access."
               rm -rf "$workdir"
+              echo "::endgroup::"
               continue
             fi
 
-            target="$workdir/repo/.ocodejs/shared"
-            mkdir -p "$target"
-            cp -R ecosystem/shared/. "$target/"
-            if git -C "$workdir/repo" diff --quiet && [[ -z "$(git -C "$workdir/repo" status --porcelain)" ]]; then
-              echo "No managed-file changes."
+            changed=false
+            while IFS= read -r module; do
+              source_dir="ecosystem/shared/modules/${module}"
+              if [[ ! -d "$source_dir" ]]; then
+                echo "Module ${module} has no published payload yet; skipped."
+                continue
+              fi
+              target_dir="$workdir/repo/.ocodejs/shared/${module}"
+              mkdir -p "$target_dir"
+              cp -R "$source_dir/." "$target_dir/"
+              changed=true
+            done <<< "$modules"
+
+            if [[ "$changed" != "true" ]] || [[ -z "$(git -C "$workdir/repo" status --porcelain)" ]]; then
+              echo "No managed module changes."
               rm -rf "$workdir"
               echo "::endgroup::"
               continue
             fi
 
             if [[ "$dry_run" == "true" ]]; then
-              echo "DRY RUN: changes detected; no branch or PR created."
+              echo "DRY RUN: proposed managed-file changes:"
               git -C "$workdir/repo" status --short
               rm -rf "$workdir"
               echo "::endgroup::"
@@ -90,12 +97,12 @@ jobs:
             git -C "$workdir/repo" config user.email "actions@users.noreply.github.com"
             git -C "$workdir/repo" checkout -b "$branch"
             git -C "$workdir/repo" add .ocodejs/shared
-            git -C "$workdir/repo" commit -m "chore(ocodejs): sync managed ecosystem assets"
+            git -C "$workdir/repo" commit -m "chore(ocodejs): sync managed ecosystem modules"
             git -C "$workdir/repo" push origin "$branch"
-            base="$(git -C "$workdir/repo" remote show origin | sed -n '/HEAD branch/s/.*: //p')"
+            base="$(gh repo view "$repo" --json defaultBranchRef --jq '.defaultBranchRef.name')"
             gh pr create --repo "$repo" --base "$base" --head "$branch" \
-              --title "chore(ocodejs): sync managed ecosystem assets" \
-              --body "Automated update from OCodejs/ocodejs.github.io. Only files under .ocodejs/shared are managed by this sync. Review before merging; application-specific code and configuration are not changed."
+              --title "chore(ocodejs): sync managed ecosystem modules" \
+              --body "Automated shared-module update from OCodejs/ocodejs.github.io (source commit ${SOURCE_SHA}). Only .ocodejs/shared is managed. Project-specific source, APIs, auth, data, and deployment settings are untouched. Review before merging."
             rm -rf "$workdir"
             echo "::endgroup::"
-          done < <(jq -r '.repositories[] | select(.sync.enabled == true) | .repository' projects.registry.json)
+          done < <(jq -c '.repositories[] | select(.sync.enabled == true)' projects.registry.json)
