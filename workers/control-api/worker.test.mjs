@@ -51,7 +51,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
     if (message.method === "notifications/initialized") return new Response(null, { status: 202 });
     if (message.method === "tools/list") {
       return new Response(JSON.stringify({ jsonrpc: "2.0", id: 2, result: { tools: [
-        { name: "get_control_api_health" }, { name: "list_services" }, { name: "list_agents" }, { name: "get_agent_definition" }
+        { name: "get_control_api_health" }, { name: "list_services" }, { name: "list_agents" }, { name: "get_agent_definition" }, { name: "list_providers" }, { name: "get_provider_definition" }
       ]}}), { status: 200, headers: { "Content-Type": "application/json" } });
     }
     throw new Error("Unexpected MCP method");
