@@ -1,0 +1,28 @@
+name: Control API tests
+
+on:
+  pull_request:
+    paths:
+      - "workers/control-api/**"
+      - ".github/workflows/control-api-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "workers/control-api/**"
+      - ".github/workflows/control-api-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run Control API tests
+        run: node --test workers/control-api/worker.test.mjs
