@@ -30,6 +30,10 @@ The deployment API confirmed the Worker script and its 100% deployment version. 
 
 Service Registry probes `https://auth.ocodejs.dev/health` for the separate OCodeJS CLI GitHub OAuth/PAT service and performs an MCP `initialize` + `tools/list` handshake against the isolated `ocodejs-mcp-staging` Worker. The MCP probe validates the protocol version and the six-tool read-only allowlist; it does not invoke tools. The Account Portal Auth.js service remains `not_configured`: its source exists in the private `zskbot/mcp.server.auth` repository, and a Cloudflare Workers Preview build has now compiled and deployed behind Access. Its health route is not yet verified; Preview settings intentionally contain no database or OAuth secrets, so Account Portal Auth.js remains `not_configured`. Agent Registry is available as read-only metadata; all definitions are `draft`, have no provider/tools, and `executionEnabled: false`. The MCP Connection Registry exposes only the fixed staging endpoint and a live initialize/tools-list probe; it accepts no arbitrary URL or write operation. AI runtime and MCP connection manager remain `not_configured`. Telemetry is `degraded`: structured request events are emitted to Workers Logs, but metrics aggregation and a queryable audit store are not configured.
 
+## Analytics Engine integration
+
+Attach a staging-only Workers Analytics Engine dataset as the `OBSERVABILITY` binding after the dataset is provisioned and reviewed. The writer records method, bounded route family, status class and duration; request ID and normalized path are stored as blobs. Query strings, bodies, cookies and authorization headers are never written. The binding is optional and failures are isolated from API responses. Do not attach a Production dataset from this Preview branch.
+
 ## Local tests
 
 Requires Node.js 20 or later. No third-party package is required.
@@ -52,4 +56,4 @@ No production routes are attached. This Worker is isolated from existing OCodeJS
 
 ## Structured request telemetry
 
-Every request emits one JSON event to Cloudflare Workers Logs with `event`, `requestId`, HTTP method, normalized URL path, response status, duration in milliseconds and timestamp. The query string, request body, cookies, authorization headers and upstream payloads are deliberately excluded. Responses also return `X-Request-Id` and `Server-Timing` for correlation. This is log-based observability only; it does not provide durable audit records, metric aggregation, alerting or a role-based log explorer.
+Every request emits one JSON event to Cloudflare Workers Logs with `event`, `requestId`, HTTP method, normalized URL path, response status, duration in milliseconds and timestamp. The query string, request body, cookies, authorization headers and upstream payloads are deliberately excluded. Responses also return `X-Request-Id` and `Server-Timing` for correlation. This is log-based observability. The current branch additionally supports an optional Workers Analytics Engine binding named `OBSERVABILITY`, which writes bounded request dimensions and duration when attached. The binding is not configured on staging by this code change; without it, the Worker continues to operate using structured logs only. No public metrics query, alert evaluator, durable audit record store or role-based explorer is implemented yet.
