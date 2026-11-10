@@ -7,7 +7,7 @@ OCodeJS Server Control Center and public technical documentation.
 - **Project Registry:** [projects/](projects/index.html) · [registry JSON](projects.registry.json)
 - **OCode.js Profile spec:** [multi-user architecture](docs/profile-system.md) · [API contract](docs/profile-api-contract.md) · [UI preview](profile/preview.html)
 - **Ecosystem sync architecture:** [docs/ecosystem-registry.md](docs/ecosystem-registry.md)
-- **Technical documentation:** [docs/](docs/index.md)
+- **Technical documentation:** [architecture and documentation overview](docs/architecture.md)
 - **Architecture:** [docs/architecture.md](docs/architecture.md)
 - **API contract:** [docs/api-contract.md](docs/api-contract.md)
 - **Authentication integration status:** [docs/auth-integration-status.md](docs/auth-integration-status.md)
