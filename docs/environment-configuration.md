@@ -11,6 +11,14 @@ This document lists configuration names and their scope. It intentionally contai
 
 The Control API does not require a database for its current read-only routes. Do not add a production database or production secrets to this Worker.
 
+### Optional request metrics — staging only
+
+| Name | Type | Purpose | Current state |
+|---|---|---|---|
+| `OBSERVABILITY` | Workers Analytics Engine dataset binding | Writes bounded request dimensions (method, route family, status class) and duration for operational analysis | Code supports the binding; it is not attached until a staging dataset is explicitly provisioned |
+
+The Worker remains functional when `OBSERVABILITY` is absent. When present, it emits one data point per request. The event writer does not expose a public metrics query endpoint; dashboards, alert evaluation and durable audit exploration remain separate follow-up work. Do not attach this binding to Production as part of this Preview change.
+
 ## Account Portal Auth.js — isolated Preview
 
 The following values are required before `GET /api/health` can report `ready`:

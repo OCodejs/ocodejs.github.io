@@ -1,3 +1,5 @@
+import { writeRequestMetric } from "./telemetry.mjs";
+
 const API_PREFIX = "/api/v1";
 const API_VERSION = "1.7.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
@@ -523,11 +525,11 @@ async function handleRequest(request, env, url, headers, id) {
     );
 }
 
-function logRequest(response, request, url, id, startedAt) {
+function logRequest(response, request, url, id, startedAt, env) {
   const durationMs = Math.max(0, Date.now() - startedAt);
   response.headers.set("X-Request-Id", id);
   response.headers.set("Server-Timing", `app;dur=${durationMs}`);
-  console.log(JSON.stringify({
+  const telemetryEvent = {
     event: "control_api.request",
     requestId: id,
     method: request.method,
@@ -535,7 +537,33 @@ function logRequest(response, request, url, id, startedAt) {
     status: response.status,
     durationMs,
     timestamp: new Date().toISOString()
+  };
+  console.log(JSON.stringify({
+    event: "control_api.request",
+    requestId: id,
+    method: request.method,
+    path: url.pathname,
+    status: response.status,
+    durationMs,
+    timestamp: telemetryEvent.timestamp
   }));
+  try {
+    writeRequestMetric(env.OBSERVABILITY, {
+      method: request.method,
+      routeClass: url.pathname.startsWith(`${API_PREFIX}/services`) ? "services"
+        : url.pathname.startsWith(`${API_PREFIX}/agents`) ? "agents"
+        : url.pathname.startsWith(`${API_PREFIX}/providers`) ? "providers"
+        : url.pathname.startsWith(`${API_PREFIX}/mcp`) ? "mcp"
+        : url.pathname.startsWith(`${API_PREFIX}/health`) ? "health"
+        : url.pathname.startsWith(`${API_PREFIX}/runtime`) ? "runtime" : "other",
+      status: response.status,
+      requestId: id,
+      path: url.pathname,
+      durationMs
+    });
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "control_api.telemetry_write_failed", requestId: id, errorType: error?.name || "Error" }));
+  }
   return response;
 }
 
@@ -557,6 +585,6 @@ export default {
         headers
       );
     }
-    return logRequest(response, request, url, id, startedAt);
+    return logRequest(response, request, url, id, startedAt, env);
   }
 };

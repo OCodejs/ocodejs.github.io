@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: 22
       - name: Run Control API tests
-        run: node --test workers/control-api/worker.test.mjs
+        run: node --test workers/control-api/worker.test.mjs workers/control-api/telemetry.test.mjs
       - name: Run MCP server tests
         run: node --test workers/mcp-server/worker.test.mjs
       - name: Validate Control Center JavaScript
