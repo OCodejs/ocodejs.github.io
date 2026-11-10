@@ -230,7 +230,9 @@ test("telemetry reports partial structured logging without claiming metrics stor
   assert.equal(response.status, 200);
   assert.equal(body.service.state, "degraded");
   assert.equal(body.service.source, "self");
-  assert.match(body.service.description, /metrics aggregation/i);
+  assert.match(body.service.description, /Analytics Engine metrics are supported by code/i);
+  assert.match(body.service.description, /binding is not attached/i);
+  assert.match(body.service.description, /queryable audit storage is not configured/i);
 });
 
 
