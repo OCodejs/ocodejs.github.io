@@ -116,7 +116,7 @@ const SERVICES = [
   {
     id: "telemetry",
     name: "Developer Telemetry",
-    description: "Structured request events are emitted to Workers Logs; metrics aggregation and a queryable audit store are not configured.",
+    description: "Structured request logs are enabled; optional Analytics Engine metrics are supported by code but the staging binding is not attached, and queryable audit storage is not configured.",
     state: "degraded",
     source: "self"
   }
