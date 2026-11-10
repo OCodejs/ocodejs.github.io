@@ -1,3 +1,5 @@
+import { writeRequestMetric } from "./telemetry.mjs";
+
 const API_PREFIX = "/api/v1";
 const API_VERSION = "1.7.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
@@ -545,23 +547,22 @@ function logRequest(response, request, url, id, startedAt, env) {
     durationMs,
     timestamp: telemetryEvent.timestamp
   }));
-  if (env.OBSERVABILITY && typeof env.OBSERVABILITY.writeDataPoint === "function") {
-    const routeClass = url.pathname.startsWith(`${API_PREFIX}/services`) ? "services"
-      : url.pathname.startsWith(`${API_PREFIX}/agents`) ? "agents"
-      : url.pathname.startsWith(`${API_PREFIX}/providers`) ? "providers"
-      : url.pathname.startsWith(`${API_PREFIX}/mcp`) ? "mcp"
-      : url.pathname.startsWith(`${API_PREFIX}/health`) ? "health"
-      : url.pathname.startsWith(`${API_PREFIX}/runtime`) ? "runtime"
-      : "other";
-    try {
-      env.OBSERVABILITY.writeDataPoint({
-        indexes: [request.method, routeClass, `${Math.floor(response.status / 100)}xx`],
-        blobs: [id, url.pathname],
-        doubles: [durationMs]
-      });
-    } catch (error) {
-      console.warn(JSON.stringify({ event: "control_api.telemetry_write_failed", requestId: id, errorType: error?.name || "Error" }));
-    }
+  try {
+    writeRequestMetric(env.OBSERVABILITY, {
+      method: request.method,
+      routeClass: url.pathname.startsWith(`${API_PREFIX}/services`) ? "services"
+        : url.pathname.startsWith(`${API_PREFIX}/agents`) ? "agents"
+        : url.pathname.startsWith(`${API_PREFIX}/providers`) ? "providers"
+        : url.pathname.startsWith(`${API_PREFIX}/mcp`) ? "mcp"
+        : url.pathname.startsWith(`${API_PREFIX}/health`) ? "health"
+        : url.pathname.startsWith(`${API_PREFIX}/runtime`) ? "runtime" : "other",
+      status: response.status,
+      requestId: id,
+      path: url.pathname,
+      durationMs
+    });
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "control_api.telemetry_write_failed", requestId: id, errorType: error?.name || "Error" }));
   }
   return response;
 }
