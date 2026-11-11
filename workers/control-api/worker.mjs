@@ -4,7 +4,7 @@ const API_PREFIX = "/api/v1";
 const API_VERSION = "1.7.0";
 const CLI_AUTH_HEALTH_URL = "https://auth.ocodejs.dev/health";
 const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
-const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io"];
+const DEFAULT_ALLOWED_ORIGINS = ["https://ocodejs.github.io", "https://ocodejs.co"];
 
 const AGENTS = [
   {

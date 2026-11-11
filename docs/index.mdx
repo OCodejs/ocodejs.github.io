@@ -5,6 +5,7 @@ This repository hosts a static GitHub Pages frontend, a separately deployed Clou
 ## Start here
 - [Platform architecture](architecture.md)
 - [API contract](api-contract.md)
+- [Control API staging connection and troubleshooting](control-api-staging.md)
 - [Authentication integration status](auth-integration-status.md)
 - [Environment configuration](environment-configuration.md)
 - [Deployment runbook](deployment-runbook.md)
@@ -13,7 +14,7 @@ This repository hosts a static GitHub Pages frontend, a separately deployed Clou
 
 | Area | Responsibility | Current state |
 |---|---|---|
-| Server Dashboard | Health, uptime, resource and deployment status | Live API integration merged; visual browser verification pending |
+| Server Dashboard | Health, uptime, resource and deployment status | Live API integration; each refresh requires a fresh verified snapshot; stale data is cleared on failure |
 | AI Agents | Registry, provider configuration, task execution | Read-only Agent/Provider catalogs staged; runtime not configured |
 | API Gateway | Routing, auth, quotas, validation | Read-only Control API live on staging |
 | Authentication | Identity, OAuth, sessions, roles | CLI OAuth health probe integrated; Account Auth Preview build succeeded, but DB/provider secrets and E2E auth remain pending |

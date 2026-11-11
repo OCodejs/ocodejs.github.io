@@ -6,6 +6,8 @@ import assert from "node:assert/strict";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const markdownFiles = ["README.md"];
 async function walk(directory) {
+  // docs/content is vendored GitHub Docs source; root-relative links there target docs.github.com routes, not local files.
+  if (directory === path.join(root, "docs", "content")) return;
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const full = path.join(directory, entry.name);
     if (entry.isDirectory()) await walk(full);
