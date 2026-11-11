@@ -7,12 +7,23 @@ _site/
 .jekyll-cache/
 .jekyll-metadata
 
-# Additional Ruby/bundler ignore for when you run: bundle install
+# Additional Ruby/bundler ignore for when: bundle install
 /vendor
 
 # Specific ignore for GitHub Pages
-# GitHub Pages will always use its own deployed version of pages-gem
-# This means GitHub Pages will NOT use your Gemfile.lock and therefore it is
-# counterproductive to check this file into the repository.
-# Details at https://github.com/github/pages-gem/issues/768
+# GitHub Pages uses its own pages-gem version; Gemfile.lock is not used.
 Gemfile.lock
+
+# Local environment files and runtime secrets (never commit real credentials)
+/.env
+/.env.*
+!/.env.example
+**/.env
+**/.env.*
+!**/.env.example
+/.dev.vars
+/.dev.vars.*
+**/.dev.vars
+**/.dev.vars.*
+*.pem
+*.key
