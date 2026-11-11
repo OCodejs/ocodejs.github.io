@@ -1,0 +1,5 @@
+# Keep the root dashboard and its public documentation on GitHub Pages.
+# The vendored GitHub Docs source includes Liquid tags that are not part of
+# this site's Jekyll theme and must remain source-only to avoid build failures.
+exclude:
+  - content/pages
