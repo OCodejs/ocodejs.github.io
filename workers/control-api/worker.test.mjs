@@ -101,6 +101,11 @@ test("CORS allows only configured origins", async () => {
   });
   assert.equal(allowed.headers.get("Access-Control-Allow-Origin"), "https://ocodejs.github.io");
 
+  const customDomain = await call("/api/v1/health/live", {
+    headers: { Origin: "https://ocodejs.co" }
+  });
+  assert.equal(customDomain.headers.get("Access-Control-Allow-Origin"), "https://ocodejs.co");
+
   const denied = await call("/api/v1/health/live", {
     headers: { Origin: "https://attacker.example" }
   });
@@ -131,6 +136,13 @@ test("GitHub Pages production origin is allowed by the staging API", async () =>
     {}
   );
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://ocodejs.github.io");
+  const customDomain = await worker.fetch(
+    new Request("https://api-staging.example.workers.dev/api/v1/services", {
+      headers: { Origin: "https://ocodejs.co" }
+    }),
+    {}
+  );
+  assert.equal(customDomain.headers.get("Access-Control-Allow-Origin"), "https://ocodejs.co");
 });
 
 
