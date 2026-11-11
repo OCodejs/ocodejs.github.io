@@ -2,7 +2,7 @@
 
 OCodeJS Server Control Center and public technical documentation.
 
-- **Live frontend:** https://ocodejs.co (GitHub Pages fallback: https://ocodejs.github.io/)
+- **Custom domain:** https://ocodejs.co (CNAME declared; verify DNS and HTTPS in GitHub Pages). Fallback: https://ocodejs.github.io/
 - **Control Center source:** [index.html](index.html)
 - **Project Registry:** [projects/](projects/index.html) · [registry JSON](projects.registry.json)
 - **OCode.js Profile spec:** [multi-user architecture](docs/profile-system.md) · [API contract](docs/profile-api-contract.md) · [UI preview](profile/preview.html)
