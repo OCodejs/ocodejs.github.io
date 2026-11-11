@@ -284,7 +284,7 @@ A page or service is **Done** only when:
 
 ## 11. Mandatory OCode.js Theme & Design-System Governance
 
-<IMPORTANT>This section is a mandatory, non-optional engineering rule for every current and future project in the OCodeJS ecosystem.</IMPORTANT>
+**MANDATORY POLICY — applies to every current and future project in the OCodeJS ecosystem.**
 
 ### 11.1 The current OCode.js design is the canonical default template
 
