@@ -4,7 +4,7 @@ Tài liệu này hướng dẫn kết nối OCodeJS Server Control Center tại 
 
 ## Endpoint chính xác
 
-- API base: `https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1`
+- API base: `https://ocodejs-server-api-staging.ocodejs-df1.workers.dev/api/v1`
 - Liveness: `GET /health/live`
 - Readiness: `GET /health/ready`
 - Service Registry: `GET /services`
@@ -27,7 +27,7 @@ Nếu dùng thêm `https://www.ocodejs.co`, chỉ thêm origin này sau khi host
 
 ## Kiểm tra kết nối theo thứ tự
 
-1. Mở endpoint liveness trong Safari: `https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1/health/live`
+1. Mở endpoint liveness trong Safari: `https://ocodejs-server-api-staging.ocodejs-df1.workers.dev/api/v1/health/live`
 2. Kết quả hợp lệ phải là HTTP 200 và JSON có `service: "control-api"`, `live: true`, `checkedAt`.
 3. Mở `/api/v1/health/ready`; kết quả phải có `ready: true`.
 4. Mở `/api/v1/services`; xác nhận có mảng `services`, `checkedAt` mới và từng service có `id`, `name`, `state`.
@@ -63,3 +63,16 @@ Control API staging hiện là API đọc dữ liệu, không phải hệ thốn
 - Chỉ thay đổi và xác minh `ocodejs-server-api-staging`.
 - Không thay Production Worker, secrets, database hoặc DNS ngoài cấu hình domain đã được phê duyệt.
 - Không merge PR hoặc triển khai Production khi chưa có xác nhận riêng.
+
+
+## DNS failure after Worker deployment
+
+The staging Worker upload and 100% deployment can succeed while the public `workers.dev` hostname remains unreachable. A GitHub Actions smoke test on 2026-11-11 observed `getaddrinfo ENOTFOUND ocodejs-server-api-staging.ocodejs-df1.workers.dev`; this is a DNS resolution failure, not an API healthy response.
+
+Check in the **Ocodejs** Cloudflare account:
+1. Open **Workers & Pages → Overview** and confirm the account subdomain is `ocodejs-df1`.
+2. Open `ocodejs-server-api-staging` → **Settings → Domains & Routes** and confirm its workers.dev hostname is enabled.
+3. Confirm the account workers.dev hostname resolves from an external DNS resolver before treating the API as reachable.
+4. If workers.dev remains unavailable, an API custom hostname such as `api-staging.ocodejs.dev` can be considered only after explicit approval to add a DNS/custom-domain route to the active `ocodejs.dev` zone.
+
+Do not mark the API healthy based only on a successful Cloudflare upload/deployment response. The runtime smoke test must pass liveness, readiness, a fresh Service Registry response and the exact `https://ocodejs.co` CORS preflight.
