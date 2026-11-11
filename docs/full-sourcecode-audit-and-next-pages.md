@@ -281,3 +281,89 @@ A page or service is **Done** only when:
 
 ---
 *This document is an audit and delivery plan. It does not certify that any unverified runtime is healthy, and it does not authorize production changes.*
+
+## 11. Mandatory OCode.js Theme & Design-System Governance
+
+<IMPORTANT>This section is a mandatory, non-optional engineering rule for every current and future project in the OCodeJS ecosystem.</IMPORTANT>
+
+### 11.1 The current OCode.js design is the canonical default template
+
+The current OCode.js theme, layout, component styling and navigation framework are the **official default design template** for the entire OCodeJS ecosystem. They are not a disposable example, optional inspiration or a starting point to redesign freely.
+
+Canonical source files in this repository:
+- `ocodejs-design-system.css` — canonical design tokens and reusable base components.
+- `ocodejs-pages-theme.css` — canonical OCode.js page theme, responsive layout, navigation and component styling.
+- `index.html` — current Control Center information architecture and navigation behavior.
+- The current published OCode.js dashboard and its approved pages — visual reference for matching the existing product.
+
+Before implementing a new page or creating a new project, developers/agents MUST inspect and reuse these canonical files and the current live theme. If a project has its own framework, port the same tokens and component rules into that framework; do not invent a competing theme.
+
+### 11.2 Non-negotiable visual rules
+
+Every OCodeJS page, dashboard, tool, app, generated project and new repository MUST:
+1. Use the OCode.js dark, minimal, developer-oriented visual language.
+2. Use the canonical monospace typography stack defined in the theme.
+3. Use the existing black/dark surfaces, white/grey text, thin neutral borders and restrained accent colors from the canonical CSS.
+4. Use **perfectly square corners everywhere**: `border-radius: 0`. No rounded buttons, cards, inputs, modals, badges, tabs, navigation items or containers. Do not add radius utilities or component-library defaults that reintroduce rounded corners.
+5. Reuse the existing spacing scale, content widths, responsive breakpoints, navigation/drawer behavior, focus states and reduced-motion rules.
+6. Preserve the established OCode.js header, sidebar/navigation patterns, panel/card hierarchy, buttons, form controls, tables and status treatments.
+7. Remain responsive on iPhone Safari and desktop, without horizontal overflow or browser zoom traps.
+8. Preserve accessibility: visible keyboard focus, semantic controls, readable contrast, labels and reduced-motion support.
+
+### 11.3 No unauthorized design changes
+
+- Do not redesign, replace, restyle, simplify, recolor or restructure the canonical theme without explicit approval from the user.
+- Do not silently replace the existing Control Center layout or navigation model.
+- Do not introduce another design system, theme, font family, color palette, rounded component library or visual framework as the default.
+- Do not modify canonical theme files as a side effect of building an unrelated feature.
+- Do not overwrite an existing page's design while changing its API/data logic.
+- If a requested feature appears to require a visual deviation, keep the existing theme and solve the requirement within its component/layout rules. If a true exception is unavoidable, document the exact deviation and obtain explicit approval before implementation.
+
+### 11.4 Mandatory reuse for every new project
+
+This policy applies to:
+- Every new repository or project created inside the OCodeJS ecosystem.
+- Every new dashboard, page, route, settings screen, account portal, developer tool or marketplace.
+- Every AI-generated application, template, starter, code export or project scaffold.
+- Every integration and feature added to an existing OCodeJS repository.
+- Every Preview/staging deployment and eventual Production release.
+
+Each new project MUST include or import the canonical theme assets (or a framework-native port generated from the same canonical tokens). It MUST NOT ship with a generic framework starter theme as its final UI.
+
+Recommended implementation contract:
+- Plain HTML: import `ocodejs-design-system.css` followed by `ocodejs-pages-theme.css`.
+- React/Vite/Next.js: port the canonical CSS variables and base rules into the app's global stylesheet, then reuse the same page/component patterns.
+- Tailwind or component libraries: map their tokens to the canonical values and explicitly force zero radius; disable defaults that conflict.
+- Other frameworks: implement a small theme adapter that preserves the exact tokens and interaction rules.
+
+### 11.5 Required design-system conformance gate
+
+A project is not considered OCodeJS-compliant until its PR includes:
+- A link or path to the canonical theme files used.
+- A short statement confirming the existing theme was reused without unauthorized redesign.
+- A screenshot of at least one desktop viewport and one iPhone-sized viewport.
+- A check that all interactive controls, panels, dialogs and cards have zero corner radius.
+- A check for responsive overflow, keyboard focus, semantic labels and reduced-motion behavior.
+- A visual regression comparison against the current OCode.js reference pages.
+
+Suggested automated checks:
+- Fail CI if CSS introduces non-zero `border-radius` on OCodeJS UI components, unless a documented and user-approved exception exists.
+- Fail CI if required canonical theme imports/tokens are missing.
+- Run screenshot comparison on representative dashboard, form, table and navigation states.
+- Check mobile viewport width and horizontal document overflow.
+
+### 11.6 Reusable project starter requirement
+
+The ecosystem should maintain one official OCode.js starter/template that includes:
+- Canonical theme and design tokens.
+- Responsive application shell and navigation.
+- Page header, panels, cards, tables, buttons, inputs, dialogs and status components.
+- Loading, empty, error, offline and unverified states.
+- Accessibility and reduced-motion defaults.
+- Basic visual-regression tests and CI conformance checks.
+
+New projects should be bootstrapped from this starter rather than rebuilding the UI foundation independently. The starter itself must be derived from the current approved OCode.js theme and may only be changed through a dedicated, explicitly approved design-system PR.
+
+### 11.7 Definition of Design-System Done
+
+A feature or project is **not Done** if it works functionally but fails to reuse the OCode.js template. Theme compliance is a release gate, not a cosmetic follow-up task. No new project may be marked ready for Preview or Production until the design-system conformance checks pass.
