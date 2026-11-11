@@ -4,7 +4,7 @@ Tài liệu này hướng dẫn kết nối OCodeJS Server Control Center tại 
 
 ## Endpoint chính xác
 
-- API base: `https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1`
+- API base: `https://ocodejs-server-api-staging.ocodejs-df1.workers.dev/api/v1`
 - Liveness: `GET /health/live`
 - Readiness: `GET /health/ready`
 - Service Registry: `GET /services`
@@ -27,7 +27,7 @@ Nếu dùng thêm `https://www.ocodejs.co`, chỉ thêm origin này sau khi host
 
 ## Kiểm tra kết nối theo thứ tự
 
-1. Mở endpoint liveness trong Safari: `https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1/health/live`
+1. Mở endpoint liveness trong Safari: `https://ocodejs-server-api-staging.ocodejs-df1.workers.dev/api/v1/health/live`
 2. Kết quả hợp lệ phải là HTTP 200 và JSON có `service: "control-api"`, `live: true`, `checkedAt`.
 3. Mở `/api/v1/health/ready`; kết quả phải có `ready: true`.
 4. Mở `/api/v1/services`; xác nhận có mảng `services`, `checkedAt` mới và từng service có `id`, `name`, `state`.
