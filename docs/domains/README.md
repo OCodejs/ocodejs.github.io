@@ -66,3 +66,29 @@ Lưu ý sau khi cài đặt: Quá trình cập nhật DNS có thể mất từ 1
 • Bạn đã có tài khoản GitHub chưa?
 • Bạn muốn làm một trang web với mục đích gì (ví dụ: làm blog cá nhân, showcase dự án lập trình, hay làm portfolio/CV online)?
 • Bạn đã mua tên miền riêng chưa hay định dùng tên miền miễn phí của GitHub?
+
+
+## OCodeJS Server Control Center — ocodejs.co
+
+Repository: [OCodejs/ocodejs.github.io](https://github.com/OCodejs/ocodejs.github.io)
+
+The repository root already contains a GitHub Pages `CNAME` file whose only value is `ocodejs.co`. Do not create a second CNAME file or add a second domain to that file.
+
+For the apex domain `ocodejs.co`, configure DNS at the domain provider with the four GitHub Pages A records:
+
+| Type | Host | Value |
+|---|---|---|
+| A | @ | 185.199.108.153 |
+| A | @ | 185.199.109.153 |
+| A | @ | 185.199.110.153 |
+| A | @ | 185.199.111.153 |
+
+Remove conflicting parking/hosting A records. Do not point the apex at a Workers.dev hostname. If IPv6 AAAA records are used, use only GitHub's published Pages IPv6 addresses. Do not add `www.ocodejs.co` unless it is intentionally configured as a second hostname and the Pages redirect behavior is reviewed.
+
+In GitHub, open **OCodejs/ocodejs.github.io → Settings → Pages** and verify:
+- Custom domain is exactly `ocodejs.co`.
+- Publishing source is the intended Pages branch/workflow.
+- DNS check passes.
+- Enable **Enforce HTTPS** only after GitHub makes it available.
+
+A root `CNAME` file confirms the repository-side declaration only; it does not prove that public DNS, GitHub Pages settings, TLS issuance, or browser access are healthy. DNS changes can take up to 24 hours to propagate. See [GitHub's custom-domain guide](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
