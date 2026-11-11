@@ -1,0 +1,40 @@
+
+name: Create OCodeJS Upstash Redis
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  create-redis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Redis database
+        env:
+          UPSTASH_EMAIL: ${{ secrets.UPSTASH_EMAIL }}
+          UPSTASH_API_KEY: ${{ secrets.UPSTASH_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$UPSTASH_EMAIL" ] || [ -z "$UPSTASH_API_KEY" ]; then
+            echo "::error::Missing Upstash credentials"
+            exit 1
+          fi
+
+          curl --fail-with-body --silent --show-error \
+            -X POST "https://api.upstash.com/v2/redis/database" \
+            -u "$UPSTASH_EMAIL:$UPSTASH_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "ocodejsinfra",
+              "region": "ap-southeast-1",
+              "tls": true,
+              "eviction": true,
+              "auto_upgrade": false
+            }' \
+            -o response.json
+
+          echo "Redis database creation request completed."
+          echo "Response received. Do not print credentials into Actions logs."
