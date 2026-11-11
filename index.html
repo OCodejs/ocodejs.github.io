@@ -61,7 +61,7 @@ function header(kicker,title,desc,action=''){return '<div class="page-head"><div
 function panel(title,body,extra=''){return '<section class="panel"><div class="panel-head"><strong>'+title+'</strong>'+extra+'</div>'+body+'</section>'}
 function overview(){return header('SYSTEM OVERVIEW / 00','Server Dashboard','Trạng thái dịch vụ được lấy trực tiếp từ OCodeJS Control API trên môi trường staging.')+
 '<div class="notice" id="apiNotice" role="status" aria-live="polite">Đang kết nối Control API staging để tải trạng thái dịch vụ…</div>'+
-'<div class="grid stats"><div class="stat"><div class="stat-top">Healthy services <span>◌</span></div><div class="stat-value" id="healthyCount">— / —</div><div class="stat-foot" id="serviceCountNote">Đang kiểm tra kết nối</div></div><div class="stat"><div class="stat-top">AI Agents <span>✳</span></div><div class="stat-value">0 / 6</div><div class="stat-foot">Runtime chưa tích hợp</div></div><div class="stat"><div class="stat-top">Control API <span>⌘</span></div><div class="stat-value" id="apiStateValue">CHECKING</div><div class="stat-foot">Cloudflare Workers · staging</div></div><div class="stat"><div class="stat-top">MCP Connections <span>⛓</span></div><div class="stat-value">'+connections.length+'</div><div class="stat-foot">Chưa có MCP adapter</div></div></div>'+
+'<div class="grid stats"><div class="stat"><div class="stat-top">Healthy services <span>◌</span></div><div class="stat-value" id="healthyCount">— / —</div><div class="stat-foot" id="serviceCountNote">Đang kiểm tra kết nối</div></div><div class="stat"><div class="stat-top">AI Agents <span>✳</span></div><div class="stat-value" id="agentCount">—</div><div class="stat-foot" id="agentCountNote">Chưa xác minh Agent Registry</div></div><div class="stat"><div class="stat-top">Control API <span>⌘</span></div><div class="stat-value" id="apiStateValue">CHECKING</div><div class="stat-foot">Cloudflare Workers · staging</div></div><div class="stat"><div class="stat-top">MCP Connections <span>⛓</span></div><div class="stat-value" id="mcpConnectionCount">—</div><div class="stat-foot" id="mcpConnectionCountNote">Chưa xác minh MCP Registry</div></div></div>'+
 '<div class="grid cols">'+panel('SERVICE STATUS','<div class="panel-body service-list" id="serviceStatus" aria-live="polite"><div class="empty">Đang tải dữ liệu từ API…</div></div>','<div style="display:flex;align-items:center;gap:8px"><small id="apiHealthStatus">CHECKING</small><button class="btn ghost" id="refreshServices" type="button">↻ Refresh</button></div>')+
 panel('CONTROL API HEALTH','<div class="panel-body feed"><div class="feed-item"><i class="feed-dot"></i><div><b id="apiHealthTitle">Đang kiểm tra API</b><small id="apiHealthDetail">GET /api/v1/health/live</small></div></div><div class="feed-item"><i class="feed-dot"></i><div><b>Readiness probe</b><small id="apiReadyDetail">GET /api/v1/health/ready · đang chờ</small></div></div><div class="feed-item"><i class="feed-dot"></i><div><b>Last checked</b><small id="apiCheckedAt">Chưa có dữ liệu</small></div></div></div>','<small>STAGING</small>')+
 '</div><div style="height:14px"></div><div class="grid cols">'+panel('INTEGRATION STATUS','<div class="panel-body feed"><div class="feed-item"><i class="feed-dot"></i><div><b>Control API</b><small>Đã triển khai trên Cloudflare Workers staging</small></div></div><div class="feed-item"><i class="feed-dot"></i><div><b>Identity · AI Runtime · MCP · Telemetry</b><small>Chưa tích hợp health adapter; không được tính là healthy</small></div></div></div>')+panel('QUICK ACCESS','<div class="panel-body feed"><button class="btn ghost" data-go="agents">Mở AI Agents →</button><button class="btn ghost" data-go="api">Xem API Catalog →</button><button class="btn ghost" data-go="mcp">Quản lý MCP →</button><button class="btn ghost" data-go="docs">Đọc tài liệu →</button></div>')+'</div>'}
@@ -102,6 +102,23 @@ async function refreshDashboard(){
   if(target)target.innerHTML=registry.services.map(item=>'<div class="service"><div><b>'+escapeHtml(item.name)+'</b><small>'+escapeHtml(item.description||'')+'</small></div><span class="state '+(classes[item.state]||'off')+'">'+(labels[item.state]||'UNKNOWN')+'</span><span class="latency">'+(Number.isFinite(item.latencyMs)?item.latencyMs+' ms':'—')+'</span></div>').join('')||'<div class="empty">API chưa đăng ký dịch vụ nào.</div>';
   setText('healthyCount',healthy+' / '+registry.services.length);
   setText('serviceCountNote','Healthy theo snapshot mới · '+Math.round(ageMs/1000)+' giây');
+  const [agentResult,mcpResult]=await Promise.allSettled([
+   fetch(CONTROL_API_BASE+'/agents',options).then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();}),
+   fetch(CONTROL_API_BASE+'/mcp/connections',options).then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
+  ]);
+  if(requestId!==dashboardRequestSequence)return;
+  if(agentResult.status==='fulfilled'&&Array.isArray(agentResult.value.agents)){
+   setText('agentCount',String(agentResult.value.agents.length));
+   setText('agentCountNote','Agent Registry · dữ liệu vừa tải');
+  }else{
+   setText('agentCount','—');setText('agentCountNote','Agent Registry chưa xác minh');
+  }
+  if(mcpResult.status==='fulfilled'&&Array.isArray(mcpResult.value.connections)){
+   setText('mcpConnectionCount',String(mcpResult.value.connections.length));
+   setText('mcpConnectionCountNote','MCP Registry · dữ liệu vừa tải');
+  }else{
+   setText('mcpConnectionCount','—');setText('mcpConnectionCountNote','MCP Registry chưa xác minh');
+  }
   setText('apiStateValue','ONLINE');setText('apiHealthStatus','API ONLINE');
   setText('apiHealthTitle','Control API đang phản hồi');
   setText('apiHealthDetail','HTTP '+responses[0].status+' · '+live.service+' · v'+String(live.version||'unknown'));
@@ -113,6 +130,8 @@ async function refreshDashboard(){
   if(requestId!==dashboardRequestSequence)return;
   if(target)target.innerHTML='<div class="empty">Không có dữ liệu Service Registry đã xác minh. Kiểm tra mạng, DNS, CORS hoặc API staging rồi nhấn Refresh.</div>';
   setText('healthyCount','— / —');setText('serviceCountNote','Không có snapshot hợp lệ');
+  setText('agentCount','—');setText('agentCountNote','Agent Registry chưa xác minh');
+  setText('mcpConnectionCount','—');setText('mcpConnectionCountNote','MCP Registry chưa xác minh');
   setText('apiStateValue','UNVERIFIED');setText('apiHealthStatus','API UNVERIFIED');
   setText('apiHealthTitle','Không xác minh được Control API');
   setText('apiHealthDetail','GET '+CONTROL_API_BASE+'/health/live');
