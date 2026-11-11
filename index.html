@@ -53,7 +53,7 @@ const navigationRegistry=[
 let current='overview',connections=[];
 let dashboardRequestSequence=0;
 let dashboardAbortController=null;
-const CONTROL_API_BASE='https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1';
+const CONTROL_API_BASE='https://ocodejs-server-api-staging.ocodejs-df1.workers.dev/api/v1';
 const MCP_ENDPOINT='https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp';
 const services=[['AI Agent Runtime','Điều phối tác vụ agent','Chưa kết nối','off','—'],['API Gateway','Định tuyến API & rate limits','Chưa kết nối','off','—'],['Identity / Auth','OAuth · session · account','Chưa kết nối','off','—'],['MCP Registry','Quản lý MCP endpoints','Chưa kết nối','off','—'],['Developer Telemetry','Logs · metrics · traces','Chưa kết nối','off','—']];
 const endpoints=[['GET','/api/v1','API metadata và route index','STAGING LIVE'],['GET','/api/v1/health/live','Liveness probe','STAGING LIVE'],['GET','/api/v1/health/ready','Readiness probe','STAGING LIVE'],['GET','/api/v1/services','Service Registry','STAGING LIVE'],['GET','/api/v1/services/{serviceId}','Chi tiết một service','STAGING LIVE'],['GET','/api/v1/providers','Provider Registry (read-only)','STAGING LIVE'],['GET','/api/v1/providers/{providerId}','Provider adapter detail','STAGING LIVE'],['GET','/api/v1/agents','Agent Registry (read-only)','STAGING LIVE'],['GET','/api/v1/agents/{agentId}','Agent definition versioned','STAGING LIVE'],['GET','/api/v1/mcp/connections','MCP Connection Registry','STAGING LIVE'],['GET','/api/v1/mcp/connections/{connectionId}','MCP connection detail','STAGING LIVE']];
