@@ -5,13 +5,14 @@ This Worker is the first read-only backend slice for the OCodeJS Server Control 
 ## Staging deployment
 
 - Worker: `ocodejs-server-api-staging`
-- Staging URL: https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev
-- Deployment: uploaded successfully to the OCodeJS Cloudflare account.
+- Staging URL: https://ocodejs-server-api-staging.ocodejs-df1.workers.dev
+- Deployment: uploaded successfully to the connected **Ocodejs** Cloudflare account on 2026-11-11 (Worker version tag `2ac7360ec1db40e788c8d9bd5e47dae6`, deployment ID `3beb75bcd4094441821ca35b5eeda9af`).
+- Workers.dev URL: `https://ocodejs-server-api-staging.ocodejs-df1.workers.dev` (enabled; preview URLs disabled).
 - Workers.dev: enabled for this Worker only; preview URLs remain disabled.
 - Observability: Workers Logs and Traces enabled; structured JSON request events include request ID, method, normalized path, status and duration. Query strings, request bodies and authorization headers are not logged.
 - No custom domain, production route, secret, or existing Worker was changed.
 
-The deployment API confirmed the Worker script and its 100% deployment version. Runtime HTTP smoke tests are still pending: the current execution environment could not resolve the workers.dev hostname, so do not treat the endpoint as browser-verified.
+The deployment API confirmed the Worker script and its 100% deployment version. Runtime HTTP smoke tests from a browser are still pending. The Cloudflare API confirmed script upload and workers.dev enablement, but those control-plane confirmations do not prove that the public hostname is reachable from the user's network.
 
 ## Implemented routes
 
