@@ -2,7 +2,7 @@
 
 OCodeJS Server Control Center and public technical documentation.
 
-- **Live frontend:** https://ocodejs.github.io/
+- **Live frontend:** https://ocodejs.co (GitHub Pages fallback: https://ocodejs.github.io/)
 - **Control Center source:** [index.html](index.html)
 - **Project Registry:** [projects/](projects/index.html) · [registry JSON](projects.registry.json)
 - **OCode.js Profile spec:** [multi-user architecture](docs/profile-system.md) · [API contract](docs/profile-api-contract.md) · [UI preview](profile/preview.html)
@@ -10,6 +10,7 @@ OCodeJS Server Control Center and public technical documentation.
 - **Technical documentation:** [architecture and documentation overview](docs/architecture.md)
 - **Architecture:** [docs/architecture.md](docs/architecture.md)
 - **API contract:** [docs/api-contract.md](docs/api-contract.md)
+- **Control API staging connection guide:** [docs/control-api-staging.md](docs/control-api-staging.md)
 - **Authentication integration status:** [docs/auth-integration-status.md](docs/auth-integration-status.md)
 - **Environment configuration:** [docs/environment-configuration.md](docs/environment-configuration.md)
 - **Deployment runbook:** [docs/deployment-runbook.md](docs/deployment-runbook.md)
