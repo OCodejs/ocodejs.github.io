@@ -10,9 +10,13 @@ new vm.Script(match[1], { filename: "index.html:inline-script" });
 for (const marker of [
   "CONTROL_API_BASE",
   "refreshDashboard",
+  "dashboardRequestSequence",
+  "snapshot is missing",
+  "Dashboard đã xóa dữ liệu cũ",
   "api/v1/health/live",
   "api/v1/health/ready",
   "api/v1/services",
+  "ocodejs.co",
   "Không có dữ liệu xác thực",
   "API UNREACHABLE",
   "refreshAuthReadiness",
