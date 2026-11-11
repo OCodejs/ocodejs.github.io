@@ -11,6 +11,8 @@ for (const marker of [
   "CONTROL_API_BASE",
   "refreshDashboard",
   "dashboardRequestSequence",
+  "agentCount",
+  "mcpConnectionCount",
   "snapshot is missing",
   "Dashboard đã xóa dữ liệu cũ",
   "api/v1/health/live",
