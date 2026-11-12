@@ -3,4 +3,4 @@
 # that must remain source-only for ingestion, not be rendered by this Jekyll site.
 exclude:
   - content
-  - docs/agent-resources/clients.mdx
+  - "**/*.mdx"
