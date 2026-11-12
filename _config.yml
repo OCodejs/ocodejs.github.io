@@ -1,5 +1,6 @@
-# Keep the root dashboard and its public documentation on GitHub Pages.
-# The vendored GitHub Docs source includes Liquid tags that are not part of
-# this site's Jekyll theme and must remain source-only to avoid build failures.
+# Keep the root dashboard and public documentation on GitHub Pages.
+# Vendored upstream GitHub Docs source contains Liquid tags and MDX files
+# that must remain source-only for ingestion, not be rendered by this Jekyll site.
 exclude:
-  - content/pages
+  - content
+  - docs/agent-resources/clients.mdx
