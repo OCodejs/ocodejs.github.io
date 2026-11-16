@@ -483,3 +483,26 @@ test("MCP probe uses the internal Cloudflare service binding when configured", a
   assert.equal(body.service.toolCount, 6);
   assert.deepEqual(methods, ["initialize", "notifications/initialized", "tools/list"]);
 });
+
+
+test("CLI Auth probe uses the internal Cloudflare service binding when configured", async () => {
+  const CLI_AUTH = {
+    fetch: async (request) => {
+      assert.equal(new URL(request.url).pathname, "/health");
+      return new Response(JSON.stringify({
+        ok: true,
+        service: "ocodejs-auth-worker",
+        patConfigured: true,
+        oauthConfigured: true
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+  };
+  const response = await worker.fetch(
+    new Request("https://api-staging.example.workers.dev/api/v1/services/cli-auth"),
+    { ...env, CLI_AUTH }
+  );
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.service.state, "healthy");
+  assert.match(body.service.description, /Internal Auth Worker health responds/);
+});
