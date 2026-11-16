@@ -29,15 +29,45 @@ const results = await Promise.all(targets.map(async (target) => {
         title = body.slice(titleOpen + 1, titleClose).replaceAll("\\n", " ").replaceAll("\\r", " ").trim();
       }
     }
+    let scriptAsset = null;
+    const scriptStart = lowerBody.indexOf("<script");
+    if (scriptStart >= 0) {
+      const scriptEnd = lowerBody.indexOf(">", scriptStart);
+      const scriptTag = body.slice(scriptStart, scriptEnd + 1);
+      const srcIndex = scriptTag.toLowerCase().indexOf("src=");
+      if (srcIndex >= 0) {
+        const quote = scriptTag[srcIndex + 4];
+        const quoteEnd = scriptTag.indexOf(quote, srcIndex + 5);
+        const src = scriptTag.slice(srcIndex + 5, quoteEnd);
+        const assetUrl = new URL(src, response.url);
+        const assetResponse = await fetch(assetUrl, {
+          redirect: "follow",
+          cache: "no-store",
+          signal: AbortSignal.timeout(20000),
+          headers: { "user-agent": "OCodeJS-Ecosystem-HTTP-Smoke/1.0", accept: "*/*" }
+        });
+        const assetBody = await assetResponse.arrayBuffer();
+        const assetType = assetResponse.headers.get("content-type") || "";
+        scriptAsset = {
+          src,
+          status: assetResponse.status,
+          contentType: assetType,
+          bytes: assetBody.byteLength,
+          ok: assetResponse.status === 200 && (assetType.includes("javascript") || assetType.includes("ecmascript"))
+        };
+      }
+    }
+    const pageOk = response.status === 200;
     return {
       name: target.name,
       requestedUrl: target.url,
       status: response.status,
-      ok: response.status === 200,
+      ok: pageOk && (!scriptAsset || scriptAsset.ok),
       finalUrl: response.url,
       contentType: response.headers.get("content-type"),
       bytes: Buffer.byteLength(body),
-      title
+      title,
+      scriptAsset
     };
   } catch (error) {
     return { name: target.name, requestedUrl: target.url, ok: false, error: error?.cause?.code || error?.message || "fetch failed" };
