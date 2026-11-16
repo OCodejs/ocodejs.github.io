@@ -1,4 +1,4 @@
-const BASE = (process.env.CONTROL_API_BASE || "https://api-staging.ocodejs.co/api/v1").replace(/\/$/, "");
+const BASE = (process.env.CONTROL_API_BASE || "https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1").replace(/\/$/, "");
 const ORIGIN = "https://ocodejs.co";
 const MAX_AGE_MS = 60_000;
 
