@@ -31,7 +31,7 @@ test("service registry probes CLI Auth and MCP while keeping Account Auth.js sep
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, options = {}) => {
     if (url === "https://auth.ocodejs.dev/health") {
-      assert.equal(options.redirect, "error");
+      assert.equal(options.redirect, "follow");
       return new Response(JSON.stringify({
         ok: true,
         service: "ocodejs-auth-worker",
