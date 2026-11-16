@@ -1,0 +1,47 @@
+name: Ask OCodeJS source validation (alternate runner)
+
+on:
+  push:
+    branches:
+      - test/ask-ocodejs-source-validation-20261117
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ask-ocodejs-source-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout validation harness
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Clone public Ask OCodeJS source
+        run: git clone --depth 1 --branch main https://github.com/zskbot/ask-ocodejs.git ask-ocodejs
+      - name: Install Ask OCodeJS dependencies
+        working-directory: ask-ocodejs
+        run: npm ci --no-audit --no-fund
+      - name: Run Ask OCodeJS tests
+        working-directory: ask-ocodejs
+        run: npm test
+      - name: Run Ask OCodeJS lint
+        working-directory: ask-ocodejs
+        run: npm run lint
+      - name: Build Ask OCodeJS for GitHub Pages
+        working-directory: ask-ocodejs
+        run: npm run build -- --base=/ask-ocodejs/
+      - name: Verify built Pages assets
+        working-directory: ask-ocodejs
+        run: |
+          test -s dist/index.html
+          grep -q '/ask-ocodejs/assets/' dist/index.html
+          find dist/assets -maxdepth 1 -type f -name '*.js' -size +0c | grep -q .
