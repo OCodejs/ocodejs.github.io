@@ -171,7 +171,7 @@ async function probeCliAuth(env = {}) {
   const checkedAt = new Date().toISOString();
   const viaServiceBinding = env.CLI_AUTH && typeof env.CLI_AUTH.fetch === "function";
   const authFetch = viaServiceBinding
-    ? (init) => env.CLI_AUTH.fetch(new Request("https://auth-internal/health", init))
+    ? (init) => env.CLI_AUTH.fetch(new Request(CLI_AUTH_HEALTH_URL, init))
     : (init) => fetch(CLI_AUTH_HEALTH_URL, init);
   try {
     const response = await authFetch({
@@ -209,10 +209,11 @@ async function probeCliAuth(env = {}) {
       checkedAt,
       latencyMs: Date.now() - startedAt
     };
-  } catch {
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "control_api.cli_auth_probe_failed", errorType: error?.name || "Error" }));
     return {
       state: "unavailable",
-      description: "CLI Auth health endpoint could not be reached.",
+      description: "CLI Auth health endpoint could not be reached (" + (error?.name || "Error") + ").",
       checkedAt,
       latencyMs: Date.now() - startedAt
     };
