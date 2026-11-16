@@ -1,6 +1,7 @@
-// Post-deployment check after the staging MCP probe timeout update.
+// Post-deployment diagnostic for Auth, Control API, and MCP redirect behavior.
 const API_BASE = "https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1";
 const AUTH_CUSTOM = "https://auth.ocodejs.dev/health";
+const MCP_ENDPOINT = "https://ocodejs-mcp-staging.huynhthuongg2505-f9b.workers.dev/mcp";
 const ORIGIN = "https://ocodejs.co";
 
 async function getResponse(url, headers = {}) {
@@ -21,10 +22,38 @@ async function getResponse(url, headers = {}) {
   }
 }
 
-const [auth, services, mcpService] = await Promise.all([
+async function inspectMcpRedirect() {
+  try {
+    const response = await fetch(MCP_ENDPOINT, {
+      method: "POST",
+      redirect: "manual",
+      cache: "no-store",
+      signal: AbortSignal.timeout(15000),
+      headers: { accept: "application/json, text/event-stream", "content-type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "diagnostic", version: "1.0.0" } }
+      })
+    });
+    const raw = await response.text();
+    return {
+      status: response.status,
+      location: response.headers.get("location"),
+      contentType: response.headers.get("content-type"),
+      bodyPreview: raw.slice(0, 200)
+    };
+  } catch (error) {
+    return { error: error?.cause?.code || error?.message || "fetch failed" };
+  }
+}
+
+const [auth, services, mcpService, mcpManual] = await Promise.all([
   getResponse(AUTH_CUSTOM),
   getResponse(API_BASE + "/services", { origin: ORIGIN }),
-  getResponse(API_BASE + "/services/mcp-server", { origin: ORIGIN })
+  getResponse(API_BASE + "/services/mcp-server", { origin: ORIGIN }),
+  inspectMcpRedirect()
 ]);
 
 const states = Object.fromEntries((services.body?.services || []).map((service) => [service.id, service.state]));
@@ -46,6 +75,7 @@ const result = {
     serviceDescriptions: descriptions,
     error: services.error
   },
+  mcpManualRedirectCheck: mcpManual,
   mcpProbe: {
     status: mcpService.response?.status ?? null,
     service: mcpService.body?.service ?? null,
