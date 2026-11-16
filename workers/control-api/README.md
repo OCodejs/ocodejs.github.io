@@ -69,3 +69,11 @@ The Control API staging Worker should use an internal Cloudflare service binding
 - Service: `ocodejs-mcp-staging`
 
 The API uses this binding for health probes when present and falls back to the public `MCP_ENDPOINT` URL otherwise. The public endpoint remains in the service catalog for clients. Do not copy this binding into Production without a separate review.
+
+The same staging Worker can also use an internal binding for the configured Auth backend in the Huynh Cloudflare account:
+
+- Binding name: `CLI_AUTH`
+- Binding type: `service`
+- Service: `ocodejs-auth`
+
+This reports the internal backend health only. It does not prove that the public `auth.ocodejs.dev` hostname routes to this Worker or that an OAuth login succeeds. Keep the binding staging-only until the canonical public Auth Worker/domain ownership is resolved.
