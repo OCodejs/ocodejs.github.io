@@ -1,3 +1,4 @@
+// Post-deployment check after the staging MCP probe timeout update.
 const API_BASE = "https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1";
 const AUTH_CUSTOM = "https://auth.ocodejs.dev/health";
 const ORIGIN = "https://ocodejs.co";
