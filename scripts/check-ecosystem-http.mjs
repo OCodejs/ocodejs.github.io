@@ -2,7 +2,9 @@
 // Diagnostic-only smoke test; this branch is not intended for production deployment.
 const targets = [
   { name: "OCodeJS docs custom domain", url: "https://ocodejs.co/docs/" },
+  { name: "OCodeJS docs canonical Pages", url: "https://ocodejs.github.io/docs/" },
   { name: "OCodeJS homepage custom domain", url: "https://ocodejs.co/" },
+  { name: "OCodeJS homepage canonical Pages", url: "https://ocodejs.github.io/" },
   { name: "OCodeJS www custom domain", url: "https://www.ocodejs.co/" },
   { name: "OCodeJS CLI Hub custom route", url: "https://ocodejs.co/cli-hub/" },
   { name: "OCodeJS CLI Hub canonical Pages", url: "https://ocodejs.github.io/cli-hub/" },
