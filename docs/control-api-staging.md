@@ -1,3 +1,6 @@
+---
+---
+
 # Kết nối và xử lý lỗi Control API staging
 
 Tài liệu này hướng dẫn kết nối OCodeJS Server Control Center tại `https://ocodejs.co` với Control API staging. Frontend là GitHub Pages tĩnh; API chạy trên Cloudflare Workers staging độc lập.
