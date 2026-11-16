@@ -29,6 +29,9 @@ jobs:
       - name: Install Ask OCodeJS dependencies
         working-directory: ask-ocodejs
         run: npm ci --no-audit --no-fund
+      - name: Audit Ask OCodeJS dependency vulnerabilities
+        working-directory: ask-ocodejs
+        run: npm audit --audit-level=high
       - name: Run Ask OCodeJS tests
         working-directory: ask-ocodejs
         run: npm test
