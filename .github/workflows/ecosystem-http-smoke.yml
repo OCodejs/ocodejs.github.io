@@ -21,5 +21,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Inspect OCodeJS custom-domain DNS and TLS certificate
+        run: |
+          for host in ocodejs.co www.ocodejs.co; do
+            echo "== $host =="
+            getent ahosts "$host" | head -n 4 || true
+            timeout 12 openssl s_client -connect "$host:443" -servername "$host" </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -ext subjectAltName || true
+          done
       - name: Check public Pages and custom-domain URLs
         run: node scripts/check-ecosystem-http.mjs
