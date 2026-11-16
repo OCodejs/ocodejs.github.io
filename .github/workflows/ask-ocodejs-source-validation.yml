@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 22
       - name: Clone public Ask OCodeJS source
-        run: git clone --depth 1 --branch fix/restore-eslint-flat-config https://github.com/zskbot/ask-ocodejs.git ask-ocodejs
+        run: git clone --depth 1 --branch security/patch-transitive-dependencies https://github.com/zskbot/ask-ocodejs.git ask-ocodejs
       - name: Generate lockfile from reviewed security overrides
         working-directory: ask-ocodejs
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
