@@ -178,7 +178,7 @@ async function probeCliAuth(env = {}) {
       method: "GET",
       headers: { Accept: "application/json" },
       cache: "no-store",
-      redirect: "error",
+      redirect: "follow",
       signal: AbortSignal.timeout(4000)
     });
     if (!response.ok) {
