@@ -1,3 +1,6 @@
+---
+---
+
 # OCodeJS Server — Architecture
 
 ## System boundary
