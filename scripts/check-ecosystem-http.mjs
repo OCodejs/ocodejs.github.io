@@ -2,8 +2,10 @@
 const targets = [
   { name: "OCodeJS docs custom domain", url: "https://ocodejs.co/docs/" },
   { name: "OCodeJS homepage custom domain", url: "https://ocodejs.co/" },
+  { name: "OCodeJS www custom domain", url: "https://www.ocodejs.co/" },
   { name: "OCodeJS CLI Hub custom route", url: "https://ocodejs.co/cli-hub/" },
   { name: "OCodeJS CLI Hub canonical Pages", url: "https://ocodejs.github.io/cli-hub/" },
+  { name: "OCodeJS CLI Hub standalone Pages", url: "https://zskbot.github.io/ocodejs-cli/" },
   { name: "Ask OCodeJS Pages", url: "https://zskbot.github.io/ask-ocodejs/" },
   { name: "VelclawHost Pages overview", url: "https://velclaw.github.io/VelclawHost/#/overview" }
 ];
