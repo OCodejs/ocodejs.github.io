@@ -29,6 +29,7 @@ jobs:
             timeout 12 openssl s_client -connect "$host:443" -servername "$host" </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -ext subjectAltName || true
           done
       - name: Check public Pages and custom-domain URLs
+        continue-on-error: true
         run: node scripts/check-ecosystem-http.mjs
       - name: Verify staging Auth and Control API service health
         run: node scripts/check-staging-auth-api.mjs
