@@ -1,3 +1,6 @@
+---
+---
+
 # OCodeJS Server — API Contract (Draft)
 
 Proposed contract only. Routes are not live until an API service is implemented and deployed.
