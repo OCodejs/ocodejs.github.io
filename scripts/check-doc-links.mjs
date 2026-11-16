@@ -34,7 +34,7 @@ for (const file of markdownFiles) {
     }
     const candidates = [candidate];
     // Jekyll publishes Markdown pages as .html; map those public URLs back to their source files during repository checks.
-    if (/\\.html?$/i.test(candidate)) candidates.push(candidate.replace(/\\.html?$/i, ".md"));
+    if (/\.html?$/i.test(candidate)) candidates.push(candidate.replace(/\.html?$/i, ".md"));
     if (!path.extname(candidate)) candidates.push(candidate + ".md", candidate + ".html", path.join(candidate, "index.md"), path.join(candidate, "index.html"));
     let found = false;
     for (const item of candidates) {
