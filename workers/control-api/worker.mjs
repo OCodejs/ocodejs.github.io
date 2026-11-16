@@ -232,7 +232,7 @@ async function probeMcpServer() {
       }),
       cache: "no-store",
       redirect: "error",
-      signal: AbortSignal.timeout(4000)
+      signal: AbortSignal.timeout(12000)
     });
     if (!initializeResponse.ok) {
       return { state: "unavailable", description: "MCP initialize returned HTTP " + initializeResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
@@ -248,7 +248,7 @@ async function probeMcpServer() {
       body: JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
       cache: "no-store",
       redirect: "error",
-      signal: AbortSignal.timeout(4000)
+      signal: AbortSignal.timeout(12000)
     });
     if (notificationResponse.status !== 202) {
       return { state: "unknown", description: "MCP initialized notification was not accepted.", checkedAt, latencyMs: Date.now() - startedAt };
@@ -260,7 +260,7 @@ async function probeMcpServer() {
       body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
       cache: "no-store",
       redirect: "error",
-      signal: AbortSignal.timeout(4000)
+      signal: AbortSignal.timeout(12000)
     });
     if (!toolsResponse.ok) {
       return { state: "unavailable", description: "MCP tools/list returned HTTP " + toolsResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
@@ -277,7 +277,8 @@ async function probeMcpServer() {
       latencyMs: Date.now() - startedAt,
       toolCount: toolNames.length
     };
-  } catch {
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "control_api.mcp_probe_failed", errorType: error?.name || "Error" }));
     return {
       state: "unavailable",
       description: "MCP staging endpoint could not complete the protocol handshake.",
