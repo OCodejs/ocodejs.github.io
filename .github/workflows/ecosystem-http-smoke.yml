@@ -1,0 +1,25 @@
+name: Ecosystem public HTTP smoke
+
+on:
+  push:
+    branches:
+      - test/ecosystem-http-smoke-20261117
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecosystem-public-http-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check public Pages and custom-domain URLs
+        run: node scripts/check-ecosystem-http.mjs
