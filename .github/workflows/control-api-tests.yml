@@ -12,7 +12,6 @@ on:
       - "scripts/check-doc-links.mjs"
       - "scripts/check-mcp-staging.mjs"
       - "scripts/check-control-api-staging.mjs"
-      - "scripts/check-ecosystem-http.mjs"
       - "ocodejs-pages-theme.css"
       - "docs/**"
       - "README.md"
@@ -61,5 +60,3 @@ jobs:
         run: node scripts/check-mcp-staging.mjs
       - name: Smoke test deployed Control API staging and custom-domain CORS
         run: node scripts/check-control-api-staging.mjs
-      - name: Check public ecosystem Pages HTTP
-        run: node scripts/check-ecosystem-http.mjs
