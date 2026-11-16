@@ -166,11 +166,15 @@ function errorResponse(code, message, status, id, headers) {
   }, status, headers);
 }
 
-async function probeCliAuth() {
+async function probeCliAuth(env = {}) {
   const startedAt = Date.now();
   const checkedAt = new Date().toISOString();
+  const viaServiceBinding = env.CLI_AUTH && typeof env.CLI_AUTH.fetch === "function";
+  const authFetch = viaServiceBinding
+    ? (init) => env.CLI_AUTH.fetch(new Request("https://auth-internal/health", init))
+    : (init) => fetch(CLI_AUTH_HEALTH_URL, init);
   try {
-    const response = await fetch(CLI_AUTH_HEALTH_URL, {
+    const response = await authFetch({
       method: "GET",
       headers: { Accept: "application/json" },
       cache: "no-store",
@@ -198,7 +202,9 @@ async function probeCliAuth() {
     return {
       state: configured ? "healthy" : "degraded",
       description: configured
-        ? "Health endpoint responds and required GitHub OAuth/PAT bindings are present; end-to-end login is not verified."
+        ? (viaServiceBinding
+          ? "Internal Auth Worker health responds and required GitHub OAuth/PAT bindings are present; public auth hostname and end-to-end login remain unverified."
+          : "Health endpoint responds and required GitHub OAuth/PAT bindings are present; end-to-end login is not verified.")
         : "Health endpoint responds, but one or more GitHub OAuth/PAT bindings are missing.",
       checkedAt,
       latencyMs: Date.now() - startedAt
@@ -298,7 +304,7 @@ async function probeMcpServer(env = {}) {
 
 async function serviceSnapshot(service, checkedAt, env = {}) {
   if (service.id === "cli-auth") {
-    return { ...service, ...(await probeCliAuth()) };
+    return { ...service, ...(await probeCliAuth(env)) };
   }
   if (service.id === "mcp-server") {
     return { ...service, ...(await probeMcpServer(env)) };
