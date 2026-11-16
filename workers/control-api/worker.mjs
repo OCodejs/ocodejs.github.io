@@ -213,12 +213,15 @@ async function probeCliAuth() {
   }
 }
 
-async function probeMcpServer() {
+async function probeMcpServer(env = {}) {
   const startedAt = Date.now();
   const checkedAt = new Date().toISOString();
   let phase = "initialize";
+  const mcpFetch = env.MCP_SERVER && typeof env.MCP_SERVER.fetch === "function"
+    ? (init) => env.MCP_SERVER.fetch(new Request("https://mcp-server/mcp", init))
+    : (init) => fetch(MCP_ENDPOINT, init);
   try {
-    const initializeResponse = await fetch(MCP_ENDPOINT, {
+    const initializeResponse = await mcpFetch({
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -245,7 +248,7 @@ async function probeMcpServer() {
     }
 
     phase = "initialized-notification";
-    const notificationResponse = await fetch(MCP_ENDPOINT, {
+    const notificationResponse = await mcpFetch({
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
       body: JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
@@ -258,7 +261,7 @@ async function probeMcpServer() {
     }
 
     phase = "tools-list";
-    const toolsResponse = await fetch(MCP_ENDPOINT, {
+    const toolsResponse = await mcpFetch({
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
       body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
@@ -293,12 +296,12 @@ async function probeMcpServer() {
   }
 }
 
-async function serviceSnapshot(service, checkedAt) {
+async function serviceSnapshot(service, checkedAt, env = {}) {
   if (service.id === "cli-auth") {
     return { ...service, ...(await probeCliAuth()) };
   }
   if (service.id === "mcp-server") {
-    return { ...service, ...(await probeMcpServer()) };
+    return { ...service, ...(await probeMcpServer(env)) };
   }
   return {
     ...service,
@@ -389,7 +392,7 @@ async function handleRequest(request, env, url, headers, id) {
 
     if (url.pathname === `${API_PREFIX}/services`) {
       const checkedAt = new Date().toISOString();
-      const services = await Promise.all(SERVICES.map((service) => serviceSnapshot(service, checkedAt)));
+      const services = await Promise.all(SERVICES.map((service) => serviceSnapshot(service, checkedAt, env)));
       return json({
         services,
         count: services.length,
@@ -415,7 +418,7 @@ async function handleRequest(request, env, url, headers, id) {
       }
 
       return json({
-        service: await serviceSnapshot(service, new Date().toISOString()),
+        service: await serviceSnapshot(service, new Date().toISOString(), env),
         requestId: id
       }, 200, headers);
     }
@@ -490,7 +493,7 @@ async function handleRequest(request, env, url, headers, id) {
     }
 
     if (url.pathname === API_PREFIX + "/mcp/connections") {
-      const health = await probeMcpServer();
+      const health = await probeMcpServer(env);
       const connections = MCP_CONNECTIONS.map((connection) => ({
         ...connection,
         ...health
