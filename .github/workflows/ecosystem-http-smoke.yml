@@ -30,3 +30,5 @@ jobs:
           done
       - name: Check public Pages and custom-domain URLs
         run: node scripts/check-ecosystem-http.mjs
+      - name: Verify staging Auth and Control API service health
+        run: node scripts/check-staging-auth-api.mjs
