@@ -1,4 +1,4 @@
-# Diagnostic branch only; this workflow does not deploy or modify Ask OCodeJS.
+# Diagnostic branch only; this workflow does not deploy or modify Ask OCodeJS. Re-run after ESLint cleanup.
 name: Ask OCodeJS source validation (alternate runner)
 
 on:
