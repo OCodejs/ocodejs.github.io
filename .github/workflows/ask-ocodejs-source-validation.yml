@@ -54,9 +54,14 @@ jobs:
         if: always()
         run: |
           mkdir -p .diagnostics/ask-ocodejs
-          cp ask-ocodejs/package.json .diagnostics/ask-ocodejs/package.json
-          cp ask-ocodejs/package-lock.json .diagnostics/ask-ocodejs/package-lock.json
-          cp ask-ocodejs/audit.json .diagnostics/ask-ocodejs/audit.json
+          if [ -f ask-ocodejs/package-lock.json ]; then
+            cp ask-ocodejs/package.json .diagnostics/ask-ocodejs/package.json
+            cp ask-ocodejs/package-lock.json .diagnostics/ask-ocodejs/package-lock.json
+            [ ! -f ask-ocodejs/audit.json ] || cp ask-ocodejs/audit.json .diagnostics/ask-ocodejs/audit.json
+          else
+            echo "No candidate lockfile to export"
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .diagnostics/ask-ocodejs
