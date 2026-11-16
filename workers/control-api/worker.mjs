@@ -216,6 +216,7 @@ async function probeCliAuth() {
 async function probeMcpServer() {
   const startedAt = Date.now();
   const checkedAt = new Date().toISOString();
+  let phase = "initialize";
   try {
     const initializeResponse = await fetch(MCP_ENDPOINT, {
       method: "POST",
@@ -231,41 +232,45 @@ async function probeMcpServer() {
         }
       }),
       cache: "no-store",
-      redirect: "error",
+      redirect: "follow",
       signal: AbortSignal.timeout(12000)
     });
     if (!initializeResponse.ok) {
       return { state: "unavailable", description: "MCP initialize returned HTTP " + initializeResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
     }
     const initialized = await initializeResponse.json();
+    phase = "validate-initialize";
     if (initialized?.result?.protocolVersion !== "2025-03-26" || initialized?.result?.serverInfo?.name !== "ocodejs-control-center") {
       return { state: "unknown", description: "MCP initialize response did not match the expected protocol contract.", checkedAt, latencyMs: Date.now() - startedAt };
     }
 
+    phase = "initialized-notification";
     const notificationResponse = await fetch(MCP_ENDPOINT, {
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
       body: JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
       cache: "no-store",
-      redirect: "error",
+      redirect: "follow",
       signal: AbortSignal.timeout(12000)
     });
     if (notificationResponse.status !== 202) {
       return { state: "unknown", description: "MCP initialized notification was not accepted.", checkedAt, latencyMs: Date.now() - startedAt };
     }
 
+    phase = "tools-list";
     const toolsResponse = await fetch(MCP_ENDPOINT, {
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
       body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
       cache: "no-store",
-      redirect: "error",
+      redirect: "follow",
       signal: AbortSignal.timeout(12000)
     });
     if (!toolsResponse.ok) {
       return { state: "unavailable", description: "MCP tools/list returned HTTP " + toolsResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
     }
     const listed = await toolsResponse.json();
+    phase = "validate-tools-list";
     const toolNames = (listed?.result?.tools || []).map((tool) => tool.name).sort();
     if (JSON.stringify(toolNames) !== JSON.stringify(["get_agent_definition", "get_control_api_health", "get_provider_definition", "list_agents", "list_providers", "list_services"])) {
       return { state: "unknown", description: "MCP tools/list did not return the expected read-only tool allowlist.", checkedAt, latencyMs: Date.now() - startedAt };
@@ -281,7 +286,7 @@ async function probeMcpServer() {
     console.warn(JSON.stringify({ event: "control_api.mcp_probe_failed", errorType: error?.name || "Error" }));
     return {
       state: "unavailable",
-      description: "MCP staging endpoint could not complete the protocol handshake.",
+      description: "MCP staging probe failed during " + phase + " (" + (error?.name || "Error") + ").",
       checkedAt,
       latencyMs: Date.now() - startedAt
     };
