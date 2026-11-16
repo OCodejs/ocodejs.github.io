@@ -6,15 +6,15 @@ title: OCodeJS Server — Documentation
 
 # OCodeJS Server — Documentation
 
-Technical documentation and entry points for the OCodeJS and Velclaw ecosystem. This page is published through GitHub Pages at [ocodejs.co/docs](http://ocodejs.co/docs/).
+Technical documentation and entry points for the OCodeJS and Velclaw ecosystem. This page is published through GitHub Pages at [ocodejs.co/docs](https://ocodejs.co/docs/).
 
 ## OCodeJS Ecosystem — Live Pages
 
 | Project | Description | Live page |
 |---|---|---|
-| OCodeJS Docs | Technical documentation and developer guides | [Open Docs](http://ocodejs.co/docs/) |
-| OCodeJS | Main website and Control Center | [Open OCodeJS](http://ocodejs.co/) |
-| OCodeJS CLI Hub | CLI tools and developer utilities | [Open CLI Hub](http://ocodejs.co/cli-hub/) |
+| OCodeJS Docs | Technical documentation and developer guides | [Open Docs](https://ocodejs.co/docs/) |
+| OCodeJS | Main website and Control Center | [Open OCodeJS](https://ocodejs.co/) |
+| OCodeJS CLI Hub | CLI tools and developer utilities | [Open CLI Hub](https://ocodejs.co/cli-hub/) |
 | Ask OCodeJS | AI assistant and Q&A workspace | [Open Ask OCodeJS](https://zskbot.github.io/ask-ocodejs/) |
 | VelclawHost | Hosting Control Center and deployment management | [Open VelclawHost](https://velclaw.github.io/VelclawHost/#/overview) |
 
