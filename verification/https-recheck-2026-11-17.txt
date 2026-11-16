@@ -1,0 +1,1 @@
+Diagnostic-only marker. Re-run the existing public HTTP smoke workflow after enabling Cloudflare proxy and Always Use HTTPS for ocodejs.co. No production source or deployment configuration is changed.
