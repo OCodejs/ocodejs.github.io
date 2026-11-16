@@ -1,3 +1,4 @@
+// Verify both internal Auth and MCP bindings after staging deployment.
 // Post-deployment check after adding the internal MCP service binding.
 // Recheck after deploying the diagnostic MCP probe revision.
 // Post-deployment diagnostic for Auth, Control API, and MCP redirect behavior.
