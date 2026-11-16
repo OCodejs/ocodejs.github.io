@@ -8,7 +8,21 @@ async function request(path, init = {}) {
     signal: AbortSignal.timeout(10_000),
     ...init
   });
-  if (!response.ok) throw new Error(path + " returned HTTP " + response.status);
+  if (!response.ok) {
+    const body = (await response.text()).replace(/\\s+/g, " ").slice(0, 360);
+    const location = response.headers.get("location");
+    const safeLocation = location ? (() => { try { const u = new URL(location); return u.origin + u.pathname; } catch { return "present"; } })() : null;
+    throw new Error(JSON.stringify({
+      path,
+      status: response.status,
+      finalUrl: new URL(response.url).origin + new URL(response.url).pathname,
+      server: response.headers.get("server"),
+      cfMitigated: response.headers.get("cf-mitigated"),
+      contentType: response.headers.get("content-type"),
+      location: safeLocation,
+      body
+    }));
+  }
   return response;
 }
 
