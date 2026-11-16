@@ -1,4 +1,4 @@
-# Diagnostic branch only; this workflow does not deploy or modify Ask OCodeJS. Re-run after ESLint cleanup.
+# Diagnostic branch only; validates the merged Ask OCodeJS main branch on an alternate healthy runner. Re-run after ESLint cleanup.
 name: Ask OCodeJS source validation (alternate runner)
 
 on:
@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 22
       - name: Clone public Ask OCodeJS source
-        run: git clone --depth 1 --branch security/patch-transitive-dependencies https://github.com/zskbot/ask-ocodejs.git ask-ocodejs
+        run: git clone --depth 1 --branch main https://github.com/zskbot/ask-ocodejs.git ask-ocodejs
       - name: Generate lockfile from reviewed security overrides
         working-directory: ask-ocodejs
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
