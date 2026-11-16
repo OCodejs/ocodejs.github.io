@@ -1,3 +1,4 @@
+// Post-deployment check after adding the internal MCP service binding.
 // Recheck after deploying the diagnostic MCP probe revision.
 // Post-deployment diagnostic for Auth, Control API, and MCP redirect behavior.
 const API_BASE = "https://ocodejs-server-api-staging.huynhthuongg2505-f9b.workers.dev/api/v1";
