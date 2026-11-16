@@ -58,3 +58,14 @@ No production routes are attached. This Worker is isolated from existing OCodeJS
 ## Structured request telemetry
 
 Every request emits one JSON event to Cloudflare Workers Logs with `event`, `requestId`, HTTP method, normalized URL path, response status, duration in milliseconds and timestamp. The query string, request body, cookies, authorization headers and upstream payloads are deliberately excluded. Responses also return `X-Request-Id` and `Server-Timing` for correlation. This is log-based observability. The current branch additionally supports an optional Workers Analytics Engine binding named `OBSERVABILITY`, which writes bounded request dimensions and duration when attached. The binding is not configured on staging by this code change; without it, the Worker continues to operate using structured logs only. No public metrics query, alert evaluator, durable audit record store or role-based explorer is implemented yet.
+
+
+## Cloudflare staging service binding
+
+The Control API staging Worker should use an internal Cloudflare service binding to the MCP Worker in the same Cloudflare account. Configure this binding only on the staging Worker:
+
+- Binding name: `MCP_SERVER`
+- Binding type: `service`
+- Service: `ocodejs-mcp-staging`
+
+The API uses this binding for health probes when present and falls back to the public `MCP_ENDPOINT` URL otherwise. The public endpoint remains in the service catalog for clients. Do not copy this binding into Production without a separate review.
