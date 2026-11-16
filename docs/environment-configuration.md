@@ -1,3 +1,6 @@
+---
+---
+
 # Environment Configuration
 
 This document lists configuration names and their scope. It intentionally contains no credential values.

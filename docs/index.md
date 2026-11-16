@@ -23,14 +23,14 @@ Technical documentation and entry points for the OCodeJS and Velclaw ecosystem. 
 This repository hosts a static GitHub Pages frontend, a separately deployed Cloudflare staging Control API, and technical documentation. The UI and service registry distinguish live checks from unconfigured integrations.
 
 ### Start here
-- [Platform architecture](architecture.md)
-- [API contract](api-contract.md)
-- [Control API staging connection and troubleshooting](control-api-staging.md)
-- [Authentication integration status](auth-integration-status.md)
-- [Environment configuration](environment-configuration.md)
-- [Deployment runbook](deployment-runbook.md)
-- [Security baseline](security.md)
-- [Delivery roadmap](roadmap.md)
+- [Platform architecture](architecture.html)
+- [API contract](api-contract.html)
+- [Control API staging connection and troubleshooting](control-api-staging.html)
+- [Authentication integration status](auth-integration-status.html)
+- [Environment configuration](environment-configuration.html)
+- [Deployment runbook](deployment-runbook.html)
+- [Security baseline](security.html)
+- [Delivery roadmap](roadmap.html)
 
 | Area | Responsibility | Current state |
 |---|---|---|
