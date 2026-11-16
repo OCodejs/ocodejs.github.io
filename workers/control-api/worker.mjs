@@ -166,11 +166,15 @@ function errorResponse(code, message, status, id, headers) {
   }, status, headers);
 }
 
-async function probeCliAuth() {
+async function probeCliAuth(env = {}) {
   const startedAt = Date.now();
   const checkedAt = new Date().toISOString();
+  const viaServiceBinding = env.CLI_AUTH && typeof env.CLI_AUTH.fetch === "function";
+  const authFetch = viaServiceBinding
+    ? (init) => env.CLI_AUTH.fetch(new Request(CLI_AUTH_HEALTH_URL, init))
+    : (init) => fetch(CLI_AUTH_HEALTH_URL, init);
   try {
-    const response = await fetch(CLI_AUTH_HEALTH_URL, {
+    const response = await authFetch({
       method: "GET",
       headers: { Accept: "application/json" },
       cache: "no-store",
@@ -198,26 +202,33 @@ async function probeCliAuth() {
     return {
       state: configured ? "healthy" : "degraded",
       description: configured
-        ? "Health endpoint responds and required GitHub OAuth/PAT bindings are present; end-to-end login is not verified."
+        ? (viaServiceBinding
+          ? "Internal Auth Worker health responds and required GitHub OAuth/PAT bindings are present; public auth hostname and end-to-end login remain unverified."
+          : "Health endpoint responds and required GitHub OAuth/PAT bindings are present; end-to-end login is not verified.")
         : "Health endpoint responds, but one or more GitHub OAuth/PAT bindings are missing.",
       checkedAt,
       latencyMs: Date.now() - startedAt
     };
-  } catch {
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "control_api.cli_auth_probe_failed", errorType: error?.name || "Error" }));
     return {
       state: "unavailable",
-      description: "CLI Auth health endpoint could not be reached.",
+      description: "CLI Auth health endpoint could not be reached (" + (error?.name || "Error") + ").",
       checkedAt,
       latencyMs: Date.now() - startedAt
     };
   }
 }
 
-async function probeMcpServer() {
+async function probeMcpServer(env = {}) {
   const startedAt = Date.now();
   const checkedAt = new Date().toISOString();
+  let phase = "initialize";
+  const mcpFetch = env.MCP_SERVER && typeof env.MCP_SERVER.fetch === "function"
+    ? (init) => env.MCP_SERVER.fetch(new Request("https://mcp-server/mcp", init))
+    : (init) => fetch(MCP_ENDPOINT, init);
   try {
-    const initializeResponse = await fetch(MCP_ENDPOINT, {
+    const initializeResponse = await mcpFetch({
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -231,41 +242,45 @@ async function probeMcpServer() {
         }
       }),
       cache: "no-store",
-      redirect: "error",
-      signal: AbortSignal.timeout(4000)
+      redirect: "follow",
+      signal: AbortSignal.timeout(12000)
     });
     if (!initializeResponse.ok) {
       return { state: "unavailable", description: "MCP initialize returned HTTP " + initializeResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
     }
     const initialized = await initializeResponse.json();
+    phase = "validate-initialize";
     if (initialized?.result?.protocolVersion !== "2025-03-26" || initialized?.result?.serverInfo?.name !== "ocodejs-control-center") {
       return { state: "unknown", description: "MCP initialize response did not match the expected protocol contract.", checkedAt, latencyMs: Date.now() - startedAt };
     }
 
-    const notificationResponse = await fetch(MCP_ENDPOINT, {
+    phase = "initialized-notification";
+    const notificationResponse = await mcpFetch({
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
       body: JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
       cache: "no-store",
-      redirect: "error",
-      signal: AbortSignal.timeout(4000)
+      redirect: "follow",
+      signal: AbortSignal.timeout(12000)
     });
     if (notificationResponse.status !== 202) {
       return { state: "unknown", description: "MCP initialized notification was not accepted.", checkedAt, latencyMs: Date.now() - startedAt };
     }
 
-    const toolsResponse = await fetch(MCP_ENDPOINT, {
+    phase = "tools-list";
+    const toolsResponse = await mcpFetch({
       method: "POST",
       headers: { Accept: "application/json, text/event-stream", "Content-Type": "application/json", "MCP-Protocol-Version": "2025-03-26" },
       body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
       cache: "no-store",
-      redirect: "error",
-      signal: AbortSignal.timeout(4000)
+      redirect: "follow",
+      signal: AbortSignal.timeout(12000)
     });
     if (!toolsResponse.ok) {
       return { state: "unavailable", description: "MCP tools/list returned HTTP " + toolsResponse.status + ".", checkedAt, latencyMs: Date.now() - startedAt };
     }
     const listed = await toolsResponse.json();
+    phase = "validate-tools-list";
     const toolNames = (listed?.result?.tools || []).map((tool) => tool.name).sort();
     if (JSON.stringify(toolNames) !== JSON.stringify(["get_agent_definition", "get_control_api_health", "get_provider_definition", "list_agents", "list_providers", "list_services"])) {
       return { state: "unknown", description: "MCP tools/list did not return the expected read-only tool allowlist.", checkedAt, latencyMs: Date.now() - startedAt };
@@ -277,22 +292,23 @@ async function probeMcpServer() {
       latencyMs: Date.now() - startedAt,
       toolCount: toolNames.length
     };
-  } catch {
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "control_api.mcp_probe_failed", errorType: error?.name || "Error" }));
     return {
       state: "unavailable",
-      description: "MCP staging endpoint could not complete the protocol handshake.",
+      description: "MCP staging probe failed during " + phase + " (" + (error?.name || "Error") + ").",
       checkedAt,
       latencyMs: Date.now() - startedAt
     };
   }
 }
 
-async function serviceSnapshot(service, checkedAt) {
+async function serviceSnapshot(service, checkedAt, env = {}) {
   if (service.id === "cli-auth") {
-    return { ...service, ...(await probeCliAuth()) };
+    return { ...service, ...(await probeCliAuth(env)) };
   }
   if (service.id === "mcp-server") {
-    return { ...service, ...(await probeMcpServer()) };
+    return { ...service, ...(await probeMcpServer(env)) };
   }
   return {
     ...service,
@@ -383,7 +399,7 @@ async function handleRequest(request, env, url, headers, id) {
 
     if (url.pathname === `${API_PREFIX}/services`) {
       const checkedAt = new Date().toISOString();
-      const services = await Promise.all(SERVICES.map((service) => serviceSnapshot(service, checkedAt)));
+      const services = await Promise.all(SERVICES.map((service) => serviceSnapshot(service, checkedAt, env)));
       return json({
         services,
         count: services.length,
@@ -409,7 +425,7 @@ async function handleRequest(request, env, url, headers, id) {
       }
 
       return json({
-        service: await serviceSnapshot(service, new Date().toISOString()),
+        service: await serviceSnapshot(service, new Date().toISOString(), env),
         requestId: id
       }, 200, headers);
     }
@@ -484,7 +500,7 @@ async function handleRequest(request, env, url, headers, id) {
     }
 
     if (url.pathname === API_PREFIX + "/mcp/connections") {
-      const health = await probeMcpServer();
+      const health = await probeMcpServer(env);
       const connections = MCP_CONNECTIONS.map((connection) => ({
         ...connection,
         ...health

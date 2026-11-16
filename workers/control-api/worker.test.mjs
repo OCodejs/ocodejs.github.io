@@ -441,3 +441,68 @@ test("runtime readiness explicitly keeps provider inference and agent execution 
   assert.ok(body.checkedAt);
   assert.ok(body.requestId);
 });
+
+
+test("MCP probe uses the internal Cloudflare service binding when configured", async () => {
+  const methods = [];
+  const tools = [
+    "get_control_api_health",
+    "get_provider_definition",
+    "get_agent_definition",
+    "list_agents",
+    "list_providers",
+    "list_services"
+  ];
+  const MCP_SERVER = {
+    fetch: async (request) => {
+      assert.equal(new URL(request.url).pathname, "/mcp");
+      const message = await request.json();
+      methods.push(message.method);
+      if (message.method === "initialize") {
+        return new Response(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: {
+          protocolVersion: "2025-03-26",
+          serverInfo: { name: "ocodejs-control-center" }
+        }}), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      if (message.method === "notifications/initialized") return new Response(null, { status: 202 });
+      if (message.method === "tools/list") {
+        return new Response(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: {
+          tools: tools.map((name) => ({ name }))
+        }}), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      throw new Error("Unexpected MCP method: " + message.method);
+    }
+  };
+  const response = await worker.fetch(
+    new Request("https://api-staging.example.workers.dev/api/v1/services/mcp-server"),
+    { ...env, MCP_SERVER }
+  );
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.service.state, "healthy");
+  assert.equal(body.service.toolCount, 6);
+  assert.deepEqual(methods, ["initialize", "notifications/initialized", "tools/list"]);
+});
+
+
+test("CLI Auth probe uses the internal Cloudflare service binding when configured", async () => {
+  const CLI_AUTH = {
+    fetch: async (request) => {
+      assert.equal(new URL(request.url).pathname, "/health");
+      return new Response(JSON.stringify({
+        ok: true,
+        service: "ocodejs-auth-worker",
+        patConfigured: true,
+        oauthConfigured: true
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+  };
+  const response = await worker.fetch(
+    new Request("https://api-staging.example.workers.dev/api/v1/services/cli-auth"),
+    { ...env, CLI_AUTH }
+  );
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.service.state, "healthy");
+  assert.match(body.service.description, /Internal Auth Worker health responds/);
+});
