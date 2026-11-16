@@ -1,3 +1,4 @@
+# Diagnostic branch only; this workflow does not deploy or modify Ask OCodeJS.
 name: Ask OCodeJS source validation (alternate runner)
 
 on:
