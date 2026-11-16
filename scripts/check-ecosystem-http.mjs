@@ -17,7 +17,16 @@ const results = await Promise.all(targets.map(async (target) => {
       headers: { "user-agent": "OCodeJS-Ecosystem-HTTP-Smoke/1.0", accept: "text/html,application/xhtml+xml" }
     });
     const body = await response.text();
-    const title = body.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1]?.replace(/\\s+/g, " ").trim() || null;
+    let title = null;
+    const lowerBody = body.toLowerCase();
+    const titleStart = lowerBody.indexOf("<title");
+    if (titleStart >= 0) {
+      const titleOpen = lowerBody.indexOf(">", titleStart);
+      const titleClose = lowerBody.indexOf("</title>", titleOpen + 1);
+      if (titleOpen >= 0 && titleClose > titleOpen) {
+        title = body.slice(titleOpen + 1, titleClose).replaceAll("\\n", " ").replaceAll("\\r", " ").trim();
+      }
+    }
     return {
       name: target.name,
       requestedUrl: target.url,
