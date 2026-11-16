@@ -1,3 +1,4 @@
+// Recheck current public DNS proxy, HTTPS redirect, and Pages behavior after external Cloudflare updates.
 // Diagnostic-only smoke test; this branch is not intended for production deployment.
 const targets = [
   { name: "OCodeJS docs custom domain", url: "https://ocodejs.co/docs/" },
