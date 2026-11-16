@@ -1,3 +1,9 @@
+---
+layout: null
+permalink: /docs/
+title: OCodeJS Server — Documentation
+---
+
 # OCodeJS Server — Documentation
 
 Technical documentation and entry points for the OCodeJS and Velclaw ecosystem. This page is published through GitHub Pages at [ocodejs.co/docs](http://ocodejs.co/docs/).
