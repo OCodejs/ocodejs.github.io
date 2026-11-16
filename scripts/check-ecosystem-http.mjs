@@ -1,3 +1,4 @@
+// Diagnostic-only smoke test; this branch is not intended for production deployment.
 const targets = [
   { name: "OCodeJS docs custom domain", url: "https://ocodejs.co/docs/" },
   { name: "OCodeJS homepage custom domain", url: "https://ocodejs.co/" },
