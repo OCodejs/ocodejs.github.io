@@ -12,11 +12,24 @@ This compose file is a **local staging bootstrap**, not a production deployment.
 ## Start
 
 1. Set FORGEJO_DB_PASSWORD in the host environment using a randomly generated value.
-2. Run docker compose -f infra/autorun/docker-compose.yml config and inspect the rendered configuration.
+2. Validate Compose without printing resolved secrets: `docker compose -f infra/autorun/docker-compose.yml config --quiet`. Never paste unredacted Compose output into tickets or logs.
 3. Run docker compose -f infra/autorun/docker-compose.yml up -d.
 4. Open http://127.0.0.1:3000 from the host or through a secure SSH tunnel.
-5. Complete the Forgejo install wizard only after confirming PostgreSQL connection settings. Create the first administrator; keep registration disabled.
+5. Complete the Forgejo install wizard only after confirming PostgreSQL connection settings. Create the first administrator; keep registration disabled. Forgejo's installer lock is not forced off by the environment, so its persisted installation state can take effect.
 6. Verify backup/restore before importing any important repository.
+
+## Database password rotation
+
+Changing `FORGEJO_DB_PASSWORD` in the shell alone does not rotate the password inside an already-initialized PostgreSQL volume. Rotate both sides deliberately:
+
+1. Connect interactively: `docker compose -f infra/autorun/docker-compose.yml exec database psql -U forgejo -d postgres`.
+2. At the `psql` prompt, run `\\password forgejo` and enter the new password when prompted (do not place it in shell history or command arguments).
+3. Exit `psql`, update `FORGEJO_DB_PASSWORD` in the host secret manager/environment, then recreate only the Forgejo service: `docker compose -f infra/autorun/docker-compose.yml up -d --no-deps git`.
+4. Verify Forgejo health and database connectivity. Keep a tested backup before rotating credentials.
+
+## Network boundary
+
+The `git-internal` network intentionally has no external route. This local bootstrap therefore does not support outbound OIDC discovery, GitHub imports/mirroring, or webhook delivery. Do not weaken this boundary by making the network externally routable without first defining and enforcing a host-level egress allowlist and reviewing the threat model.
 
 ## GitHub Actions AutoRun reporting
 
