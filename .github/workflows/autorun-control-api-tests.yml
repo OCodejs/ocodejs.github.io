@@ -1,0 +1,26 @@
+name: AutoRun Control API tests
+
+on:
+  pull_request:
+    paths:
+      - "infra/autorun/control-api/**"
+      - ".github/workflows/autorun-events.yml"
+      - ".github/workflows/autorun-control-api-tests.yml"
+      - "scripts/autorun-control-api.test.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test AutoRun Control API and OIDC bridge
+        run: node --test scripts/autorun-control-api.test.mjs
