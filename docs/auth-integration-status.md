@@ -44,3 +44,11 @@
 
 ## Safety
 No Production Worker, DNS route, OAuth app, database, secret or account data is changed by this integration.
+
+## Central dashboard integration (2026-11-21)
+
+- The Authentication view in `index.html` now exposes the separate Account Portal source and a direct link to the last known Vercel Preview deployment.
+- The linked deployment is explicitly labeled **STALE** and SSO-protected. It is a navigation handoff only; it is not a verified current-main Preview and must not be presented as a working sign-in endpoint.
+- GitHub Pages does not embed Auth.js, proxy `/api/auth/*`, collect credentials, or share cookies. The Account Portal remains the only owner of Auth.js sessions and account data.
+- Keep account sign-in disabled in the central dashboard until a fresh Preview built from the current Auth repository `main` passes the documented health, OAuth, session, registration, authorization and logout checks.
+- No Auth repository files, Vercel environment variables, OAuth applications, database schemas, secrets, DNS records or Production deployments are changed by this dashboard-only integration.
