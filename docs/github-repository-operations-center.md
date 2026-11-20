@@ -16,7 +16,9 @@ The GitHub Workspace is a browser-side, read-only view for public repositories.
 - All GitHub requests are HTTP GET requests to the public GitHub REST API.
 - No OAuth flow, PAT input, token storage, browser storage, mutation endpoint, workflow dispatch, or write operation is included.
 - Private repositories are rejected. Do not add a token to this page.
-- File preview is limited to 180 KB and binary content is not rendered.
+- File preview is limited to 180 KB and binary / invalid UTF-8 content is not rendered.
+- GitHub API requests have a 15-second timeout; branch enumeration is bounded to 1,000 branches and tree rendering is bounded to 5,000 entries / 500 visible entries per directory.
+- External links are restricted to HTTP(S), and stale file / comparison / inventory responses are ignored when the active selection changes.
 - The unauthenticated GitHub API rate limit applies. PR review/check details are bounded to 12 PRs per refresh; errors are displayed rather than replaced with cached or fabricated state.
 - Inventory uses the public organization repositories endpoint for the selected repository owner; it does not claim to enumerate private repositories or all personal-account resources.
 - Audit log is not connected. The UI documents a future append-only event schema but does not create or display fabricated events.
