@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Publish run lifecycle to OCodeJS Control API
         env:
-          API_BASE: ${{ vars.AUTORUN_CONTROL_API }}
+          API_BASE: https://ocodejs-autorun-control-staging.ocodejs-df1.workers.dev
           OIDC_REQUEST_URL: ${{ env.ACTIONS_ID_TOKEN_REQUEST_URL }}
           OIDC_REQUEST_TOKEN: ${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
           EVENT_JSON: ${{ toJSON(github.event) }}
