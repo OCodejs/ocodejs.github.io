@@ -1,0 +1,78 @@
+name: OCodeJS Business Content Sync
+
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ocodejs-business-content-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout central repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "OCodeJS Business Sync Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Prepare stable sync branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="bot/business-content-sync"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH"
+            git checkout -B "$BRANCH" "origin/$BRANCH"
+          else
+            git checkout -b "$BRANCH"
+          fi
+
+      - name: Import public OCodeJS business content
+        run: node scripts/sync-business-content.mjs
+
+      - name: Create content update commit when needed
+        id: changes
+        shell: bash
+        run: |
+          if git diff --quiet -- business-sync; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No business content changes."
+            exit 0
+          fi
+          git add business-sync
+          git commit -m "chore(content): sync OCodeJS business catalog"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push sync branch
+        if: steps.changes.outputs.changed == 'true'
+        run: git push --force-with-lease origin bot/business-content-sync
+
+      - name: Open or update Draft PR
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          existing="$(gh pr list --state open --head bot/business-content-sync --base main --json number --jq '.[0].number')"
+          if [[ -n "$existing" ]]; then
+            echo "Updated existing Draft PR #$existing"
+          else
+            gh pr create --draft --base main --head bot/business-content-sync \
+              --title "chore(content): sync OCodeJS business articles and projects" \
+              --body "Automated import from the public OCodejs/OCODEJS source. Source workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. Source revision: $SOURCE_SHA. Review the generated business-sync/ files before merging. No merge or deployment is performed automatically."
+          fi
