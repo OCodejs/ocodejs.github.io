@@ -4,6 +4,9 @@ The GitHub Workspace is a browser-side, read-only view for public repositories.
 
 ## Features
 - Repository metadata and public branch listing.
+- Organization Repository Inventory: public repositories with visibility, default branch, primary language and last update timestamp. Private repositories are not exposed by the unauthenticated browser API.
+- Pull Request Center: up to 30 recently updated PRs, with review state, mergeability and checks fetched for up to 12 PRs per refresh.
+- Security & Permissions: proposed Viewer / Developer / Admin capability matrix and GitHub App authentication architecture. This is design documentation only; no roles are provisioned and no write capabilities are enabled.
 - Branch comparison with ahead/behind counts, commit totals and changed-file statistics.
 - Recent commit history with author, timestamp and canonical GitHub links.
 - Recursive Git tree explorer with directory navigation and bounded text-file preview.
@@ -14,7 +17,9 @@ The GitHub Workspace is a browser-side, read-only view for public repositories.
 - No OAuth flow, PAT input, token storage, browser storage, mutation endpoint, workflow dispatch, or write operation is included.
 - Private repositories are rejected. Do not add a token to this page.
 - File preview is limited to 180 KB and binary content is not rendered.
-- The unauthenticated GitHub API rate limit applies; errors are displayed rather than replaced with cached or fabricated state.
+- The unauthenticated GitHub API rate limit applies. PR review/check details are bounded to 12 PRs per refresh; errors are displayed rather than replaced with cached or fabricated state.
+- Inventory uses the public organization repositories endpoint for the selected repository owner; it does not claim to enumerate private repositories or all personal-account resources.
+- Audit log is not connected. The UI documents a future append-only event schema but does not create or display fabricated events.
 - Repository names are validated as owner/repository and all API-derived text is HTML-escaped before rendering.
 
 ## Before enabling private-repository or write access
@@ -27,3 +32,8 @@ Implement a server-side GitHub App/OIDC integration with:
 6. An allowlisted API proxy. Never proxy arbitrary URLs supplied by the browser.
 
 Until those controls are deployed and independently reviewed, this workspace must remain read-only.
+
+## Current implementation limits
+- Inventory is scoped to the organization endpoint derived from the selected repository owner and returns at most 100 repositories per request.
+- Pull Request Center returns at most 30 PRs and enriches at most 12 with reviews, check-runs and legacy commit statuses. `Unknown` / `Not loaded` means GitHub did not provide a verified value; it is not treated as success.
+- GitHub App installation, OAuth identity binding, RBAC enforcement, audit persistence and all write operations remain unimplemented by design.
