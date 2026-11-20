@@ -46,7 +46,8 @@ function parseArticle(file, root) {
 }
 
 try {
-  execFileSync("git", ["clone", "--depth", "1", sourceRepo, checkout], { stdio: "inherit" });
+  const sourceRef = process.env.OCODEJS_SOURCE_REF || "main";
+  execFileSync("git", ["clone", "--depth", "1", "--branch", sourceRef, sourceRepo, checkout], { stdio: "inherit" });
   const manifestPath = path.join(checkout, "business/manifest.json");
   if (!fs.existsSync(manifestPath)) throw new Error("Source manifest missing: business/manifest.json");
   const sourceManifest = readJson(manifestPath);
