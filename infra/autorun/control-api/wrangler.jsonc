@@ -6,14 +6,15 @@
   "workers_dev": true,
   "vars": {
     "ALLOWED_REPOSITORY": "OCodejs/ocodejs.github.io",
-    "ALLOWED_WORKFLOW_REF": "OCodejs/ocodejs.github.io/.github/workflows/autorun-events.yml@refs/heads/main",
+    "ALLOWED_REPOSITORY_ID": "1449322239",
+    "ALLOWED_WORKFLOW_REF": "OCodejs/ocodejs.github.io/.github/workflows/autorun-control-api-tests.yml@refs/heads/main",
     "ALLOWED_ORIGINS": "https://ocodejs.github.io,https://ocodejs.co,https://www.ocodejs.dev"
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "ocodejs-autorun-staging",
-      "database_id": "672785ae-195b-405b-b97b-cb60eb48db5f",
+      "database_id": "672785ae-195b-405b-97b7-cb60eb48db5f",
       "migrations_dir": "../migrations"
     }
   ]
