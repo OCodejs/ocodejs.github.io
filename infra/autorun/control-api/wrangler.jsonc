@@ -8,7 +8,9 @@
     "ALLOWED_REPOSITORY": "OCodejs/ocodejs.github.io",
     "ALLOWED_REPOSITORY_ID": "1449322239",
     "ALLOWED_WORKFLOW_REF": "OCodejs/ocodejs.github.io/.github/workflows/autorun-control-api-tests.yml@refs/heads/main",
-    "ALLOWED_ORIGINS": "https://ocodejs.github.io,https://ocodejs.co,https://www.ocodejs.dev"
+    "ALLOWED_ORIGINS": "https://ocodejs.github.io,https://ocodejs.co,https://www.ocodejs.dev",
+    "ALLOWED_JOB_REPOSITORIES": "OCodejs/mcp.auth.ocodejs",
+    "ALLOWED_COMMAND_IDS": "npm_ci,unit_tests,prisma_generate,prisma_validate,typecheck,nextjs_build,lint,vite_build"
   },
   "d1_databases": [
     {

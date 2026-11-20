@@ -1,3 +1,5 @@
+import { handleDurableQueueRequest } from "./queue.js";
+
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
@@ -199,6 +201,8 @@ export default {
     const cors = corsHeaders(request, env);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
     const url = new URL(request.url);
+    const queueResponse = await handleDurableQueueRequest(request, env);
+    if (queueResponse) return queueResponse;
 
     if (request.method === "GET" && url.pathname === "/health/live") {
       return json({ ok: true, service: "ocodejs-autorun-control-staging", storage: "d1" }, 200, cors);
