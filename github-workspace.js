@@ -72,13 +72,28 @@ async function loadTree(branch,requestId){
   state.tree=Array.isArray(data.tree)?data.tree:[];
   if(data.truncated){target.innerHTML='<div class="gh-empty">Git tree is truncated by GitHub. Open full tree on GitHub.</div>';return;}
   const entries=state.tree.filter(x=>x.type==='tree'||x.type==='blob').slice(0,500);
-  target.innerHTML=entries.map(x=>'<button type="button" data-ghw-path="'+esc(x.path)+'" data-ghw-type="'+esc(x.type)+'">'+(x.type==='tree'?'▸ ':'▤ ')+esc(x.path)+'</button>').join('')||'<div class="gh-empty">Empty tree.</div>';
-  target.querySelectorAll('[data-ghw-path]').forEach(btn=>btn.addEventListener('click',()=>openTreeItem(btn.dataset.ghwPath,btn.dataset.ghwType,branch)));
+  renderTreeFolder('',branch);
  }catch(error){if(requestId===state.request)target.innerHTML='<div class="gh-empty gh-error">'+esc(error.message)+'</div>';}
+}
+function renderTreeFolder(prefix,branch){
+ const target=document.getElementById('ghwTree');if(!target)return;
+ const normalized=prefix?prefix+'/':'';
+ const immediate=new Map();
+ state.tree.filter(x=>x.type==='blob'||x.type==='tree').forEach(item=>{
+  if(!item.path.startsWith(normalized))return;
+  const rest=item.path.slice(normalized.length);if(!rest)return;
+  const segment=rest.split('/')[0];const full=normalized+segment;
+  if(rest.includes('/'))immediate.set(full,{path:full,type:'tree'});
+  else immediate.set(full,{path:full,type:item.type});
+ });
+ const items=[...immediate.values()].sort((a,b)=>a.type===b.type?a.path.localeCompare(b.path):a.type==='tree'?-1:1);
+ target.innerHTML=(prefix?'<button type="button" data-ghw-up="1">↰ .. / '+esc(prefix)+'</button>':'')+items.map(x=>'<button type="button" data-ghw-path="'+esc(x.path)+'" data-ghw-type="'+esc(x.type)+'">'+(x.type==='tree'?'▸ ':'▤ ')+esc(x.path.slice(normalized.length))+'</button>').join('')||'<div class="gh-empty">Empty directory.</div>';
+ target.querySelectorAll('[data-ghw-path]').forEach(btn=>btn.addEventListener('click',()=>openTreeItem(btn.dataset.ghwPath,btn.dataset.ghwType,branch)));
+ const up=target.querySelector('[data-ghw-up]');if(up)up.addEventListener('click',()=>renderTreeFolder(prefix.split('/').slice(0,-1).join('/'),branch));
 }
 async function openTreeItem(path,type,branch){
  const target=document.getElementById('ghwFileContent');setText('ghwFilePath',path);
- if(type==='tree'){setText('ghwFilePath',path+' · directory');return;}
+ if(type==='tree'){setText('ghwFilePath',path+' · directory');document.getElementById('ghwFileContent').textContent='Directory: '+path;renderTreeFolder(path,branch);return;}
  target.textContent='Loading '+path+'…';
  try{
   const file=await get(repoPath('/contents/'+path.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(branch)));
