@@ -46,3 +46,6 @@ Until those controls are deployed and independently reviewed, this workspace mus
 - Added a 15-second API timeout, strict UTF-8 decoding for previews, branch/repository inventory pagination (bounded at 1,000 items), and explicit cap warnings for large comparisons.
 - CI aggregates check runs, commit statuses, and workflow runs. Check-runs use GitHub's maximum 100-per-page response; if GitHub reports more checks than returned, the headline is marked partial. Workflow and commit-status failures are included in PR-level check classification.
 - Browser smoke test and full live GitHub API interaction test remain pending. No CI workflow was dispatched manually.
+
+- Repository and branch enumeration are capped at 1,000 items per refresh; UI labels expose the cap when reached.
+- Comparison file details are marked potentially incomplete when the GitHub API response reaches its 300-file cap.
