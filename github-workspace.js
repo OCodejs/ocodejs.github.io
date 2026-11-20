@@ -40,7 +40,7 @@ async function loadRepository(){
  const input=document.getElementById('ghwRepo');if(!input)return;
  const match=input.value.trim().match(/^([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)$/);
  if(!match){setText('ghwRepoMeta','Định dạng hợp lệ: owner/repository');return;}
- state.repo=match[1]+'/'+match[2];const id=++state.request;
+ state.repo=match[1]+'/'+match[2];const id=++state.request;state.inventoryRequest++;state.prRequest++;state.fileRequest++;state.compareRequest++;['ghwBase','ghwHead'].forEach(key=>{const el=document.getElementById(key);if(el)mountHtml(el,'<option value="">Loading…</option>');});setText('ghwInventoryStats','Loading inventory for '+state.repo+'…');
  const button=document.getElementById('ghwLoad');button.disabled=true;button.textContent='Loading…';
  ['ghwDefault','ghwBranchCount','ghwLatest','ghwCi'].forEach(key=>setText(key,'—'));
  ['ghwHistory','ghwTree','ghwCiDetail','ghwCompareResult','ghwPullRequests'].forEach(key=>{const el=document.getElementById(key);if(el)el.textContent='Loading new repository…';});
