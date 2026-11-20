@@ -10,7 +10,7 @@
 | GitHub Pages | `https://ocodejs.github.io/` | Static Control Center | Updated only after an approved merge to `main` and successful Pages workflow |
 | Control API staging | `ocodejs-server-api-staging` | Read-only service, agent and provider registries | Staging-only Worker versions; no Production routes |
 | MCP staging | `ocodejs-mcp-staging` | Streamable HTTP MCP endpoint | Fixed read-only tool allowlist |
-| Account Auth Preview | Cloudflare Workers Preview URL protected by Access | Build and route validation | No production deploy command; dedicated Preview resources required |
+| Account Auth Preview | Vercel Preview project `mcp-auth-ocodejs`, protected by Vercel SSO | Separate Auth.js build and route validation | Preview-only database and secrets; no Production deployment |
 
 ## Change workflow
 
@@ -58,14 +58,15 @@ The connected execution runner currently blocks outbound HTTP requests to Worker
 
 ## Account Auth Preview gate
 
-1. Confirm the Preview hostname is protected by the existing Cloudflare Access policy.
-2. Configure the seven Preview-only values listed in [Environment Configuration](environment-configuration.md).
-3. Attach a dedicated Preview PostgreSQL database.
-4. Confirm `GET /api/health` returns `200 ready`.
-5. Verify registration, invalid-password handling, GitHub OAuth, Google OAuth, session persistence, logout, and session revocation.
-6. Keep sign-in disabled until all checks pass.
+1. Confirm the Vercel project is `mcp-auth-ocodejs`, linked to `OCodejs/mcp.auth.ocodejs`, and that Preview remains protected by Vercel SSO.
+2. Reconcile `package.json` and `package-lock.json` before requesting a new Preview build. The current mainline lockfile still names `@prisma/adapter-neon` while the manifest and Prisma client use `@prisma/adapter-pg` and `pg`.
+3. Confirm the Preview database is a dedicated non-production Auth resource. The Auth repository currently describes schema-level `auth_preview` isolation on an Auth-only PostgreSQL instance; verify the actual target before initializing it.
+4. Configure Preview-only `DATABASE_URL`, `DATABASE_URL_POOLED`, `AUTH_SECRET`, `AUTH_URL`, provider credentials and `AUTH_PREVIEW_DB_PUSH=true` only where schema initialization is explicitly intended. Never set the Preview push flag in Production.
+5. Confirm `GET /api/health` returns `200 ready` against the intended Preview database.
+6. Verify registration, invalid-password handling, GitHub OAuth, Google OAuth, session persistence, profile creation, logout and negative authorization cases.
+7. Keep sign-in disabled until all checks pass on a fresh Preview built from current mainline.
 
-The current Preview has built successfully but does not have the database or provider secrets. Do not report it as a working login system.
+The last observed READY Preview belongs to an older feature branch and is not a current-mainline release candidate. A successful build alone does not prove database or authentication readiness.
 
 ## Rollback
 
