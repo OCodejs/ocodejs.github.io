@@ -25,13 +25,13 @@ jobs:
           OIDC_REQUEST_TOKEN: ${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
           EVENT_JSON: ${{ toJSON(github.event) }}
         run: |
-          node <<'NODE'
+          node --input-type=module <<'NODE'
           const base = process.env.API_BASE;
           if (!base) throw new Error("Repository variable AUTORUN_CONTROL_API is not configured");
-          const tokenUrl = new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+          const tokenUrl = new URL(process.env.OIDC_REQUEST_URL);
           tokenUrl.searchParams.set("audience", "ocodejs-autorun-staging");
           const tokenResponse = await fetch(tokenUrl, {
-            headers: { authorization: `Bearer ${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}` }
+            headers: { authorization: `Bearer ${process.env.OIDC_REQUEST_TOKEN}` }
           });
           if (!tokenResponse.ok) throw new Error(`GitHub OIDC token request failed: HTTP ${tokenResponse.status}`);
           const { value } = await tokenResponse.json();
