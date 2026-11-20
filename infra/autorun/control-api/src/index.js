@@ -64,7 +64,7 @@ async function verifyGitHubOidc(token, env) {
 
 function corsHeaders(request, env) {
   const origin = request.headers.get("origin") || "";
-  const allowed = String(env.ALLOWED_ORIGINS || "https://ocodejs.github.io").split(",").map((item) => item.trim()).filter(Boolean);
+  const allowed = String(env.ALLOWED_ORIGINS || "https://ocodejs.github.io,https://ocodejs.co,https://www.ocodejs.dev").split(",").map((item) => item.trim()).filter(Boolean);
   if (!origin || !allowed.includes(origin)) return {};
   return {
     "access-control-allow-origin": origin,
