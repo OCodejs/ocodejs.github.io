@@ -120,6 +120,7 @@ async function handleEvent(request, env) {
   try { body = JSON.parse(raw); } catch { return json({ error: "invalid_json" }, 400); }
   let run;
   try { run = normalizeRun(body); } catch (error) { return json({ error: "invalid_payload", message: error.message }, 400); }
+  if (String(body.workflow_run.repository?.id || "") !== String(claims.repository_id || "")) return json({ error: "repository_identity_mismatch" }, 403);
 
   const eventId = run.runId + ":" + run.attempt + ":" + run.action;
   const now = new Date().toISOString();
@@ -129,9 +130,13 @@ async function handleEvent(request, env) {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(run_id, run_attempt) DO UPDATE SET
        workflow_name=excluded.workflow_name, event_name=excluded.event_name, branch=excluded.branch,
-       head_sha=excluded.head_sha, status=excluded.status, conclusion=excluded.conclusion,
-       html_url=excluded.html_url, created_at=excluded.created_at, started_at=excluded.started_at,
-       updated_at=excluded.updated_at, last_action=excluded.last_action, synced_at=excluded.synced_at`,
+       head_sha=excluded.head_sha,
+       status=CASE WHEN autorun_runs.status='completed' THEN 'completed' WHEN excluded.status='completed' THEN 'completed' WHEN excluded.status='in_progress' THEN 'in_progress' ELSE autorun_runs.status END,
+       conclusion=CASE WHEN excluded.status='completed' THEN excluded.conclusion ELSE autorun_runs.conclusion END,
+       html_url=excluded.html_url, created_at=excluded.created_at, started_at=COALESCE(autorun_runs.started_at, excluded.started_at),
+       updated_at=CASE WHEN autorun_runs.status='completed' THEN autorun_runs.updated_at WHEN excluded.status='completed' OR excluded.status='in_progress' THEN excluded.updated_at ELSE autorun_runs.updated_at END,
+       last_action=CASE WHEN autorun_runs.status='completed' THEN autorun_runs.last_action WHEN excluded.status='completed' OR excluded.status='in_progress' THEN excluded.last_action ELSE autorun_runs.last_action END,
+       synced_at=excluded.synced_at`,
   ).bind(run.runId, run.attempt, run.repository, run.workflowName, run.eventName, run.branch, run.sha, run.status,
     run.conclusion, run.htmlUrl, run.createdAt, run.startedAt, run.updatedAt, run.action, now).run();
 
