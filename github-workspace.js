@@ -58,7 +58,7 @@ async function loadRepository(){
   state.branches=branches.map(x=>x.name);
   setText('ghwBranchCount',state.branches.length);
   const options=state.branches.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
-  ['ghwBase','ghwHead'].forEach((id,index)=>{const el=document.getElementById(id);elmountHtml(target,options);el.value=index===0?(repo.default_branch||state.branches[0]):(state.branches.find(name=>name!==(repo.default_branch||state.branches[0]))||repo.default_branch||state.branches[0]);});
+  ['ghwBase','ghwHead'].forEach((id,index)=>{const el=document.getElementById(id);mountHtml(el,options);el.value=index===0?(repo.default_branch||state.branches[0]):(state.branches.find(name=>name!==(repo.default_branch||state.branches[0]))||repo.default_branch||state.branches[0]);});
   const commits=repo.default_branch?await get(repoPath('/commits?sha='+encodeURIComponent(repo.default_branch)+'&per_page=20')):[];
   if(id!==state.request)return;
   const latest=commits[0];setText('ghwLatest',latest?short(latest.sha):'—');
@@ -70,12 +70,12 @@ async function loadRepository(){
 }
 function renderHistory(commits){
  const target=document.getElementById('ghwHistory');if(!target)return;
- if(!Array.isArray(commits)||!commits.length){targetmountHtml(target,'<div class="gh-empty">No commits returned.</div>');return;}
- targetmountHtml(target,commits.map(c=>'<article class="gh-commit"><div><a target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(c.html_url))+'">'+esc(short(c.sha))+'</a> · '+esc(c.commit?.message?.split('\n')[0]||'No message')+'</div><div class="gh-stats"><span>'+esc(c.commit?.author?.name||c.author?.login||'Unknown author')+'</span><span>'+esc(date(c.commit?.author?.date))+'</span><span>'+esc(c.parents?.length||0)+' parent(s)</span></div></article>').join(''));
+ if(!Array.isArray(commits)||!commits.length){mountHtml(target,'<div class="gh-empty">No commits returned.</div>');return;}
+ mountHtml(target,commits.map(c=>'<article class="gh-commit"><div><a target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(c.html_url))+'">'+esc(short(c.sha))+'</a> · '+esc(c.commit?.message?.split('\n')[0]||'No message')+'</div><div class="gh-stats"><span>'+esc(c.commit?.author?.name||c.author?.login||'Unknown author')+'</span><span>'+esc(date(c.commit?.author?.date))+'</span><span>'+esc(c.parents?.length||0)+' parent(s)</span></div></article>').join(''));
 }
 async function loadTree(branch,requestId){
  const target=document.getElementById('ghwTree');if(!target)return;
- setText('ghwTreeRef',branch);targetmountHtml(target,'<div class="gh-empty">Resolving branch tree…</div>');
+ setText('ghwTreeRef',branch);mountHtml(target,'<div class="gh-empty">Resolving branch tree…</div>');
  try{
   const ref=await get(repoPath('/git/ref/heads/'+branch.split('/').map(encodeURIComponent).join('/')));
   const treeSha=ref.object&&ref.object.sha;if(!treeSha)throw new Error('Git reference không trả về tree commit SHA');
@@ -84,10 +84,10 @@ async function loadTree(branch,requestId){
   const data=await get(repoPath('/git/trees/'+encodeURIComponent(rootTreeSha)+'?recursive=1'));
   if(requestId!==state.request)return;
   state.tree=Array.isArray(data.tree)?data.tree:[];
-  if(data.truncated){targetmountHtml(target,'<div class="gh-empty">Git tree is truncated by GitHub. Open full tree on GitHub.</div>');return;}
+  if(data.truncated){mountHtml(target,'<div class="gh-empty">Git tree is truncated by GitHub. Open full tree on GitHub.</div>');return;}
   state.tree=state.tree.filter(x=>x.type==='tree'||x.type==='blob').slice(0,5000);
   renderTreeFolder('',branch);
- }catch(error){if(requestId===state.request)targetmountHtml(target,'<div class="gh-empty gh-error">'+esc(error.message)+'</div>');}
+ }catch(error){if(requestId===state.request)mountHtml(target,'<div class="gh-empty gh-error">'+esc(error.message)+'</div>');}
 }
 function renderTreeFolder(prefix,branch){
  const target=document.getElementById('ghwTree');if(!target)return;
@@ -101,7 +101,7 @@ function renderTreeFolder(prefix,branch){
   else immediate.set(full,{path:full,type:item.type});
  });
  const items=[...immediate.values()].sort((a,b)=>a.type===b.type?a.path.localeCompare(b.path):a.type==='tree'?-1:1).slice(0,500);
- targetmountHtml(target,(prefix?'<button type="button" data-ghw-up="1">↰ .. / '+esc(prefix)+'</button>':'')+items.map(x=>'<button type="button" data-ghw-path="'+esc(x.path)+'" data-ghw-type="'+esc(x.type)+'">'+(x.type==='tree'?'▸ ':'▤ ')+esc(x.path.slice(normalized.length))+'</button>').join('')||'<div class="gh-empty">Empty directory.</div>');
+ mountHtml(target,(prefix?'<button type="button" data-ghw-up="1">↰ .. / '+esc(prefix)+'</button>':'')+items.map(x=>'<button type="button" data-ghw-path="'+esc(x.path)+'" data-ghw-type="'+esc(x.type)+'">'+(x.type==='tree'?'▸ ':'▤ ')+esc(x.path.slice(normalized.length))+'</button>').join('')||'<div class="gh-empty">Empty directory.</div>');
  target.querySelectorAll('[data-ghw-path]').forEach(btn=>btn.addEventListener('click',()=>openTreeItem(btn.dataset.ghwPath,btn.dataset.ghwType,branch)));
  const up=target.querySelector('[data-ghw-up]');if(up)up.addEventListener('click',()=>renderTreeFolder(prefix.split('/').slice(0,-1).join('/'),branch));
 }
@@ -122,19 +122,19 @@ async function openTreeItem(path,type,branch){
 }
 async function compareBranches(){
  const request=++state.compareRequest,repoAtRequest=state.repo;const base=document.getElementById('ghwBase').value,head=document.getElementById('ghwHead').value,target=document.getElementById('ghwCompareResult'),button=document.getElementById('ghwCompare');
- if(!base||!head||base===head){targetmountHtml(target,'<div class="gh-empty">Chọn hai branch khác nhau.</div>');return;}
- button.disabled=true;button.textContent='Comparing…';targetmountHtml(target,'<div class="gh-empty">Đang so sánh refs…</div>');
+ if(!base||!head||base===head){mountHtml(target,'<div class="gh-empty">Chọn hai branch khác nhau.</div>');return;}
+ button.disabled=true;button.textContent='Comparing…';mountHtml(target,'<div class="gh-empty">Đang so sánh refs…</div>');
  try{
   const result=await get('/repos/'+repoAtRequest+'/compare/'+encodeURIComponent(base)+'...'+encodeURIComponent(head));
   if(request!==state.compareRequest||repoAtRequest!==state.repo||document.getElementById('ghwBase').value!==base||document.getElementById('ghwHead').value!==head)return;
   const files=Array.isArray(result.files)?result.files:[];
-  targetmountHtml(target,'<div class="gh-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="gh-kpi"><span class="gh-muted">AHEAD</span><b>'+Number(result.ahead_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">BEHIND</span><b>'+Number(result.behind_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">COMMITS</span><b>'+Number(result.total_commits||0)+'</b></div></div><p class="gh-muted">Status: '+esc(result.status)+' · '+esc(base)+' → '+esc(head)+'</p><div class="table-wrap"><table class="gh-table"><thead><tr><th>File</th><th>Status</th><th>+ / −</th></tr></thead><tbody>'+files.map(f=>'<tr><td class="gh-break">'+esc(f.filename)+'</td><td>'+esc(f.status)+'</td><td><span class="ok">+'+Number(f.additions||0)+'</span> / <span class="gh-error">−'+Number(f.deletions||0)+'</span></td></tr>').join('')+'</tbody></table></div>'+(result.too_large?'<p class="gh-muted">Diff too large — GitHub omitted some file details.</p>':''));
- }catch(error){if(request===state.compareRequest&&repoAtRequest===state.repo)targetmountHtml(target,'<div class="gh-empty gh-error">'+esc(error.message)+'</div>');}
+  mountHtml(target,'<div class="gh-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="gh-kpi"><span class="gh-muted">AHEAD</span><b>'+Number(result.ahead_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">BEHIND</span><b>'+Number(result.behind_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">COMMITS</span><b>'+Number(result.total_commits||0)+'</b></div></div><p class="gh-muted">Status: '+esc(result.status)+' · '+esc(base)+' → '+esc(head)+'</p><div class="table-wrap"><table class="gh-table"><thead><tr><th>File</th><th>Status</th><th>+ / −</th></tr></thead><tbody>'+files.map(f=>'<tr><td class="gh-break">'+esc(f.filename)+'</td><td>'+esc(f.status)+'</td><td><span class="ok">+'+Number(f.additions||0)+'</span> / <span class="gh-error">−'+Number(f.deletions||0)+'</span></td></tr>').join('')+'</tbody></table></div>'+(result.too_large?'<p class="gh-muted">Diff too large — GitHub omitted some file details.</p>':''));
+ }catch(error){if(request===state.compareRequest&&repoAtRequest===state.repo)mountHtml(target,'<div class="gh-empty gh-error">'+esc(error.message)+'</div>');}
  finally{if(request===state.compareRequest){button.disabled=false;button.textContent='Compare';}}
 }
 async function loadCi(sha,requestId){
  const target=document.getElementById('ghwCiDetail');if(!target)return;
- targetmountHtml(target,'<div class="gh-empty">Loading check-runs and commit statuses…</div>');
+ mountHtml(target,'<div class="gh-empty">Loading check-runs and commit statuses…</div>');
  if(!sha){setText('ghwCi','NO SHA');return;}
  const results=await Promise.allSettled([
   get(repoPath('/commits/'+sha+'/check-runs?per_page=100')),
@@ -156,7 +156,7 @@ async function loadCi(sha,requestId){
  const rows=checks.map(x=>({name:x.name,status:x.status==='completed'?x.conclusion:x.status,url:safeUrl(x.html_url),kind:'Check'}))
  .concat(statuses.map(x=>({name:x.context,status:x.state,url:safeUrl(x.target_url),kind:'Commit status'})))
  .concat(runs.map(x=>({name:x.name+' #'+x.run_number,status:x.conclusion||x.status,url:safeUrl(x.html_url),kind:'Workflow'})));
- targetmountHtml(target,'<div class="gh-stats"><span>Checks '+checks.length+'</span><span>Success '+succeeded+'</span><span>Pending '+pending+'</span><span>Failed '+failed+'</span></div>'+rows.map(x=>'<div class="gh-row"><div><b>'+esc(x.name)+'</b><div class="gh-muted">'+esc(x.kind)+'</div></div>'+pill(x.status)+'<a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(x.url||'#')+'">Open ↗</a></div>').join('')||'<div class="gh-empty">No CI checks or workflow runs reported for this commit.</div>');
+ mountHtml(target,'<div class="gh-stats"><span>Checks '+checks.length+'</span><span>Success '+succeeded+'</span><span>Pending '+pending+'</span><span>Failed '+failed+'</span></div>'+rows.map(x=>'<div class="gh-row"><div><b>'+esc(x.name)+'</b><div class="gh-muted">'+esc(x.kind)+'</div></div>'+pill(x.status)+'<a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(x.url||'#')+'">Open ↗</a></div>').join('')||'<div class="gh-empty">No CI checks or workflow runs reported for this commit.</div>');
  const errors=results.map((r,i)=>r.status==='rejected'?['checks','statuses','workflow runs'][i]+': '+r.reason.message:null).filter(Boolean);
  if(errors.length)appendText(target,'p','gh-muted','Some sources unavailable: '+errors.join(' · '));
 }
@@ -204,7 +204,7 @@ async function loadPrCenter(){
   if(detailed.some(x=>x.status==='rejected'))stats.textContent+=' · Some review/check details unavailable';
  }catch(error){stats.textContent='PR data unavailable: '+error.message;mountHtml(body,'<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>');}
 }
-function render(){const root=document.getElementById('view');rootmountHtml(target,'<div class="page-head"><div><div class="eyebrow">DEVELOPMENT / GITHUB</div><h1>Repository Operations Center</h1><p>Branch comparison · commit history · file explorer · aggregated CI status.</p></div><span class="tag">GET ONLY / READ ONLY</span></div>'+shell());document.getElementById('ghwLoad').addEventListener('click',loadRepository);document.getElementById('ghwRepo').addEventListener('keydown',e=>{if(e.key==='Enter')loadRepository();});document.getElementById('ghwCompare').addEventListener('click',compareBranches);loadInventory();loadRepository();}
+function render(){const root=document.getElementById('view');mountHtml(root,'<div class="page-head"><div><div class="eyebrow">DEVELOPMENT / GITHUB</div><h1>Repository Operations Center</h1><p>Branch comparison · commit history · file explorer · aggregated CI status.</p></div><span class="tag">GET ONLY / READ ONLY</span></div>'+shell());document.getElementById('ghwLoad').addEventListener('click',loadRepository);document.getElementById('ghwRepo').addEventListener('keydown',e=>{if(e.key==='Enter')loadRepository();});document.getElementById('ghwCompare').addEventListener('click',compareBranches);loadInventory();loadRepository();}
 function register(){
  if(!window.OCodeNavigation||typeof window.OCodeNavigation.registerPage!=='function'){setTimeout(register,50);return;}
  window.OCodeNavigation.registerPage({id:'github-workspace',title:'GitHub Workspace',label:'GitHub Workspace',icon:'⌘',group:'DEVELOPMENT',render:function(){setTimeout(render,0);return '<div class="empty">Loading GitHub Workspace…</div>'; }});
