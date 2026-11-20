@@ -222,6 +222,17 @@ async function listJobs(request, env) {
   return reply({ jobs: rows.results || [] }, 200);
 }
 
+async function listEvents(request, env) {
+  const url = new URL(request.url);
+  const limit = Math.max(1, Math.min(200, Number(url.searchParams.get("limit")) || 100));
+  const jobId = url.searchParams.get("jobId");
+  const statement = jobId
+    ? env.DB.prepare("SELECT event_id,job_id,event_type,status,runner_id,details_json,created_at FROM autorun_job_events WHERE job_id=? ORDER BY event_id DESC LIMIT ?").bind(jobId, limit)
+    : env.DB.prepare("SELECT event_id,job_id,event_type,status,runner_id,details_json,created_at FROM autorun_job_events ORDER BY event_id DESC LIMIT ?").bind(limit);
+  const rows = await statement.all();
+  return reply({ events: rows.results || [] }, 200);
+}
+
 export async function handleDurableQueueRequest(request, env) {
   const path = new URL(request.url).pathname;
   if (!path.startsWith("/api/v1/autorun/queue/")) return null;
@@ -237,6 +248,7 @@ export async function handleDurableQueueRequest(request, env) {
     if (request.method === "POST" && path === "/api/v1/autorun/queue/complete") return await complete(request, env);
     if (request.method === "POST" && path === "/api/v1/autorun/queue/cancel") return await cancel(request, env);
     if (request.method === "GET" && path === "/api/v1/autorun/queue/jobs") return await listJobs(request, env);
+    if (request.method === "GET" && path === "/api/v1/autorun/queue/events") return await listEvents(request, env);
     return reply({ error: "not_found" }, 404);
   } catch (error) {
     return reply({ error: error instanceof Error ? error.message : "queue_error" }, error?.status || 500);
