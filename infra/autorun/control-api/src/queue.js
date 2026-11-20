@@ -103,11 +103,11 @@ async function claim(request, env) {
 
   await env.DB.prepare(
     `UPDATE autorun_jobs
-       SET status=CASE WHEN attempt < max_attempts THEN 'queued' ELSE 'failed' END,
+       SET status=CASE WHEN cancel_requested=1 THEN 'cancelled' WHEN attempt < max_attempts THEN 'queued' ELSE 'failed' END,
            available_at=?, lease_owner=NULL, lease_token_hash=NULL, lease_expires_at=NULL,
            heartbeat_at=NULL, updated_at=?,
            error=CASE WHEN attempt < max_attempts THEN 'lease_expired_recovered' ELSE 'lease_expired_retry_budget_exhausted' END,
-           finished_at=CASE WHEN attempt < max_attempts THEN NULL ELSE ? END
+           finished_at=CASE WHEN cancel_requested=1 OR attempt >= max_attempts THEN ? ELSE NULL END
      WHERE status IN ('leased','running') AND lease_expires_at IS NOT NULL AND lease_expires_at <= ?`,
   ).bind(now, now, now, now).run();
 
@@ -171,6 +171,8 @@ async function complete(request, env) {
   const outcome = String(body.outcome || "");
   if (!["succeeded","failed","timed_out"].includes(outcome)) return reply({ error: "invalid_outcome" }, 400);
   const now = nowIso();
+  const prior = await env.DB.prepare("SELECT attempt,cancel_requested FROM autorun_jobs WHERE job_id=? AND lease_owner=? AND lease_token_hash=? AND status IN ('leased','running') AND lease_expires_at>?").bind(lease.jobId, lease.runnerId, lease.tokenHash, now).first();
+  if (!prior) return reply({ error: "lease_lost" }, 409);
   const resultJson = JSON.stringify(body.result ?? {}).slice(0, 24_000);
   const error = String(body.error || "").slice(0, 2_000);
   const result = await env.DB.prepare(
@@ -186,7 +188,7 @@ async function complete(request, env) {
          result_json=?,error=?,updated_at=?,
          finished_at=CASE WHEN cancel_requested=1 OR ?='succeeded' OR attempt>=max_attempts THEN ? ELSE NULL END
      WHERE job_id=? AND lease_owner=? AND lease_token_hash=? AND status IN ('leased','running') AND lease_expires_at>?`,
-  ).bind(outcome, outcome, outcome, new Date(Date.now() + Math.min(900_000, 30_000 * (2 ** 1))).toISOString(),
+  ).bind(outcome, outcome, outcome, new Date(Date.now() + Math.min(900_000, 30_000 * (2 ** Math.max(0, Number(prior.attempt) - 1)))).toISOString(),
     resultJson, error, now, outcome, now, lease.jobId, lease.runnerId, lease.tokenHash, now).run();
   if (!result.meta?.changes) return reply({ error: "lease_lost" }, 409);
   const saved = await env.DB.prepare("SELECT status,attempt FROM autorun_jobs WHERE job_id=?").bind(lease.jobId).first();
