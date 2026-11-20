@@ -23,7 +23,7 @@ This compose file is a **local staging bootstrap**, not a production deployment.
 Changing `FORGEJO_DB_PASSWORD` in the shell alone does not rotate the password inside an already-initialized PostgreSQL volume. Rotate both sides deliberately:
 
 1. Connect interactively: `docker compose -f infra/autorun/docker-compose.yml exec database psql -U forgejo -d postgres`.
-2. At the `psql` prompt, run `\\password forgejo` and enter the new password when prompted (do not place it in shell history or command arguments).
+2. At the `psql` prompt, run `\password forgejo` and enter the new password when prompted (do not place it in shell history or command arguments).
 3. Exit `psql`, update `FORGEJO_DB_PASSWORD` in the host secret manager/environment, then recreate only the Forgejo service: `docker compose -f infra/autorun/docker-compose.yml up -d --no-deps git`.
 4. Verify Forgejo health and database connectivity. Keep a tested backup before rotating credentials.
 
