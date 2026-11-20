@@ -6,6 +6,8 @@ on:
       - "infra/autorun/control-api/**"
       - "infra/autorun/migrations/**"
       - "scripts/autorun-queue.test.mjs"
+      - "infra/autorun/migrations/**"
+      - "scripts/autorun-queue.test.mjs"
       - ".github/workflows/autorun-control-api-tests.yml"
       - ".github/workflows/autorun-events.yml"
       - "scripts/autorun-control-api.test.mjs"
@@ -13,6 +15,8 @@ on:
     branches: [main]
     paths:
       - "infra/autorun/control-api/**"
+      - "infra/autorun/migrations/**"
+      - "scripts/autorun-queue.test.mjs"
       - ".github/workflows/autorun-control-api-tests.yml"
       - ".github/workflows/autorun-events.yml"
       - "scripts/autorun-control-api.test.mjs"
