@@ -1,0 +1,31 @@
+name: Auto Fix Code (No API Key)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      # Ví dụ cho dự án Node.js / JS / TS (tự động sửa lỗi ESLint & Prettier)
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npx eslint . --fix || true
+
+      # Tự động commit và đẩy bản sửa lỗi ngược lại repo
+      - name: Commit bản tự sửa lỗi
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: AI/Bot tự động sửa lỗi code"
