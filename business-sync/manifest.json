@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceRepository": "OCodejs/OCODEJS",
+  "sourceCommit": "c644404c7cd7e966fd66e8b0a05504f246a8229c",
+  "organization": {
+    "name": "OCodeJS",
+    "repository": "OCodejs/OCODEJS",
+    "website": "https://github.com/OCodejs",
+    "description": "OCodeJS open-source software organization and product portfolio."
+  },
+  "projects": [
+    {
+      "id": "ocode-js",
+      "name": "OCode.js",
+      "kind": "library",
+      "status": "active-development",
+      "description": "A lightweight, dependency-free JavaScript and TypeScript utility toolkit for modern web applications.",
+      "repository": "https://github.com/OCodejs/OCODEJS",
+      "documentation": "https://github.com/OCodejs/OCODEJS#readme",
+      "packageName": "ocode-js",
+      "packageVersion": "0.1.0",
+      "source": "package.json",
+      "visibility": "public"
+    }
+  ],
+  "articles": [
+    {
+      "id": "security-best-practices-for-your-project",
+      "title": "Security Best Practices for your Project",
+      "description": "Strengthen your project's future by building trust through essential security practices — from MFA and code scanning to safe dependency management and private vulnerability reporting.",
+      "language": "en",
+      "sourcePath": "_articles/security-best-practices-for-your-project.md",
+      "sourceUrl": "https://github.com/OCodejs/OCODEJS/blob/main/_articles/security-best-practices-for-your-project.md",
+      "contentPath": "articles/security-best-practices-for-your-project.md"
+    }
+  ],
+  "syncPolicy": "Generated from public source; reviewed by Draft PR; no secrets or private data."
+}

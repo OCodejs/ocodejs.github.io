@@ -1,0 +1,32 @@
+name: Business Content Sync Validation
+
+on:
+  pull_request:
+    paths:
+      - "business/**"
+      - "business-sync/**"
+      - "scripts/sync-business-content.mjs"
+      - ".github/workflows/business-content-sync.yml"
+      - ".github/workflows/business-content-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check importer syntax
+        run: node --check scripts/sync-business-content.mjs
+      - name: Import and validate public source content
+        env:
+          OCODEJS_SOURCE_REF: feat/business-content-source-20261121
+        run: node scripts/sync-business-content.mjs
+      - name: Validate generated manifest
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('business-sync/manifest.json','utf8')); if(m.sourceRepository!=='OCodejs/OCODEJS'||!Array.isArray(m.projects)||!Array.isArray(m.articles)) process.exit(1); console.log('Validated '+m.projects.length+' projects and '+m.articles.length+' articles');"
