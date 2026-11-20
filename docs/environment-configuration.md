@@ -22,27 +22,43 @@ The Control API does not require a database for its current read-only routes. Do
 
 The Worker remains functional when `OBSERVABILITY` is absent. When present, it emits one data point per request. The event writer does not expose a public metrics query endpoint; dashboards, alert evaluation and durable audit exploration remain separate follow-up work. Do not attach this binding to Production as part of this Preview change.
 
-## Account Portal Auth.js — isolated Preview
+## Account Portal Auth.js — separate Vercel Preview
 
-The following values are required before `GET /api/health` can report `ready`:
+The canonical Auth.js application is `OCodejs/mcp.auth.ocodejs`, deployed separately from the static GitHub Pages frontend through Vercel project `mcp-auth-ocodejs`. GitHub Pages must never receive passwords, OAuth client secrets, database URLs, provider tokens or session cookies.
+
+| Name | Secret? | Scope / purpose |
+|---|---:|---|
+| `DATABASE_URL` | Yes | Direct PostgreSQL URL for Prisma CLI and schema validation; Preview target only |
+| `DATABASE_URL_POOLED` | Yes | Pooled PostgreSQL URL used by the serverless runtime |
+| `AUTH_SECRET` | Yes | Auth.js signing and encryption secret |
+| `AUTH_URL` | No | Exact verified Vercel Preview origin |
+| `AUTH_PREVIEW_DB_PUSH` | No | Set to `true` only for an explicitly approved Preview schema initialization; never Production |
+| `AUTH_GITHUB_ID` | No | GitHub OAuth client ID |
+| `AUTH_GITHUB_SECRET` | Yes | GitHub OAuth client secret |
+| `AUTH_GOOGLE_ID` | No | Google OAuth client ID |
+| `AUTH_GOOGLE_SECRET` | Yes | Google OAuth client secret |
+
+Optional integrations:
 
 | Name | Secret? | Purpose |
 |---|---:|---|
-| `DATABASE_URL` | Yes | Dedicated Preview PostgreSQL connection string |
-| `AUTH_SECRET` | Yes | Auth.js signing/encryption secret |
-| `AUTH_URL` | No | Exact Preview origin |
-| `AUTH_GITHUB_ID` | No | GitHub OAuth application client ID |
-| `AUTH_GITHUB_SECRET` | Yes | GitHub OAuth application client secret |
-| `AUTH_GOOGLE_ID` | No | Google OAuth application client ID |
-| `AUTH_GOOGLE_SECRET` | Yes | Google OAuth application client secret |
+| `AUTH_OIDC_ISSUER` | No | Allowlisted upstream OIDC issuer |
+| `AUTH_OIDC_ID` | No | Upstream OIDC client ID |
+| `AUTH_OIDC_SECRET` | Yes | Upstream OIDC client secret |
+| `TOKEN_VAULT_URL` | No | Dedicated Preview Token Vault endpoint |
+| `TOKEN_VAULT_ASSERTION_SECRET` | Yes | Server-to-server HMAC assertion key; Vercel Preview and the Staging Worker only |
 
-All seven values must be configured in the Preview environment only. The Preview needs its own PostgreSQL database; do not reuse the production database or the separate OCodeJS CLI D1 database. Configure provider callback URLs only after the final Preview hostname is fixed:
+The Auth repository documents an `auth_preview` schema on its Auth-only PostgreSQL instance. This is logical schema isolation, not a separate physical database. Confirm the actual Preview database resource and schema target before setting `AUTH_PREVIEW_DB_PUSH=true`; do not reuse Production, the CLI D1 database or another application's database.
 
-- `/api/auth/callback/github`
-- `/api/auth/callback/google`
+At the latest audit, project-level `DATABASE_URL` and `DATABASE_URL_POOLED` variables have `development`, `preview` and `production` targets. Branch-scoped Auth.js secrets and Preview flags were present only for older branches; no branch-specific Auth.js variables were returned for `feat/auth-platform-phase1-security-audit`. Variable values were not read. Treat physical database separation as unverified and do not run schema initialization until the exact Preview target and branch-scoped settings are confirmed.
 
-The current Preview build is protected by the existing Cloudflare Access policy. It has no database or OAuth secrets configured; sign-in remains disabled and end-to-end authentication is unverified.
+Configure OAuth callback URLs only after the current Preview hostname is verified:
 
+- `https://<VERIFIED_PREVIEW_HOST>/api/auth/callback/github`
+- `https://<VERIFIED_PREVIEW_HOST>/api/auth/callback/google`
+
+The latest observed READY Vercel Preview belongs to an older feature branch. Current-mainline Preview, database readiness, OAuth callbacks and session flows remain unverified. Keep sign-in disabled until the Preview release gate passes.
+ 
 ## MCP staging Worker
 
 - The Control API destination is a fixed source constant pointing to the OCode.js staging Control API.
