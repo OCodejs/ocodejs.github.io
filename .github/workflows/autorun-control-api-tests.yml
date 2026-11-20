@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "infra/autorun/control-api/**"
+      - "infra/autorun/migrations/**"
+      - "scripts/autorun-queue.test.mjs"
       - ".github/workflows/autorun-control-api-tests.yml"
       - ".github/workflows/autorun-events.yml"
       - "scripts/autorun-control-api.test.mjs"
@@ -31,7 +33,7 @@ jobs:
         with:
           node-version: 22
       - name: Test AutoRun Control API and direct OIDC reporting
-        run: node --test scripts/autorun-control-api.test.mjs
+        run: node --experimental-sqlite --test scripts/autorun-control-api.test.mjs scripts/autorun-queue.test.mjs
 
   report:
     if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
