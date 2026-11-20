@@ -12,18 +12,34 @@
 - This probe is not an OAuth login, PAT issuance or user-session test.
 
 ### OCodeJS Account Portal Auth.js
-- Canonical source: private repository `zskbot/mcp.server.auth`.
-- Auth.js source includes GitHub OAuth, Google OAuth, email/password Credentials, Prisma/PostgreSQL and JWT sessions.
-- A Cloudflare Workers Preview build for branch `feat/auth-account-preview` completed successfully on commit `b25cef3198c3110dd6b3ccc098904c9b2a61c36e` (build `03a68bdf-1e01-4daf-8df5-31891c270a59`). The Preview URL is protected by the existing `Cloudflare Workers Preview URLs` Access policy. The build compiled and deployed, but the runtime health endpoint has not been independently verified.
-- The Preview intentionally has no database or production secrets: Workers Previews do not inherit production settings. A dedicated Preview PostgreSQL database, `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, GitHub OAuth credentials and Google OAuth credentials are still required before the health endpoint can report ready or sign-in can be enabled.
+- Canonical source: public repository [`OCodejs/mcp.auth.ocodejs`](https://github.com/OCodejs/mcp.auth.ocodejs).
+- Runtime: Next.js 15, Auth.js v5, Prisma/PostgreSQL, Google OAuth, GitHub OAuth and email/password Credentials.
+- Vercel project: `mcp-auth-ocodejs` in the connected `ocode-jss` team. The deployment metadata identifies `OCodejs/mcp.auth.ocodejs` as its Git source.
+- Latest observed Preview: [`mcp-auth-ocodejs-fha05e4qc-ocode-jss.vercel.app`](https://mcp-auth-ocodejs-fha05e4qc-ocode-jss.vercel.app), state `READY`, branch `feat/auth-platform-phase1-security-audit`, commit `bd52ef0b70871794af9de9bc909eb758a90e5194`. Vercel SSO protection is enabled for all deployment targets.
+- This is an older branch Preview, not a fresh Preview of current `main`. A READY build proves compilation/deployment only; it does not prove database readiness or authentication flows.
+- Current `main` has a dependency lock mismatch: `package.json` declares `@prisma/adapter-pg@6.19.3` and `pg`, while the `package-lock.json` root still declares `@prisma/adapter-neon@6.19.3` and omits `pg`. Reconcile the lockfile before relying on `npm ci` or creating a fresh Preview.
+- The Auth repository describes Preview isolation through the `auth_preview` PostgreSQL schema on the Auth-only database instance. This is schema-level isolation, not a separate physical database. Verify the actual Preview database target before any schema initialization; never point Preview at Production or another application's database.
+- `GET /api/health` checks required configuration and a read-only PostgreSQL `SELECT 1`. It is a readiness signal, not proof of registration, OAuth callbacks, sessions or logout.
+- Required environment variable names and Preview-only settings are documented in [Environment Configuration](environment-configuration.md) and the Auth repository's [`.env.example`](https://github.com/OCodejs/mcp.auth.ocodejs/blob/main/.env.example). No secret values belong in this repository.
 
-## CI / Preview status
-- GitHub Actions in the private Auth repository still reports `startup_failure` with zero jobs; this is a runner/workflow startup blocker, not a reported source-code failure. Separately, Cloudflare Workers Builds successfully ran `npm run build:cloudflare`, Prisma Client generation, Next.js compilation, lint/type checks, static page generation, OpenNext bundling and the Preview deploy command.
-- Vercel project discovery for the private repository previously returned `repo_not_found`; the isolated Cloudflare Workers Preview is the current staging target. The build completed successfully, but HTTP route verification is blocked by the connected runner's outbound-host restriction.
-- No credentials or secrets are stored in this repository.
+## GitHub Pages and Vercel project boundary
+- `OCodejs/ocodejs.github.io` remains the static GitHub Pages frontend. It must not host Auth.js handlers, receive passwords, store OAuth tokens or own user sessions.
+- The Vercel project `ocodejs-profile` is currently linked to this Pages repository but is configured as Next.js. Its latest observed Production build fails because the repository root has no `package.json` (`ENOENT /vercel/path0/package.json`). Do not treat that project as the Account Portal or as proof that GitHub Pages is deployed.
+- The Account Portal has its own Vercel project, `mcp-auth-ocodejs`. Do not connect the Control Center account UI to the CLI PAT endpoints or infer Auth.js health from the Control API identity registry.
+- GitHub status links for some Vercel checks point to team slugs not present in the connected Vercel team list. Their build-rate-limit status cannot be reconciled from the current `ocode-jss` team connection alone.
+
+## Preview release gate
+1. Reconcile `package.json` and `package-lock.json`; do not hand-edit the lockfile or dispatch repeated builds.
+2. Confirm the exact Vercel Preview project, branch and hostname. Keep Vercel SSO protection enabled.
+3. Configure only Preview-scoped database and Auth.js variables. The Preview schema initialization flag `AUTH_PREVIEW_DB_PUSH` must never be enabled in Production.
+4. Confirm `GET /api/health` returns `200 ready` against the intended isolated Preview database.
+5. Verify registration, duplicate-email handling, invalid credentials, GitHub and Google callbacks, session persistence, profile creation, logout and negative authorization cases.
+6. Keep sign-in controls disabled until all checks pass on the current mainline Preview.
 
 ## Integration boundary
-The CLI OAuth/PAT Worker is not the Account Portal. Do not connect the Control Center account form to CLI PAT endpoints. Keep sign-in controls disabled until Preview registration, login, OAuth callbacks, session persistence and logout are tested end-to-end.
+- GitHub Pages is a static frontend. It may link to the separate Account Portal after a current Preview hostname is verified, but it must not proxy credentials or session cookies.
+- CLI OAuth/PAT and Account Portal Auth.js are different identity services with separate sessions and authorization boundaries.
+- Account linking must require proof of control of both identities; never merge accounts solely because email strings match.
 
 ## Safety
-No production Worker, DNS route, OAuth app, database, secret or account data is changed by this integration.
+No Production Worker, DNS route, OAuth app, database, secret or account data is changed by this integration.
