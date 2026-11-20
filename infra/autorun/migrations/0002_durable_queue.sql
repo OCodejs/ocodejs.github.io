@@ -60,3 +60,11 @@ BEGIN
   INSERT INTO autorun_job_events(job_id,event_type,status,runner_id,details_json,created_at)
   VALUES(NEW.job_id,'status_changed',NEW.status,COALESCE(NEW.lease_owner,''),json_object('from',OLD.status,'attempt',NEW.attempt),NEW.updated_at);
 END;
+
+CREATE TRIGGER IF NOT EXISTS trg_autorun_jobs_cancel_event
+AFTER UPDATE OF cancel_requested ON autorun_jobs
+WHEN OLD.cancel_requested = 0 AND NEW.cancel_requested = 1
+BEGIN
+  INSERT INTO autorun_job_events(job_id,event_type,status,runner_id,details_json,created_at)
+  VALUES(NEW.job_id,'cancel_requested',NEW.status,COALESCE(NEW.lease_owner,''),'{}',NEW.updated_at);
+END;
