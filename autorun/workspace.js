@@ -24,7 +24,7 @@
   const badge = (state) => '<span class="state ' + (state==='succeeded'||state==='OPEN'?'ok':state==='failed'?'warn':'') + '">' + escapeHTML(state.toUpperCase()) + '</span>';
   const table = (headers, rows) => '<div class="table-wrap"><table class="table"><thead><tr>' + headers.map(h=>'<th>'+h+'</th>').join('') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
   function render() {
-    return '<div class="notice"><strong>STAGING DESIGN PREVIEW</strong> — dữ liệu bên dưới là mẫu minh họa, không phải repository, job, PR hoặc runner đang hoạt động. API và Git server chưa được triển khai.</div>' +
+    return '<style>.autorun-view .panel,.autorun-view .stat,.autorun-view .notice,.autorun-view .demo-pill,.autorun-view .state,.autorun-view .tag{border-radius:0!important}</style><div class="autorun-view"><div class="notice"><strong>STAGING DESIGN PREVIEW</strong> — dữ liệu bên dưới là mẫu minh họa, không phải repository, job, PR hoặc runner đang hoạt động. API và Git server chưa được triển khai.</div>' +
       '<div class="page-head"><div><div class="eyebrow">PLATFORM / GIT + CI</div><h1>OCodeJS AutoRun</h1><p>Git hosting, Pull Requests, queue orchestration và isolated build runners.</p></div><span class="demo-pill">● NOT CONNECTED</span></div>' +
       '<div class="grid stats">' + [['Repositories','03','Sample catalog'],['Open Pull Requests','02','Sample records'],['Queued Jobs','01','No queue binding'],['Online Runners','0','No runner provisioned']].map(x=>'<div class="stat"><div class="stat-top">'+x[0]+'</div><div class="stat-value">'+x[1]+'</div><div class="stat-foot">'+x[2]+'</div></div>').join('') + '</div>' +
       '<div class="grid cols"><section class="panel"><div class="panel-head"><strong>RECENT PIPELINE RUNS</strong><small>DEMO DATA</small></div>' +
@@ -35,7 +35,7 @@
       '<div style="height:14px"></div><section class="panel"><div class="panel-head"><strong>PULL REQUESTS</strong><small>REVIEW + REQUIRED CHECKS</small></div>' +
       table(['ID','Title','Repository','Head branch','State','Checks'],sample.prs.map(p=>'<tr><td><code>'+p.id+'</code></td><td>'+p.title+'</td><td>'+p.repo+'</td><td><code>'+p.branch+'</code></td><td>'+badge(p.state)+'</td><td>'+badge(p.checks)+'</td></tr>')) + '</section>' +
       '<div style="height:14px"></div><div class="grid cards">' +
-      [['Git Authentication','SSH keys, HTTPS tokens, scoped service identities, MFA and audit events.'],['AutoRun Queue','Idempotent job creation, bounded retries, cancellation and per-repository concurrency.'],['Artifacts & Logs','Short-lived signed downloads, retention limits and redacted structured logs.']].map(x=>'<article class="panel tile"><h3>'+x[0]+'</h3><p>'+x[1]+'</p><span class="tag">DESIGN</span></article>').join('') + '</div>';
+      [['Git Authentication','SSH keys, HTTPS tokens, scoped service identities, MFA and audit events.'],['AutoRun Queue','Idempotent job creation, bounded retries, cancellation and per-repository concurrency.'],['Artifacts & Logs','Short-lived signed downloads, retention limits and redacted structured logs.']].map(x=>'<article class="panel tile"><h3>'+x[0]+'</h3><p>'+x[1]+'</p><span class="tag">DESIGN</span></article>').join('') + '</div></div>';
   }
   if (window.OCodeNavigation && typeof window.OCodeNavigation.registerPage === 'function') {
     window.OCodeNavigation.registerPage({id:'autorun',title:'OCodeJS AutoRun',icon:'↯',group:'PLATFORM',render});
