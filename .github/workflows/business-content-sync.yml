@@ -47,7 +47,7 @@ jobs:
         id: changes
         shell: bash
         run: |
-          if git diff --quiet -- business-sync; then
+          if [[ -z "$(git status --porcelain -- business-sync)" ]]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No business content changes."
             exit 0
