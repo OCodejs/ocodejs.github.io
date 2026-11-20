@@ -12,23 +12,31 @@ const workerSource = await readFile(
 const { default: worker } = await import(
   `data:text/javascript;base64,${Buffer.from(workerSource).toString("base64")}`
 );
-
-const workflowPath = new URL("../.github/workflows/autorun-events.yml", import.meta.url);
-const workflowSource = await readFile(workflowPath, "utf8");
+const workflowSource = await readFile(
+  new URL("../.github/workflows/autorun-control-api-tests.yml", import.meta.url),
+  "utf8",
+);
 const originalFetch = globalThis.fetch;
+const repository = "OCodejs/ocodejs.github.io";
+const repositoryId = "1449322239";
+const workflowRef =
+  "OCodejs/ocodejs.github.io/.github/workflows/autorun-control-api-tests.yml@refs/heads/main";
 let keyPair;
 let jwks;
 let dbCalls;
 
 const env = {
-  ALLOWED_REPOSITORY: "OCodejs/ocodejs.github.io",
-  ALLOWED_WORKFLOW_REF:
-    "OCodejs/ocodejs.github.io/.github/workflows/autorun-events.yml@refs/heads/main",
+  ALLOWED_REPOSITORY: repository,
+  ALLOWED_REPOSITORY_ID: repositoryId,
+  ALLOWED_WORKFLOW_REF: workflowRef,
   DB: {
     prepare(sql) {
       return {
+        sql,
         bind(...values) {
           return {
+            sql,
+            values,
             async run() {
               dbCalls.push({ sql, values, operation: "run" });
               return { success: true };
@@ -39,11 +47,15 @@ const env = {
             },
             async all() {
               dbCalls.push({ sql, values, operation: "all" });
-              return { results: [{ run_id: "123", status: "in_progress" }] };
+              return { results: [{ run_id: "123", status: "completed" }] };
             },
           };
         },
       };
+    },
+    async batch(statements) {
+      dbCalls.push({ operation: "batch", statements });
+      return statements.map(() => ({ success: true }));
     },
   },
 };
@@ -61,12 +73,13 @@ async function issueToken(overrides = {}) {
     iat: now,
     nbf: now - 1,
     exp: now + 300,
-    repository: "OCodejs/ocodejs.github.io",
-    repository_id: "1449322239",
-    workflow_ref:
-      "OCodejs/ocodejs.github.io/.github/workflows/autorun-events.yml@refs/heads/main",
-    event_name: "workflow_run",
+    repository,
+    repository_id: repositoryId,
+    workflow_ref: workflowRef,
+    event_name: "push",
     ref: "refs/heads/main",
+    run_id: "123",
+    run_attempt: "1",
     actor: "zskbot",
     ...overrides,
   };
@@ -83,20 +96,20 @@ async function issueToken(overrides = {}) {
 function eventPayload(overrides = {}) {
   return {
     action: "completed",
-    workflow_run: {
+    repository: { id: Number(repositoryId), full_name: repository },
+    run: {
       id: 123,
       run_attempt: 1,
-      name: "Control API checks",
+      name: "OCodeJS AutoRun - Test and Report",
       event: "push",
       head_branch: "main",
       head_sha: "a".repeat(40),
       status: "completed",
       conclusion: "success",
       html_url: "https://github.com/OCodejs/ocodejs.github.io/actions/runs/123",
-      created_at: "2026-11-20T00:00:00Z",
-      run_started_at: "2026-11-20T00:00:01Z",
+      created_at: null,
+      run_started_at: null,
       updated_at: "2026-11-20T00:00:02Z",
-      repository: { id: 1449322239, full_name: "OCodejs/ocodejs.github.io" },
       ...overrides,
     },
   };
@@ -143,16 +156,16 @@ beforeEach(() => {
   dbCalls = [];
 });
 
-test("workflow bridge is gated by workflow_run and grants only read + OIDC permissions", () => {
-  assert.match(workflowSource, /workflow_run:/);
-  assert.match(workflowSource, /types:\s*\[requested, in_progress, completed\]/);
-  assert.match(workflowSource, /contents:\s*read/);
+test("one workflow runs PR tests and reports trusted main pushes without workflow_run", () => {
+  assert.match(workflowSource, /pull_request:/);
+  assert.match(workflowSource, /push:/);
+  assert.match(workflowSource, /branches:\s*\[main\]/);
+  assert.match(workflowSource, /needs:\s*\[test\]/);
+  assert.match(workflowSource, /github\.event_name == 'push'/);
+  assert.match(workflowSource, /github\.ref == 'refs\/heads\/main'/);
   assert.match(workflowSource, /id-token:\s*write/);
-  assert.match(
-    workflowSource,
-    /workflow_run\.repository\.full_name == github\.repository/,
-  );
-  assert.match(workflowSource, /audience.*ocodejs-autorun-staging/s);
+  assert.match(workflowSource, /contents:\s*read/);
+  assert.doesNotMatch(workflowSource, /workflow_run/);
 });
 
 test("GET /health/live returns a no-store health response", async () => {
@@ -192,9 +205,11 @@ test("event ingestion rejects invalid OIDC identity claims", async (t) => {
     ["issuer", { iss: "https://attacker.example" }],
     ["audience", { aud: "wrong-audience" }],
     ["repository", { repository: "attacker/repo" }],
+    ["repository ID", { repository_id: "999" }],
     ["workflow ref", { workflow_ref: "attacker/workflow.yml@refs/heads/main" }],
-    ["event type", { event_name: "push" }],
-    ["ref", { ref: "refs/heads/feature" }],
+    ["legacy workflow_run event", { event_name: "workflow_run" }],
+    ["wrong event", { event_name: "pull_request" }],
+    ["wrong ref", { ref: "refs/heads/feature" }],
     ["expired token", { exp: 1 }],
   ]) {
     await t.test(label, async () => {
@@ -209,31 +224,52 @@ test("event ingestion rejects invalid OIDC identity claims", async (t) => {
   }
 });
 
-test("event ingestion rejects repository ID mismatch", async () => {
-  const payload = eventPayload();
-  payload.workflow_run.repository.id = 999;
+test("event ingestion rejects payload run identity mismatch", async () => {
   const response = await request("/api/v1/autorun/events", {
     method: "POST",
     token: await issueToken(),
-    body: payload,
+    body: eventPayload({ id: 456 }),
   });
-  assert.equal(response.status, 403);
+  assert.equal(response.status, 400);
   assert.equal(dbCalls.length, 0);
 });
 
-test("valid workflow_run event is persisted to both D1 tables", async () => {
+test("valid direct run result is persisted atomically to both D1 tables", async () => {
   const response = await request("/api/v1/autorun/events", {
     method: "POST",
     token: await issueToken(),
     body: eventPayload(),
   });
   assert.equal(response.status, 202);
-  assert.equal((await response.json()).ok, true);
-  assert.equal(dbCalls.length, 2);
-  assert.match(dbCalls[0].sql, /INSERT INTO autorun_runs/);
-  assert.match(dbCalls[1].sql, /INSERT OR IGNORE INTO autorun_events/);
-  assert.equal(dbCalls[1].values[0], "123:1:completed");
-  assert.equal(dbCalls[1].values[5], env.ALLOWED_WORKFLOW_REF);
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.runId, "123");
+  assert.equal(body.conclusion, "success");
+  assert.equal(dbCalls.length, 1);
+  assert.equal(dbCalls[0].operation, "batch");
+  assert.equal(dbCalls[0].statements.length, 2);
+  assert.match(dbCalls[0].statements[0].sql, /INSERT INTO autorun_runs/);
+  assert.match(dbCalls[0].statements[1].sql, /INSERT OR IGNORE INTO autorun_events/);
+  assert.equal(dbCalls[0].statements[1].values[0], "123:1:completed");
+  assert.equal(dbCalls[0].statements[1].values[5], workflowRef);
+});
+
+test("event ingestion rejects invalid status and conclusion without writing", async () => {
+  const invalidStatus = await request("/api/v1/autorun/events", {
+    method: "POST",
+    token: await issueToken(),
+    body: eventPayload({ status: "in_progress" }),
+  });
+  assert.equal(invalidStatus.status, 400);
+  assert.equal(dbCalls.length, 0);
+
+  const invalidConclusion = await request("/api/v1/autorun/events", {
+    method: "POST",
+    token: await issueToken(),
+    body: eventPayload({ conclusion: "made_up" }),
+  });
+  assert.equal(invalidConclusion.status, 400);
+  assert.equal(dbCalls.length, 0);
 });
 
 test("event ingestion rejects malformed payloads without writing", async () => {
