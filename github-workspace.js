@@ -135,8 +135,8 @@ async function loadCi(sha,requestId){
  target.innerHTML='<div class="gh-empty">Loading check-runs and commit statuses…</div>';
  if(!sha){setText('ghwCi','NO SHA');return;}
  const results=await Promise.allSettled([
-  get(repoPath('/commits/'+sha+'/check-runs')),
-  get(repoPath('/commits/'+sha+'/status')),
+  get(repoPath('/commits/'+sha+'/check-runs?per_page=100')),
+  get(repoPath('/commits/'+sha+'/status?per_page=100')),
   get(repoPath('/actions/runs?head_sha='+encodeURIComponent(sha)+'&per_page=8'))
  ]);
  if(requestId!==state.request)return;
@@ -167,7 +167,7 @@ async function loadInventory(){
   const repos=await get('/orgs/'+encodeURIComponent(owner)+'/repos?type=all&sort=updated&per_page=100');
   if(request!==state.inventoryRequest||ownerAtRequest!==(state.repo.split('/')[0]||'OCodejs'))return;
   const rows=Array.isArray(repos)?repos:[];
-  stats.textContent=rows.length+' repositories · '+rows.filter(x=>x.private).length+' private · '+rows.filter(x=>!x.private).length+' public · organization scope';
+  stats.textContent=rows.length+' visible public repositories · organization scope (private repositories require server-side authorization)';
   body.innerHTML=rows.map(r=>'<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(r.html_url))+'">'+esc(r.full_name)+'</a><div class="gh-muted">'+esc(r.description||'No description')+'</div></td><td>'+esc(r.visibility|| (r.private?'private':'public'))+'</td><td>'+esc(r.default_branch||'—')+'</td><td>'+esc(r.language||'—')+'</td><td>'+esc(date(r.updated_at))+'</td></tr>').join('')||'<tr><td colspan="5">No repositories returned.</td></tr>';
  }catch(error){if(request===state.inventoryRequest){stats.textContent='Inventory unavailable: '+error.message;body.innerHTML='<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>';}}
 }
