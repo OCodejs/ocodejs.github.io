@@ -19,7 +19,7 @@ This phase tracks GitHub Actions workflow runs; it does not replace GitHub Actio
 2. Apply `infra/autorun/migrations/0001_autorun.sql` to the dedicated database.
 3. Bind it as `DB` to a new Worker named `ocodejs-autorun-control-staging` using the config in `infra/autorun/control-api/wrangler.jsonc`.
 4. Keep `workers.dev` staging hostname only. Do not add a custom domain or route.
-5. Set repository variable `AUTORUN_CONTROL_API` to the resulting Worker URL. It is a URL, not a secret.
+5. The staging Worker endpoint is `https://ocodejs-autorun-control-staging.ocodejs-df1.workers.dev`; the workflow uses this public URL directly. It is not a secret.
 6. Enable the workflow on the default branch. No PAT, API key, long-lived runner credential or secret is needed for the OIDC event bridge.
 7. Verify `GET /health/live`, `GET /api/v1/autorun/summary`, then run a harmless workflow and confirm it appears in the dashboard.
 
