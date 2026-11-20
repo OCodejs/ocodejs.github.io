@@ -1,20 +1,28 @@
-name: AutoRun Control API tests
+name: OCodeJS AutoRun - Test and Report
 
 on:
   pull_request:
     paths:
       - "infra/autorun/control-api/**"
-      - ".github/workflows/autorun-events.yml"
       - ".github/workflows/autorun-control-api-tests.yml"
+      - ".github/workflows/autorun-events.yml"
+      - "scripts/autorun-control-api.test.mjs"
+  push:
+    branches: [main]
+    paths:
+      - "infra/autorun/control-api/**"
+      - ".github/workflows/autorun-control-api-tests.yml"
+      - ".github/workflows/autorun-events.yml"
       - "scripts/autorun-control-api.test.mjs"
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,5 +30,83 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Test AutoRun Control API and OIDC bridge
+      - name: Test AutoRun Control API and direct OIDC reporting
         run: node --test scripts/autorun-control-api.test.mjs
+
+  report:
+    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: [test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      id-token: write
+    steps:
+      - name: Publish this workflow result to OCodeJS Control API
+        env:
+          API_BASE: https://ocodejs-autorun-control-staging.ocodejs-df1.workers.dev
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+          EVENT_NAME: ${{ github.event_name }}
+          BRANCH: ${{ github.ref_name }}
+          HEAD_SHA: ${{ github.sha }}
+          REPOSITORY: ${{ github.repository }}
+          REPOSITORY_ID: ${{ github.repository_id }}
+          TEST_RESULT: ${{ needs.test.result }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.API_BASE;
+          if (!base) throw new Error("API_BASE is not configured");
+
+          const tokenUrl = new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+          tokenUrl.searchParams.set("audience", "ocodejs-autorun-staging");
+          const tokenResponse = await fetch(tokenUrl, {
+            headers: { authorization: `Bearer ${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}` }
+          });
+          if (!tokenResponse.ok) {
+            throw new Error(`GitHub OIDC token request failed: HTTP ${tokenResponse.status}`);
+          }
+          const { value } = await tokenResponse.json();
+
+          const runId = process.env.RUN_ID;
+          const runAttempt = Number(process.env.RUN_ATTEMPT || 1);
+          const repository = process.env.REPOSITORY;
+          const result = process.env.TEST_RESULT;
+          const conclusion = result === "success" ? "success" : result;
+          const payload = {
+            action: "completed",
+            repository: {
+              id: Number(process.env.REPOSITORY_ID),
+              full_name: repository
+            },
+            run: {
+              id: Number(runId),
+              run_attempt: runAttempt,
+              name: process.env.WORKFLOW_NAME,
+              event: process.env.EVENT_NAME,
+              head_branch: process.env.BRANCH,
+              head_sha: process.env.HEAD_SHA,
+              status: "completed",
+              conclusion,
+              html_url: `${process.env.SERVER_URL}/${repository}/actions/runs/${runId}`,
+              created_at: null,
+              run_started_at: null,
+              updated_at: new Date().toISOString()
+            }
+          };
+
+          const response = await fetch(new URL("/api/v1/autorun/events", base), {
+            method: "POST",
+            headers: {
+              authorization: `Bearer ${value}`,
+              "content-type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+          const body = await response.text();
+          if (!response.ok) {
+            throw new Error(`OCodeJS Control API rejected run: HTTP ${response.status} ${body}`);
+          }
+          process.stdout.write(body + "\\n");
+          NODE
