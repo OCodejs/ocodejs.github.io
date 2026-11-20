@@ -21,6 +21,9 @@ function shell(){
  '<div class="gh-note"><b>READ-ONLY MODE</b> · GitHub public REST API · Chỉ thực hiện GET. Không có OAuth, PAT, token input, write action, workflow dispatch hoặc thay đổi repository. Private repository cần cơ chế xác thực và phân quyền server-side trước khi hỗ trợ.</div>'+
  '<section class="gh-panel"><div class="gh-head"><strong>REPOSITORY TARGET</strong><span id="ghwRepoState" class="gh-pill muted">NOT LOADED</span></div><div class="gh-body"><div class="gh-form"><input id="ghwRepo" value="'+esc(state.repo)+'" aria-label="GitHub owner/repository" placeholder="owner/repository"><button id="ghwLoad">Load repository</button><a id="ghwOpenRepo" class="gh-link" target="_blank" rel="noopener noreferrer" href="https://github.com/'+esc(state.repo)+'">Open GitHub ↗</a></div><div id="ghwRepoMeta" class="gh-muted" style="margin-top:10px">Nhập owner/repository public rồi tải dữ liệu.</div></div></section>'+
  '<div class="gh-kpis"><div class="gh-kpi"><span class="gh-muted">DEFAULT BRANCH</span><b id="ghwDefault">—</b></div><div class="gh-kpi"><span class="gh-muted">BRANCHES LOADED</span><b id="ghwBranchCount">—</b></div><div class="gh-kpi"><span class="gh-muted">LATEST COMMIT</span><b id="ghwLatest">—</b></div><div class="gh-kpi"><span class="gh-muted">CI SUMMARY</span><b id="ghwCi">—</b></div></div>'+
+ '<section class="gh-panel"><div class="gh-head"><strong>REPOSITORY INVENTORY</strong><span class="gh-muted">PUBLIC ORGANIZATION REPOSITORIES</span></div><div class="gh-body"><div class="gh-stats" id="ghwInventoryStats">Loading repository inventory…</div><div class="table-wrap"><table class="gh-table"><thead><tr><th>Repository</th><th>Visibility</th><th>Default branch</th><th>Language</th><th>Updated</th></tr></thead><tbody id="ghwInventory"><tr><td colspan="5">Loading…</td></tr></tbody></table></div></div></section>'+
+ '<section class="gh-panel"><div class="gh-head"><strong>PULL REQUEST CENTER</strong><span class="gh-muted">LATEST 30 · ALL STATES</span></div><div class="gh-body"><div class="gh-stats" id="ghwPrStats">Loading pull requests…</div><div class="table-wrap"><table class="gh-table"><thead><tr><th>Pull request</th><th>State</th><th>Review</th><th>Merge</th><th>Checks</th></tr></thead><tbody id="ghwPullRequests"><tr><td colspan="5">Loading…</td></tr></tbody></table></div><p class="gh-muted">Review/check detail được lấy cho tối đa 12 PR mới nhất để giới hạn request và tránh GitHub API rate-limit.</p></div></section>'+
+ '<section class="gh-panel"><div class="gh-head"><strong>SECURITY &amp; PERMISSIONS</strong><span class="gh-pill muted">DESIGN ONLY</span></div><div class="gh-body"><p class="gh-muted">RBAC đề xuất — chưa cấp quyền hoặc bật endpoint ghi.</p><div class="table-wrap"><table class="gh-table"><thead><tr><th>Capability</th><th>Viewer</th><th>Developer</th><th>Admin</th></tr></thead><tbody><tr><td>Read inventory / PR / CI</td><td>Allow</td><td>Allow</td><td>Allow</td></tr><tr><td>Read file contents</td><td>Allow</td><td>Allow</td><td>Allow</td></tr><tr><td>Create branch / commit</td><td>—</td><td>Future</td><td>Future</td></tr><tr><td>Manage PR / request review</td><td>—</td><td>Future</td><td>Future</td></tr><tr><td>Manage App installation / policy</td><td>—</td><td>—</td><td>Future</td></tr><tr><td>Production deploy / secrets</td><td>—</td><td>—</td><td>Separate approval</td></tr></tbody></table></div><div class="gh-note" style="margin-top:12px"><b>GITHUB APP AUTH DESIGN</b><br>1. GitHub App installed only on allowlisted organizations/repositories.<br>2. OAuth user identity linked to server-side RBAC; deny by default.<br>3. App private key and short-lived installation tokens stay server-side; never expose to browser.<br>4. API proxy allowlists methods, paths, repositories and environments; no arbitrary URL forwarding.<br>5. CSRF/state validation, strict origin checks, rate limits, idempotency keys and audit events.<br>6. Write operations separated by capability; require explicit confirmation and step-up approval.<br>7. Audit log is append-only: actor, role, repo, action, target, request ID, timestamp, outcome; redact secrets.</div><div class="gh-muted" style="margin-top:10px">Audit log status: NOT CONNECTED · No authorization or write events are generated in read-only mode. Future schema: event_id, actor_id, role, installation_id, repository_id, action, resource, request_id, timestamp, result, reason.</div></div></section>'+
  '<div class="gh-grid"><section class="gh-panel"><div class="gh-head"><strong>BRANCH COMPARISON</strong><span class="gh-muted">BASE → HEAD</span></div><div class="gh-body"><div class="gh-compare"><select id="ghwBase" aria-label="Base branch"><option>Loading…</option></select><select id="ghwHead" aria-label="Compare branch"><option>Loading…</option></select><button id="ghwCompare">Compare</button></div><div id="ghwCompareResult" class="gh-list" style="margin-top:12px"><div class="gh-empty">Chọn hai branch để xem ahead/behind, commit và file diff.</div></div></div></section>'+
  '<section class="gh-panel"><div class="gh-head"><strong>CI STATUS OVERVIEW</strong><span class="gh-muted">LATEST DEFAULT BRANCH SHA</span></div><div class="gh-body"><div id="ghwCiDetail" class="gh-list"><div class="gh-empty">Chưa tải CI status.</div></div></div></section></div>'+
  '<div class="gh-grid"><section class="gh-panel"><div class="gh-head"><strong>COMMIT HISTORY</strong><span class="gh-muted">LATEST 20</span></div><div class="gh-body"><div id="ghwHistory" class="gh-list"><div class="gh-empty">Chưa tải commit history.</div></div></div></section>'+
@@ -53,7 +56,7 @@ async function loadRepository(){
   if(id!==state.request)return;
   const latest=commits[0];setText('ghwLatest',latest?short(latest.sha):'—');
   renderHistory(commits);
-  await Promise.all([loadTree(repo.default_branch,id),loadCi(latest&&latest.sha,id)]);
+  await Promise.all([loadTree(repo.default_branch,id),loadCi(latest&&latest.sha,id),loadPrCenter()]);
   setText('ghwFoot','Loaded '+date(new Date().toISOString())+' · GitHub public API · '+state.repo);
  }catch(error){if(id===state.request){setText('ghwRepoState','ERROR');setText('ghwRepoMeta',error.message);setText('ghwFoot','Request failed: '+error.message);}}
  finally{if(id===state.request){button.disabled=false;button.textContent='Load repository';}}
@@ -148,7 +151,48 @@ async function loadCi(sha,requestId){
  const errors=results.map((r,i)=>r.status==='rejected'?['checks','statuses','workflow runs'][i]+': '+r.reason.message:null).filter(Boolean);
  if(errors.length)target.insertAdjacentHTML('beforeend','<p class="gh-muted">Some sources unavailable: '+esc(errors.join(' · '))+'</p>');
 }
-function render(){const root=document.getElementById('view');root.innerHTML='<div class="page-head"><div><div class="eyebrow">DEVELOPMENT / GITHUB</div><h1>Repository Operations Center</h1><p>Branch comparison · commit history · file explorer · aggregated CI status.</p></div><span class="tag">GET ONLY / READ ONLY</span></div>'+shell();document.getElementById('ghwLoad').addEventListener('click',loadRepository);document.getElementById('ghwRepo').addEventListener('keydown',e=>{if(e.key==='Enter')loadRepository();});document.getElementById('ghwCompare').addEventListener('click',compareBranches);loadRepository();}
+async function loadInventory(){
+ const body=document.getElementById('ghwInventory'),stats=document.getElementById('ghwInventoryStats');if(!body)return;
+ body.innerHTML='<tr><td colspan="5">Loading public repositories…</td></tr>';
+ const owner=(state.repo.split('/')[0]||'OCodejs');
+ try{
+  const repos=await get('/orgs/'+encodeURIComponent(owner)+'/repos?type=all&sort=updated&per_page=100');
+  const rows=Array.isArray(repos)?repos:[];
+  stats.textContent=rows.length+' repositories · '+rows.filter(x=>x.private).length+' private · '+rows.filter(x=>!x.private).length+' public · organization scope';
+  body.innerHTML=rows.map(r=>'<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(r.html_url)+'">'+esc(r.full_name)+'</a><div class="gh-muted">'+esc(r.description||'No description')+'</div></td><td>'+esc(r.visibility|| (r.private?'private':'public'))+'</td><td>'+esc(r.default_branch||'—')+'</td><td>'+esc(r.language||'—')+'</td><td>'+esc(date(r.updated_at))+'</td></tr>').join('')||'<tr><td colspan="5">No repositories returned.</td></tr>';
+ }catch(error){stats.textContent='Inventory unavailable: '+error.message;body.innerHTML='<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>';}
+}
+async function loadPrCenter(){
+ const body=document.getElementById('ghwPullRequests'),stats=document.getElementById('ghwPrStats');if(!body)return;
+ body.innerHTML='<tr><td colspan="5">Loading pull requests…</td></tr>';
+ try{
+  const prs=await get(repoPath('/pulls?state=all&sort=updated&direction=desc&per_page=30'));
+  const list=Array.isArray(prs)?prs:[];
+  stats.textContent=list.length+' PRs returned · '+list.filter(x=>x.state==='open').length+' open · '+list.filter(x=>x.merged_at).length+' merged · '+list.filter(x=>x.state==='closed'&&!x.merged_at).length+' closed';
+  const detailed=await Promise.allSettled(list.slice(0,12).map(async p=>{
+   const [reviews,checks,status]=await Promise.allSettled([
+    get(repoPath('/pulls/'+p.number+'/reviews?per_page=100')),
+    get(repoPath('/commits/'+encodeURIComponent(p.head.sha)+'/check-runs')),
+    get(repoPath('/commits/'+encodeURIComponent(p.head.sha)+'/status'))
+   ]);
+   const reviewList=reviews.status==='fulfilled'?reviews.value:[];
+   const latestByUser=new Map();reviewList.forEach(r=>latestByUser.set(r.user?.login||String(r.id),r.state));
+   const states=[...latestByUser.values()];
+   const review=states.includes('CHANGES_REQUESTED')?'Changes requested':states.includes('APPROVED')?'Approved':states.includes('COMMENTED')?'Commented':'Review pending';
+   const runs=checks.status==='fulfilled'?(checks.value.check_runs||[]):[];
+   const statuses=status.status==='fulfilled'?(status.value.statuses||[]):[];
+   const failed=runs.some(x=>x.status==='completed'&&['failure','timed_out','cancelled','action_required','startup_failure'].includes(String(x.conclusion).toLowerCase()))||statuses.some(x=>['failure','error'].includes(String(x.state).toLowerCase()));
+   const pending=runs.some(x=>x.status!=='completed')||statuses.some(x=>['pending','queued','in_progress'].includes(String(x.state).toLowerCase()));
+   const checkLabel=failed?'Failure':pending?'In progress':runs.length||statuses.length?'Success':'No checks';
+   const merge=p.mergeable===false?'Conflict':p.mergeable===true?'Mergeable':'Unknown';
+   return {number:p.number,title:p.title,url:p.html_url,state:p.merged_at?'Merged':p.state,review,merge,checkLabel};
+  }));
+  const map=new Map();detailed.forEach(x=>{if(x.status==='fulfilled')map.set(x.value.number,x.value);});
+  body.innerHTML=list.map(p=>{const d=map.get(p.number)||{review:'Not loaded',merge:p.mergeable===false?'Conflict':p.mergeable===true?'Mergeable':'Unknown',checkLabel:'Not loaded'};return '<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(p.html_url)+'">#'+p.number+' · '+esc(p.title)+'</a><div class="gh-muted">'+esc(p.user?.login||'')+' → '+esc(p.base?.ref||'')+'</div></td><td>'+pill(p.merged_at?'merged':p.state)+'</td><td>'+esc(d.review)+'</td><td>'+pill(d.merge==='Conflict'?'failure':d.merge==='Mergeable'?'success':'unknown')+'<div class="gh-muted">'+esc(d.merge)+'</div></td><td>'+pill(d.checkLabel==='Failure'?'failure':d.checkLabel==='Success'?'success':d.checkLabel==='In progress'?'pending':'unknown')+'<div class="gh-muted">'+esc(d.checkLabel)+'</div></td></tr>';}).join('')||'<tr><td colspan="5">No pull requests found.</td></tr>';
+  if(detailed.some(x=>x.status==='rejected'))stats.textContent+=' · Some review/check details unavailable';
+ }catch(error){stats.textContent='PR data unavailable: '+error.message;body.innerHTML='<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>';}
+}
+function render(){const root=document.getElementById('view');root.innerHTML='<div class="page-head"><div><div class="eyebrow">DEVELOPMENT / GITHUB</div><h1>Repository Operations Center</h1><p>Branch comparison · commit history · file explorer · aggregated CI status.</p></div><span class="tag">GET ONLY / READ ONLY</span></div>'+shell();document.getElementById('ghwLoad').addEventListener('click',loadRepository);document.getElementById('ghwRepo').addEventListener('keydown',e=>{if(e.key==='Enter')loadRepository();});document.getElementById('ghwCompare').addEventListener('click',compareBranches);loadInventory();loadRepository();}
 function register(){
  if(!window.OCodeNavigation||typeof window.OCodeNavigation.registerPage!=='function'){setTimeout(register,50);return;}
  window.OCodeNavigation.registerPage({id:'github-workspace',title:'GitHub Workspace',label:'GitHub Workspace',icon:'⌘',group:'DEVELOPMENT',render:function(){setTimeout(render,0);return '<div class="empty">Loading GitHub Workspace…</div>'; }});
