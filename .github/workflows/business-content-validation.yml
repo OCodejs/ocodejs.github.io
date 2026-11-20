@@ -24,6 +24,8 @@ jobs:
       - name: Check importer syntax
         run: node --check scripts/sync-business-content.mjs
       - name: Import and validate public source content
+        env:
+          OCODEJS_SOURCE_REF: feat/business-content-source-20261121
         run: node scripts/sync-business-content.mjs
       - name: Validate generated manifest
         run: |
