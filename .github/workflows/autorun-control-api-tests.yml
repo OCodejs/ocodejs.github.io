@@ -9,6 +9,7 @@ on:
       - ".github/workflows/autorun-control-api-tests.yml"
       - ".github/workflows/autorun-events.yml"
       - "scripts/autorun-control-api.test.mjs"
+      - "autorun/workspace.js"
   push:
     branches: [main]
     paths:
@@ -34,6 +35,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Check AutoRun dashboard workspace syntax
+        run: node --check autorun/workspace.js
       - name: Test AutoRun Control API and direct OIDC reporting
         run: node --experimental-sqlite --test scripts/autorun-control-api.test.mjs scripts/autorun-queue.test.mjs
 
