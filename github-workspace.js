@@ -3,7 +3,7 @@
 const API='https://api.github.com';
 const DEFAULT_REPO='OCodejs/ocodejs.github.io';
 const headers={Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
-const state={repo:DEFAULT_REPO,branches:[],tree:[],selectedPath:'',request:0,fileRequest:0,compareRequest:0,prRequest:0};
+const state={repo:DEFAULT_REPO,branches:[],tree:[],selectedPath:'',request:0,fileRequest:0,compareRequest:0,prRequest:0,inventoryRequest:0};
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const short=sha=>String(sha||'').slice(0,7);
 const date=value=>value?new Date(value).toLocaleString('vi-VN'):'—';
@@ -61,7 +61,7 @@ async function loadRepository(){
   if(id!==state.request)return;
   const latest=commits[0];setText('ghwLatest',latest?short(latest.sha):'—');
   renderHistory(commits);
-  await Promise.all([repo.default_branch?loadTree(repo.default_branch,id):Promise.resolve(setText('ghwTreeRef','EMPTY REPOSITORY')),loadCi(latest&&latest.sha,id),loadPrCenter()]);
+  await Promise.all([repo.default_branch?loadTree(repo.default_branch,id):Promise.resolve(setText('ghwTreeRef','EMPTY REPOSITORY')),loadCi(latest&&latest.sha,id),loadPrCenter(),loadInventory()]);
   setText('ghwFoot','Loaded '+date(new Date().toISOString())+' · GitHub public API · '+state.repo);
  }catch(error){if(id===state.request){setText('ghwRepoState','ERROR');setText('ghwRepoMeta',error.message);setText('ghwFoot','Request failed: '+error.message);}}
  finally{if(id===state.request){button.disabled=false;button.textContent='Load repository';}}
@@ -69,7 +69,7 @@ async function loadRepository(){
 function renderHistory(commits){
  const target=document.getElementById('ghwHistory');if(!target)return;
  if(!Array.isArray(commits)||!commits.length){target.innerHTML='<div class="gh-empty">No commits returned.</div>';return;}
- target.innerHTML=commits.map(c=>'<article class="gh-commit"><div><a target="_blank" rel="noopener noreferrer" href="'+esc(c.html_url)+'">'+esc(short(c.sha))+'</a> · '+esc(c.commit?.message?.split('\n')[0]||'No message')+'</div><div class="gh-stats"><span>'+esc(c.commit?.author?.name||c.author?.login||'Unknown author')+'</span><span>'+esc(date(c.commit?.author?.date))+'</span><span>'+esc(c.parents?.length||0)+' parent(s)</span></div></article>').join('');
+ target.innerHTML=commits.map(c=>'<article class="gh-commit"><div><a target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(c.html_url))+'">'+esc(short(c.sha))+'</a> · '+esc(c.commit?.message?.split('\n')[0]||'No message')+'</div><div class="gh-stats"><span>'+esc(c.commit?.author?.name||c.author?.login||'Unknown author')+'</span><span>'+esc(date(c.commit?.author?.date))+'</span><span>'+esc(c.parents?.length||0)+' parent(s)</span></div></article>').join('');
 }
 async function loadTree(branch,requestId){
  const target=document.getElementById('ghwTree');if(!target)return;
@@ -124,7 +124,7 @@ async function compareBranches(){
  button.disabled=true;button.textContent='Comparing…';target.innerHTML='<div class="gh-empty">Đang so sánh refs…</div>';
  try{
   const result=await get('/repos/'+repoAtRequest+'/compare/'+encodeURIComponent(base)+'...'+encodeURIComponent(head));
-  if(request!==state.compareRequest||repoAtRequest!==state.repo)return;
+  if(request!==state.compareRequest||repoAtRequest!==state.repo||document.getElementById('ghwBase').value!==base||document.getElementById('ghwHead').value!==head)return;
   const files=Array.isArray(result.files)?result.files:[];
   target.innerHTML='<div class="gh-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="gh-kpi"><span class="gh-muted">AHEAD</span><b>'+Number(result.ahead_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">BEHIND</span><b>'+Number(result.behind_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">COMMITS</span><b>'+Number(result.total_commits||0)+'</b></div></div><p class="gh-muted">Status: '+esc(result.status)+' · '+esc(base)+' → '+esc(head)+'</p><div class="table-wrap"><table class="gh-table"><thead><tr><th>File</th><th>Status</th><th>+ / −</th></tr></thead><tbody>'+files.map(f=>'<tr><td class="gh-break">'+esc(f.filename)+'</td><td>'+esc(f.status)+'</td><td><span class="ok">+'+Number(f.additions||0)+'</span> / <span class="gh-error">−'+Number(f.deletions||0)+'</span></td></tr>').join('')+'</tbody></table></div>'+(result.too_large?'<p class="gh-muted">Diff too large; GitHub omitted some file details.</p>':'');
  }catch(error){if(request===state.compareRequest&&repoAtRequest===state.repo)target.innerHTML='<div class="gh-empty gh-error">'+esc(error.message)+'</div>';}
@@ -159,15 +159,17 @@ async function loadCi(sha,requestId){
  if(errors.length)target.insertAdjacentHTML('beforeend','<p class="gh-muted">Some sources unavailable: '+esc(errors.join(' · '))+'</p>');
 }
 async function loadInventory(){
+ const request=++state.inventoryRequest,ownerAtRequest=(state.repo.split('/')[0]||'OCodejs');
  const body=document.getElementById('ghwInventory'),stats=document.getElementById('ghwInventoryStats');if(!body)return;
  body.innerHTML='<tr><td colspan="5">Loading public repositories…</td></tr>';
- const owner=(state.repo.split('/')[0]||'OCodejs');
+ const owner=ownerAtRequest;
  try{
   const repos=await get('/orgs/'+encodeURIComponent(owner)+'/repos?type=all&sort=updated&per_page=100');
+  if(request!==state.inventoryRequest||ownerAtRequest!==(state.repo.split('/')[0]||'OCodejs'))return;
   const rows=Array.isArray(repos)?repos:[];
   stats.textContent=rows.length+' repositories · '+rows.filter(x=>x.private).length+' private · '+rows.filter(x=>!x.private).length+' public · organization scope';
-  body.innerHTML=rows.map(r=>'<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(r.html_url)+'">'+esc(r.full_name)+'</a><div class="gh-muted">'+esc(r.description||'No description')+'</div></td><td>'+esc(r.visibility|| (r.private?'private':'public'))+'</td><td>'+esc(r.default_branch||'—')+'</td><td>'+esc(r.language||'—')+'</td><td>'+esc(date(r.updated_at))+'</td></tr>').join('')||'<tr><td colspan="5">No repositories returned.</td></tr>';
- }catch(error){stats.textContent='Inventory unavailable: '+error.message;body.innerHTML='<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>';}
+  body.innerHTML=rows.map(r=>'<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(r.html_url))+'">'+esc(r.full_name)+'</a><div class="gh-muted">'+esc(r.description||'No description')+'</div></td><td>'+esc(r.visibility|| (r.private?'private':'public'))+'</td><td>'+esc(r.default_branch||'—')+'</td><td>'+esc(r.language||'—')+'</td><td>'+esc(date(r.updated_at))+'</td></tr>').join('')||'<tr><td colspan="5">No repositories returned.</td></tr>';
+ }catch(error){if(request===state.inventoryRequest){stats.textContent='Inventory unavailable: '+error.message;body.innerHTML='<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>';}}
 }
 async function loadPrCenter(){
  const body=document.getElementById('ghwPullRequests'),stats=document.getElementById('ghwPrStats');if(!body)return;
