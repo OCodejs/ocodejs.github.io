@@ -3,16 +3,18 @@
 const API='https://api.github.com';
 const DEFAULT_REPO='OCodejs/ocodejs.github.io';
 const headers={Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
-const state={repo:DEFAULT_REPO,branches:[],tree:[],selectedPath:'',request:0};
+const state={repo:DEFAULT_REPO,branches:[],tree:[],selectedPath:'',request:0,fileRequest:0,compareRequest:0,prRequest:0};
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const short=sha=>String(sha||'').slice(0,7);
 const date=value=>value?new Date(value).toLocaleString('vi-VN'):'—';
 async function get(path){
- const response=await fetch(API+path,{headers:headers,cache:'no-store'});
+ const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),15000);
+ let response;try{response=await fetch(API+path,{headers:headers,cache:'no-store',signal:controller.signal});}catch(error){if(error.name==='AbortError')throw new Error('GitHub request timed out after 15 seconds');throw error;}finally{clearTimeout(timeout);}
  if(!response.ok){let message='HTTP '+response.status;try{const body=await response.json();if(body.message)message=body.message;}catch(_){}throw new Error(message);}
  return response.json();
 }
 function repoPath(path){return '/repos/'+state.repo+path;}
+function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:'#';}catch(_){return '#';}}
 function statusClass(value){const v=String(value||'').toLowerCase();if(['success','completed','healthy','passed'].includes(v))return 'ok';if(['failure','failed','error','timed_out','action_required'].includes(v))return 'bad';if(['queued','in_progress','pending','waiting','requested'].includes(v))return 'wait';return 'muted';}
 function shell(){
  return '<style id="githubWorkspaceStyles">'+
@@ -38,6 +40,9 @@ async function loadRepository(){
  if(!match){setText('ghwRepoMeta','Định dạng hợp lệ: owner/repository');return;}
  state.repo=match[1]+'/'+match[2];const id=++state.request;
  const button=document.getElementById('ghwLoad');button.disabled=true;button.textContent='Loading…';
+ ['ghwDefault','ghwBranchCount','ghwLatest','ghwCi'].forEach(key=>setText(key,'—'));
+ ['ghwHistory','ghwTree','ghwCiDetail','ghwCompareResult','ghwPullRequests'].forEach(key=>{const el=document.getElementById(key);if(el)el.textContent='Loading new repository…';});
+ state.branches=[];state.tree=[];
  setText('ghwRepoState','LOADING');setText('ghwRepoMeta','Đang đọc metadata public repository…');
  const open=document.getElementById('ghwOpenRepo');open.href='https://github.com/'+state.repo;
  try{
@@ -47,16 +52,16 @@ async function loadRepository(){
   setText('ghwRepoState','PUBLIC · READ ONLY');
   setText('ghwRepoMeta',(repo.full_name||state.repo)+' · '+(repo.description||'No description')+' · '+repo.visibility+' · updated '+date(repo.updated_at));
   setText('ghwDefault',repo.default_branch||'—');
-  const branches=await get(repoPath('/branches?per_page=100'));
-  state.branches=Array.isArray(branches)?branches.map(x=>x.name):[];
+  const branches=[];for(let page=1;page<=10;page++){const batch=await get(repoPath('/branches?per_page=100&page='+page));branches.push(...(Array.isArray(batch)?batch:[]));if(!Array.isArray(batch)||batch.length<100)break;}
+  state.branches=branches.map(x=>x.name);
   setText('ghwBranchCount',state.branches.length);
   const options=state.branches.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
   ['ghwBase','ghwHead'].forEach((id,index)=>{const el=document.getElementById(id);el.innerHTML=options;el.value=index===0?(repo.default_branch||state.branches[0]):(state.branches.find(name=>name!==(repo.default_branch||state.branches[0]))||repo.default_branch||state.branches[0]);});
-  const commits=await get(repoPath('/commits?sha='+encodeURIComponent(repo.default_branch)+'&per_page=20'));
+  const commits=repo.default_branch?await get(repoPath('/commits?sha='+encodeURIComponent(repo.default_branch)+'&per_page=20')):[];
   if(id!==state.request)return;
   const latest=commits[0];setText('ghwLatest',latest?short(latest.sha):'—');
   renderHistory(commits);
-  await Promise.all([loadTree(repo.default_branch,id),loadCi(latest&&latest.sha,id),loadPrCenter()]);
+  await Promise.all([repo.default_branch?loadTree(repo.default_branch,id):Promise.resolve(setText('ghwTreeRef','EMPTY REPOSITORY')),loadCi(latest&&latest.sha,id),loadPrCenter()]);
   setText('ghwFoot','Loaded '+date(new Date().toISOString())+' · GitHub public API · '+state.repo);
  }catch(error){if(id===state.request){setText('ghwRepoState','ERROR');setText('ghwRepoMeta',error.message);setText('ghwFoot','Request failed: '+error.message);}}
  finally{if(id===state.request){button.disabled=false;button.textContent='Load repository';}}
@@ -78,7 +83,7 @@ async function loadTree(branch,requestId){
   if(requestId!==state.request)return;
   state.tree=Array.isArray(data.tree)?data.tree:[];
   if(data.truncated){target.innerHTML='<div class="gh-empty">Git tree is truncated by GitHub. Open full tree on GitHub.</div>';return;}
-  const entries=state.tree.filter(x=>x.type==='tree'||x.type==='blob').slice(0,500);
+  state.tree=state.tree.filter(x=>x.type==='tree'||x.type==='blob').slice(0,5000);
   renderTreeFolder('',branch);
  }catch(error){if(requestId===state.request)target.innerHTML='<div class="gh-empty gh-error">'+esc(error.message)+'</div>';}
 }
@@ -93,35 +98,37 @@ function renderTreeFolder(prefix,branch){
   if(rest.includes('/'))immediate.set(full,{path:full,type:'tree'});
   else immediate.set(full,{path:full,type:item.type});
  });
- const items=[...immediate.values()].sort((a,b)=>a.type===b.type?a.path.localeCompare(b.path):a.type==='tree'?-1:1);
+ const items=[...immediate.values()].sort((a,b)=>a.type===b.type?a.path.localeCompare(b.path):a.type==='tree'?-1:1).slice(0,500);
  target.innerHTML=(prefix?'<button type="button" data-ghw-up="1">↰ .. / '+esc(prefix)+'</button>':'')+items.map(x=>'<button type="button" data-ghw-path="'+esc(x.path)+'" data-ghw-type="'+esc(x.type)+'">'+(x.type==='tree'?'▸ ':'▤ ')+esc(x.path.slice(normalized.length))+'</button>').join('')||'<div class="gh-empty">Empty directory.</div>';
  target.querySelectorAll('[data-ghw-path]').forEach(btn=>btn.addEventListener('click',()=>openTreeItem(btn.dataset.ghwPath,btn.dataset.ghwType,branch)));
  const up=target.querySelector('[data-ghw-up]');if(up)up.addEventListener('click',()=>renderTreeFolder(prefix.split('/').slice(0,-1).join('/'),branch));
 }
 async function openTreeItem(path,type,branch){
- const target=document.getElementById('ghwFileContent');setText('ghwFilePath',path);
+ const request=++state.fileRequest,repoAtRequest=state.repo;const target=document.getElementById('ghwFileContent');setText('ghwFilePath',path);
  if(type==='tree'){setText('ghwFilePath',path+' · directory');document.getElementById('ghwFileContent').textContent='Directory: '+path;renderTreeFolder(path,branch);return;}
  target.textContent='Loading '+path+'…';
  try{
-  const file=await get(repoPath('/contents/'+path.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(branch)));
+  const file=await get('/repos/'+repoAtRequest+'/contents/'+path.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(branch));
+  if(request!==state.fileRequest||repoAtRequest!==state.repo)return;
   if(file.type!=='file'||!file.content){target.textContent='This item cannot be previewed. Open it on GitHub.';return;}
   const raw=atob(file.content.replace(/\s/g,''));const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
   if(bytes.length>180000){target.textContent='File exceeds 180 KB preview limit. Open on GitHub.';return;}
   const text=new TextDecoder('utf-8',{fatal:false}).decode(bytes);
   if(text.includes('\u0000')){target.textContent='Binary file. Preview disabled.';return;}
   target.textContent=text;
- }catch(error){target.textContent='Unable to load file: '+error.message;}
+ }catch(error){if(request===state.fileRequest&&repoAtRequest===state.repo)target.textContent='Unable to load file: '+error.message;}
 }
 async function compareBranches(){
- const base=document.getElementById('ghwBase').value,head=document.getElementById('ghwHead').value,target=document.getElementById('ghwCompareResult'),button=document.getElementById('ghwCompare');
+ const request=++state.compareRequest,repoAtRequest=state.repo;const base=document.getElementById('ghwBase').value,head=document.getElementById('ghwHead').value,target=document.getElementById('ghwCompareResult'),button=document.getElementById('ghwCompare');
  if(!base||!head||base===head){target.innerHTML='<div class="gh-empty">Chọn hai branch khác nhau.</div>';return;}
  button.disabled=true;button.textContent='Comparing…';target.innerHTML='<div class="gh-empty">Đang so sánh refs…</div>';
  try{
-  const result=await get(repoPath('/compare/'+encodeURIComponent(base)+'...'+encodeURIComponent(head)));
+  const result=await get('/repos/'+repoAtRequest+'/compare/'+encodeURIComponent(base)+'...'+encodeURIComponent(head));
+  if(request!==state.compareRequest||repoAtRequest!==state.repo)return;
   const files=Array.isArray(result.files)?result.files:[];
   target.innerHTML='<div class="gh-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="gh-kpi"><span class="gh-muted">AHEAD</span><b>'+Number(result.ahead_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">BEHIND</span><b>'+Number(result.behind_by||0)+'</b></div><div class="gh-kpi"><span class="gh-muted">COMMITS</span><b>'+Number(result.total_commits||0)+'</b></div></div><p class="gh-muted">Status: '+esc(result.status)+' · '+esc(base)+' → '+esc(head)+'</p><div class="table-wrap"><table class="gh-table"><thead><tr><th>File</th><th>Status</th><th>+ / −</th></tr></thead><tbody>'+files.map(f=>'<tr><td class="gh-break">'+esc(f.filename)+'</td><td>'+esc(f.status)+'</td><td><span class="ok">+'+Number(f.additions||0)+'</span> / <span class="gh-error">−'+Number(f.deletions||0)+'</span></td></tr>').join('')+'</tbody></table></div>'+(result.too_large?'<p class="gh-muted">Diff too large; GitHub omitted some file details.</p>':'');
- }catch(error){target.innerHTML='<div class="gh-empty gh-error">'+esc(error.message)+'</div>';}
- finally{button.disabled=false;button.textContent='Compare';}
+ }catch(error){if(request===state.compareRequest&&repoAtRequest===state.repo)target.innerHTML='<div class="gh-empty gh-error">'+esc(error.message)+'</div>';}
+ finally{if(request===state.compareRequest){button.disabled=false;button.textContent='Compare';}}
 }
 async function loadCi(sha,requestId){
  const target=document.getElementById('ghwCiDetail');if(!target)return;
@@ -141,9 +148,9 @@ async function loadCi(sha,requestId){
  const pending=checks.filter(x=>x.status!=='completed').length+statuses.filter(x=>['pending','queued','in_progress'].includes(String(x.state).toLowerCase())).length+runs.filter(x=>x.status!=='completed').length;
  const succeeded=checks.filter(x=>x.status==='completed'&&x.conclusion==='success').length+statuses.filter(x=>String(x.state).toLowerCase()==='success').length+runs.filter(x=>x.status==='completed'&&x.conclusion==='success').length;
  const sourceCount=checks.length+statuses.length+runs.length;
- const overall=failed?'FAILURE':pending?'IN PROGRESS':sourceCount?'SUCCESS':'NO CHECKS';
+ const sourceErrors=results.filter(r=>r.status==='rejected').length;
+ const overall=failed?'FAILURE':pending?'IN PROGRESS':sourceCount?(sourceErrors?'PARTIAL':'SUCCESS'):sourceErrors?'UNAVAILABLE':'NO CHECKS';
  setText('ghwCi',overall);
- const safeUrl=value=>{try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:'#';}catch(_){return '#';}};
  const rows=checks.map(x=>({name:x.name,status:x.status==='completed'?x.conclusion:x.status,url:safeUrl(x.html_url),kind:'Check'}))
  .concat(statuses.map(x=>({name:x.context,status:x.state,url:safeUrl(x.target_url),kind:'Commit status'})))
  .concat(runs.map(x=>({name:x.name+' #'+x.run_number,status:x.conclusion||x.status,url:safeUrl(x.html_url),kind:'Workflow'})));
@@ -166,7 +173,9 @@ async function loadPrCenter(){
  const body=document.getElementById('ghwPullRequests'),stats=document.getElementById('ghwPrStats');if(!body)return;
  body.innerHTML='<tr><td colspan="5">Loading pull requests…</td></tr>';
  try{
+  const request=++state.prRequest,repoAtRequest=state.repo;
   const prs=await get(repoPath('/pulls?state=all&sort=updated&direction=desc&per_page=30'));
+  if(request!==state.prRequest||repoAtRequest!==state.repo)return;
   const list=Array.isArray(prs)?prs:[];
   stats.textContent=list.length+' PRs returned · '+list.filter(x=>x.state==='open').length+' open · '+list.filter(x=>x.merged_at).length+' merged · '+list.filter(x=>x.state==='closed'&&!x.merged_at).length+' closed';
   const detailed=await Promise.allSettled(list.slice(0,12).map(async p=>{
@@ -183,12 +192,12 @@ async function loadPrCenter(){
    const statuses=status.status==='fulfilled'?(status.value.statuses||[]):[];
    const failed=runs.some(x=>x.status==='completed'&&['failure','timed_out','cancelled','action_required','startup_failure'].includes(String(x.conclusion).toLowerCase()))||statuses.some(x=>['failure','error'].includes(String(x.state).toLowerCase()));
    const pending=runs.some(x=>x.status!=='completed')||statuses.some(x=>['pending','queued','in_progress'].includes(String(x.state).toLowerCase()));
-   const checkLabel=failed?'Failure':pending?'In progress':runs.length||statuses.length?'Success':'No checks';
+   const unavailable=checks.status==='rejected'&&status.status==='rejected';const checkLabel=failed?'Failure':pending?'In progress':unavailable?'Unavailable':runs.length||statuses.length?'Success':'No checks';
    const merge=p.mergeable===false?'Conflict':p.mergeable===true?'Mergeable':'Unknown';
    return {number:p.number,title:p.title,url:p.html_url,state:p.merged_at?'Merged':p.state,review,merge,checkLabel};
   }));
   const map=new Map();detailed.forEach(x=>{if(x.status==='fulfilled')map.set(x.value.number,x.value);});
-  body.innerHTML=list.map(p=>{const d=map.get(p.number)||{review:'Not loaded',merge:p.mergeable===false?'Conflict':p.mergeable===true?'Mergeable':'Unknown',checkLabel:'Not loaded'};return '<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(p.html_url)+'">#'+p.number+' · '+esc(p.title)+'</a><div class="gh-muted">'+esc(p.user?.login||'')+' → '+esc(p.base?.ref||'')+'</div></td><td>'+pill(p.merged_at?'merged':p.state)+'</td><td>'+esc(d.review)+'</td><td>'+pill(d.merge==='Conflict'?'failure':d.merge==='Mergeable'?'success':'unknown')+'<div class="gh-muted">'+esc(d.merge)+'</div></td><td>'+pill(d.checkLabel==='Failure'?'failure':d.checkLabel==='Success'?'success':d.checkLabel==='In progress'?'pending':'unknown')+'<div class="gh-muted">'+esc(d.checkLabel)+'</div></td></tr>';}).join('')||'<tr><td colspan="5">No pull requests found.</td></tr>';
+  body.innerHTML=list.map(p=>{const d=map.get(p.number)||{review:'Not loaded',merge:p.mergeable===false?'Conflict':p.mergeable===true?'Mergeable':'Unknown',checkLabel:'Not loaded'};return '<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(p.html_url))+'">#'+p.number+' · '+esc(p.title)+'</a><div class="gh-muted">'+esc(p.user?.login||'')+' → '+esc(p.base?.ref||'')+'</div></td><td>'+pill(p.merged_at?'merged':p.state)+'</td><td>'+esc(d.review)+'</td><td>'+pill(d.merge==='Conflict'?'failure':d.merge==='Mergeable'?'success':'unknown')+'<div class="gh-muted">'+esc(d.merge)+'</div></td><td>'+pill(d.checkLabel==='Failure'?'failure':d.checkLabel==='Success'?'success':d.checkLabel==='In progress'?'pending':'unknown')+'<div class="gh-muted">'+esc(d.checkLabel)+'</div></td></tr>';}).join('')||'<tr><td colspan="5">No pull requests found.</td></tr>';
   if(detailed.some(x=>x.status==='rejected'))stats.textContent+=' · Some review/check details unavailable';
  }catch(error){stats.textContent='PR data unavailable: '+error.message;body.innerHTML='<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>';}
 }
