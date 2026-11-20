@@ -1,0 +1,38 @@
+name: AI Auto-Fix & Tech Advisor
+
+on:
+  # Tự chạy khi có lỗi build/test HOẶC chạy định kỳ mỗi thứ 2 hàng tuần để gợi ý nâng cấp
+  workflow_run:
+    workflows: ["CI"] # Đổi thành tên workflow chạy test của bạn
+    types: [completed]
+  schedule:
+    - cron: '0 2 * * 1' # 9h sáng thứ 2 hàng tuần (giờ VN)
+  workflow_dispatch: # Cho phép bạn bấm nút chạy tay bất cứ lúc nào
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  ai-auto-fix-and-suggest:
+    # Chỉ chạy khi CI bị lỗi (failure) hoặc khi chạy định kỳ/chạy tay
+    if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event_name != 'workflow_run' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Claude Code CLI (hoặc Gemini CLI)
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: AI Tự sửa lỗi & Gợi ý mở rộng kèm Link
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          claude -p "Hãy kiểm tra toàn bộ repo này:
+          1. Nếu có log lỗi từ CI, hãy tìm nguyên nhân gốc rễ, tự động sửa code và chạy lại test để xác nhận đã khắc phục xong.
+          2. Phân tích cấu trúc dự án và các file dependencies hiện tại. Đề xuất 3-5 thư viện, API, hoặc công cụ mở rộng (extensions/integrations) hữu ích và hiện đại nhất giúp tăng hiệu năng, bảo mật hoặc rút ngắn thời gian phát triển cho dự án này.
+          3. Với mỗi đề xuất, BẮT BUỘC cung cấp link dẫn trực tiếp đến trang chủ/docs/GitHub chính thức, giải thích ngắn gọn lợi ích và cách tích hợp.
+          4. Nếu có sửa code, hãy tạo một Pull Request mới. Nếu chỉ là gợi ý mở rộng, hãy tạo một GitHub Issue mới với nhãn 'enhancement'." --allowedTools "Bash,Edit,Write,WebSearch"
