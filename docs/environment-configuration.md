@@ -50,6 +50,8 @@ Optional integrations:
 
 The Auth repository documents an `auth_preview` schema on its Auth-only PostgreSQL instance. This is logical schema isolation, not a separate physical database. Confirm the actual Preview database resource and schema target before setting `AUTH_PREVIEW_DB_PUSH=true`; do not reuse Production, the CLI D1 database or another application's database.
 
+At the latest audit, project-level `DATABASE_URL` and `DATABASE_URL_POOLED` variables have `development`, `preview` and `production` targets. Branch-scoped Auth.js secrets and Preview flags were present only for older branches; no branch-specific Auth.js variables were returned for `feat/auth-platform-phase1-security-audit`. Variable values were not read. Treat physical database separation as unverified and do not run schema initialization until the exact Preview target and branch-scoped settings are confirmed.
+
 Configure OAuth callback URLs only after the current Preview hostname is verified:
 
 - `https://<VERIFIED_PREVIEW_HOST>/api/auth/callback/github`
