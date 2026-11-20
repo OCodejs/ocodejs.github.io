@@ -48,7 +48,7 @@ async function loadRepository(){
   state.branches=Array.isArray(branches)?branches.map(x=>x.name):[];
   setText('ghwBranchCount',state.branches.length);
   const options=state.branches.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
-  ['ghwBase','ghwHead'].forEach((id,index)=>{const el=document.getElementById(id);el.innerHTML=options;el.value=index===0?(repo.default_branch||state.branches[0]):(state.branches.includes('main')?'main':state.branches[0]);});
+  ['ghwBase','ghwHead'].forEach((id,index)=>{const el=document.getElementById(id);el.innerHTML=options;el.value=index===0?(repo.default_branch||state.branches[0]):(state.branches.find(name=>name!==(repo.default_branch||state.branches[0]))||repo.default_branch||state.branches[0]);});
   const commits=await get(repoPath('/commits?sha='+encodeURIComponent(repo.default_branch)+'&per_page=20'));
   if(id!==state.request)return;
   const latest=commits[0];setText('ghwLatest',latest?short(latest.sha):'—');
@@ -133,7 +133,8 @@ async function loadCi(sha,requestId){
  const checks=results[0].status==='fulfilled'?(results[0].value.check_runs||[]):[];
  const statuses=results[1].status==='fulfilled'?(results[1].value.statuses||[]):[];
  const runs=results[2].status==='fulfilled'?(results[2].value.workflow_runs||[]):[];
- const failed=checks.filter(x=>x.status==='completed'&&x.conclusion&&x.conclusion!=='success').length+statuses.filter(x=>['failure','error'].includes(String(x.state).toLowerCase())).length+runs.filter(x=>x.status==='completed'&&x.conclusion&&x.conclusion!=='success').length;
+ const failedConclusions=['failure','timed_out','cancelled','action_required','startup_failure'];
+ const failed=checks.filter(x=>x.status==='completed'&&failedConclusions.includes(String(x.conclusion||'').toLowerCase())).length+statuses.filter(x=>['failure','error'].includes(String(x.state).toLowerCase())).length+runs.filter(x=>x.status==='completed'&&failedConclusions.includes(String(x.conclusion||'').toLowerCase())).length;
  const pending=checks.filter(x=>x.status!=='completed').length+statuses.filter(x=>['pending','queued','in_progress'].includes(String(x.state).toLowerCase())).length+runs.filter(x=>x.status!=='completed').length;
  const succeeded=checks.filter(x=>x.status==='completed'&&x.conclusion==='success').length+statuses.filter(x=>String(x.state).toLowerCase()==='success').length+runs.filter(x=>x.status==='completed'&&x.conclusion==='success').length;
  const sourceCount=checks.length+statuses.length+runs.length;
