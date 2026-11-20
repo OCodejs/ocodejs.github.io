@@ -7,7 +7,7 @@
   "vars": {
     "ALLOWED_REPOSITORY": "OCodejs/ocodejs.github.io",
     "ALLOWED_WORKFLOW_REF": "OCodejs/ocodejs.github.io/.github/workflows/autorun-events.yml@refs/heads/main",
-    "ALLOWED_ORIGINS": "https://ocodejs.github.io"
+    "ALLOWED_ORIGINS": "https://ocodejs.github.io,https://ocodejs.co,https://www.ocodejs.dev"
   },
   "d1_databases": [
     {
