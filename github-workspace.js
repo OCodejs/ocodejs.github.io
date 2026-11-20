@@ -16,7 +16,7 @@ async function get(path){
 function mountHtml(target,markup){const wrapped=target.tagName==='TBODY'?'<table><tbody>'+markup+'</tbody></table>':'<body>'+markup+'</body>';const parsed=new DOMParser().parseFromString('<!doctype html>'+wrapped,'text/html');const source=target.tagName==='TBODY'?parsed.querySelector('tbody'):parsed.body;target.replaceChildren(...Array.from(source.childNodes).map(node=>document.importNode(node,true)));}
 function appendText(parent,tag,className,value){const node=document.createElement(tag);if(className)node.className=className;node.textContent=String(value==null?'':value);parent.appendChild(node);return node;}
 function repoPath(path){return '/repos/'+state.repo+path;}
-function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:'#';}catch(_){return '#';}}
+function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:null;}catch(_){return null;}}
 function statusClass(value){const v=String(value||'').toLowerCase();if(['success','completed','healthy','passed'].includes(v))return 'ok';if(['failure','failed','error','timed_out','action_required'].includes(v))return 'bad';if(['queued','in_progress','pending','waiting','requested'].includes(v))return 'wait';return 'muted';}
 function shell(){
  return '<style id="githubWorkspaceStyles">'+
@@ -56,7 +56,7 @@ async function loadRepository(){
   setText('ghwDefault',repo.default_branch||'—');
   const branches=[];for(let page=1;page<=10;page++){const batch=await get(repoPath('/branches?per_page=100&page='+page));if(id!==state.request)return;branches.push(...(Array.isArray(batch)?batch:[]));if(!Array.isArray(batch)||batch.length<100)break;}
   state.branches=branches.map(x=>x.name);
-  setText('ghwBranchCount',state.branches.length);
+  setText('ghwBranchCount',state.branches.length+(state.branches.length>=1000?'+ (cap)':''));
   const options=state.branches.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
   ['ghwBase','ghwHead'].forEach((id,index)=>{const el=document.getElementById(id);mountHtml(el,options);el.value=index===0?(repo.default_branch||state.branches[0]):(state.branches.find(name=>name!==(repo.default_branch||state.branches[0]))||repo.default_branch||state.branches[0]);});
   const commits=repo.default_branch?await get(repoPath('/commits?sha='+encodeURIComponent(repo.default_branch)+'&per_page=20')):[];
@@ -156,7 +156,7 @@ async function loadCi(sha,requestId){
  const rows=checks.map(x=>({name:x.name,status:x.status==='completed'?x.conclusion:x.status,url:safeUrl(x.html_url),kind:'Check'}))
  .concat(statuses.map(x=>({name:x.context,status:x.state,url:safeUrl(x.target_url),kind:'Commit status'})))
  .concat(runs.map(x=>({name:x.name+' #'+x.run_number,status:x.conclusion||x.status,url:safeUrl(x.html_url),kind:'Workflow'})));
- mountHtml(target,'<div class="gh-stats"><span>Checks '+checks.length+'</span><span>Success '+succeeded+'</span><span>Pending '+pending+'</span><span>Failed '+failed+'</span></div>'+rows.map(x=>'<div class="gh-row"><div><b>'+esc(x.name)+'</b><div class="gh-muted">'+esc(x.kind)+'</div></div>'+pill(x.status)+'<a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(x.url||'#')+'">Open ↗</a></div>').join('')||'<div class="gh-empty">No CI checks or workflow runs reported for this commit.</div>');
+ mountHtml(target,'<div class="gh-stats"><span>Checks '+checks.length+'</span><span>Success '+succeeded+'</span><span>Pending '+pending+'</span><span>Failed '+failed+'</span></div>'+rows.map(x=>'<div class="gh-row"><div><b>'+esc(x.name)+'</b><div class="gh-muted">'+esc(x.kind)+'</div></div>'+pill(x.status)+(x.url?'<a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(x.url)+'">Open ↗</a>':'<span class="gh-muted">No safe target URL</span>')+'</div>').join('')||'<div class="gh-empty">No CI checks or workflow runs reported for this commit.</div>');
  const errors=results.map((r,i)=>r.status==='rejected'?['checks','statuses','workflow runs'][i]+': '+r.reason.message:null).filter(Boolean);
  if(errors.length)appendText(target,'p','gh-muted','Some sources unavailable: '+errors.join(' · '));
 }
@@ -167,7 +167,7 @@ async function loadInventory(){
  const owner=ownerAtRequest;
  try{
   const rows=[];for(let page=1;page<=10;page++){const repos=await get('/orgs/'+encodeURIComponent(owner)+'/repos?type=public&sort=updated&per_page=100&page='+page);if(request!==state.inventoryRequest||ownerAtRequest!==(state.repo.split('/')[0]||'OCodejs'))return;rows.push(...(Array.isArray(repos)?repos:[]));if(!Array.isArray(repos)||repos.length<100)break;}
-  stats.textContent=rows.length+' visible public repositories · organization scope (private repositories require server-side authorization)';
+  stats.textContent=rows.length+' visible public repositories · organization scope'+(rows.length>=1000?' · capped at 1,000':'')+' (private repositories require server-side authorization)';
   mountHtml(body,rows.map(r=>'<tr><td><a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(r.html_url))+'">'+esc(r.full_name)+'</a><div class="gh-muted">'+esc(r.description||'No description')+'</div></td><td>'+esc(r.visibility|| (r.private?'private':'public'))+'</td><td>'+esc(r.default_branch||'—')+'</td><td>'+esc(r.language||'—')+'</td><td>'+esc(date(r.updated_at))+'</td></tr>').join('')||'<tr><td colspan="5">No repositories returned.</td></tr>');
  }catch(error){if(request===state.inventoryRequest){stats.textContent='Inventory unavailable: '+error.message;mountHtml(body,'<tr><td colspan="5" class="gh-error">'+esc(error.message)+'</td></tr>');}}
 }
@@ -183,7 +183,7 @@ async function loadPrCenter(){
   const detailed=await Promise.allSettled(list.slice(0,12).map(async p=>{
    const [reviews,checks,status,workflows]=await Promise.allSettled([
     get(repoPath('/pulls/'+p.number+'/reviews?per_page=100')),
-    get(repoPath('/commits/'+encodeURIComponent(p.head.sha)+'/check-runs')),
+    get(repoPath('/commits/'+encodeURIComponent(p.head.sha)+'/check-runs?per_page=100')),
     get(repoPath('/commits/'+encodeURIComponent(p.head.sha)+'/status?per_page=100')),
     get(repoPath('/actions/runs?head_sha='+encodeURIComponent(p.head.sha)+'&per_page=8'))
    ]);
@@ -195,7 +195,7 @@ async function loadPrCenter(){
    const statuses=status.status==='fulfilled'?(status.value.statuses||[]):[];
    const failed=runs.some(x=>x.status==='completed'&&['failure','timed_out','cancelled','action_required','startup_failure'].includes(String(x.conclusion).toLowerCase()))||statuses.some(x=>['failure','error'].includes(String(x.state).toLowerCase()));
    const pending=runs.some(x=>x.status!=='completed')||statuses.some(x=>['pending','queued','in_progress'].includes(String(x.state).toLowerCase()));
-   const workflowRuns=workflows.status==='fulfilled'?(workflows.value.workflow_runs||[]):[];const workflowFailed=workflowRuns.some(x=>x.status==='completed'&&['failure','timed_out','cancelled','action_required','startup_failure'].includes(String(x.conclusion||'').toLowerCase()));const workflowPending=workflowRuns.some(x=>x.status!=='completed');const unavailable=checks.status==='rejected'&&status.status==='rejected'&&workflows.status==='rejected';const checkLabel=failed||workflowFailed?'Failure':pending||workflowPending?'In progress':unavailable?'Unavailable':runs.length||statuses.length||workflowRuns.length?'Success':'No checks';
+   const workflowRuns=workflows.status==='fulfilled'?(workflows.value.workflow_runs||[]):[];const workflowFailed=workflowRuns.some(x=>x.status==='completed'&&['failure','timed_out','cancelled','action_required','startup_failure'].includes(String(x.conclusion||'').toLowerCase()));const workflowPending=workflowRuns.some(x=>x.status!=='completed');const unavailable=checks.status==='rejected'&&status.status==='rejected'&&workflows.status==='rejected';const checkLabel=failed||workflowFailed?'Failure':pending||workflowPending?'In progress':unavailable?'Unavailable':runs.length||statuses.length||workflowRuns.length?'Reported':'No checks';
    const merge=p.mergeable===false?'Conflict':p.mergeable===true?'Mergeable':'Unknown';
    return {number:p.number,title:p.title,url:p.html_url,state:p.merged_at?'Merged':p.state,review,merge,checkLabel};
   }));
