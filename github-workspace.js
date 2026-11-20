@@ -65,9 +65,13 @@ function renderHistory(commits){
 }
 async function loadTree(branch,requestId){
  const target=document.getElementById('ghwTree');if(!target)return;
- setText('ghwTreeRef',branch);target.innerHTML='<div class="gh-empty">Loading repository tree…</div>';
+ setText('ghwTreeRef',branch);target.innerHTML='<div class="gh-empty">Resolving branch tree…</div>';
  try{
-  const data=await get(repoPath('/git/trees/'+encodeURIComponent(branch)+'?recursive=1'));
+  const ref=await get(repoPath('/git/ref/heads/'+branch.split('/').map(encodeURIComponent).join('/')));
+  const treeSha=ref.object&&ref.object.sha;if(!treeSha)throw new Error('Git reference không trả về tree commit SHA');
+  const commit=await get(repoPath('/git/commits/'+encodeURIComponent(treeSha)));
+  const rootTreeSha=commit.tree&&commit.tree.sha;if(!rootTreeSha)throw new Error('Commit không trả về root tree SHA');
+  const data=await get(repoPath('/git/trees/'+encodeURIComponent(rootTreeSha)+'?recursive=1'));
   if(requestId!==state.request)return;
   state.tree=Array.isArray(data.tree)?data.tree:[];
   if(data.truncated){target.innerHTML='<div class="gh-empty">Git tree is truncated by GitHub. Open full tree on GitHub.</div>';return;}
@@ -129,14 +133,16 @@ async function loadCi(sha,requestId){
  const checks=results[0].status==='fulfilled'?(results[0].value.check_runs||[]):[];
  const statuses=results[1].status==='fulfilled'?(results[1].value.statuses||[]):[];
  const runs=results[2].status==='fulfilled'?(results[2].value.workflow_runs||[]):[];
- const failed=checks.filter(x=>x.conclusion&&x.conclusion!=='success').length;
- const pending=checks.filter(x=>x.status!=='completed').length;
- const succeeded=checks.filter(x=>x.conclusion==='success').length;
- const overall=failed?'FAILURE':pending?'IN PROGRESS':checks.length?'SUCCESS':statuses.length?(results[1].value.state||'unknown').toUpperCase():'NO CHECKS';
+ const failed=checks.filter(x=>x.status==='completed'&&x.conclusion&&x.conclusion!=='success').length+statuses.filter(x=>['failure','error'].includes(String(x.state).toLowerCase())).length+runs.filter(x=>x.status==='completed'&&x.conclusion&&x.conclusion!=='success').length;
+ const pending=checks.filter(x=>x.status!=='completed').length+statuses.filter(x=>['pending','queued','in_progress'].includes(String(x.state).toLowerCase())).length+runs.filter(x=>x.status!=='completed').length;
+ const succeeded=checks.filter(x=>x.status==='completed'&&x.conclusion==='success').length+statuses.filter(x=>String(x.state).toLowerCase()==='success').length+runs.filter(x=>x.status==='completed'&&x.conclusion==='success').length;
+ const sourceCount=checks.length+statuses.length+runs.length;
+ const overall=failed?'FAILURE':pending?'IN PROGRESS':sourceCount?'SUCCESS':'NO CHECKS';
  setText('ghwCi',overall);
- const rows=checks.map(x=>({name:x.name,status:x.status==='completed'?x.conclusion:x.status,url:x.html_url,kind:'Check'}))
- .concat(statuses.map(x=>({name:x.context,status:x.state,url:x.target_url,kind:'Commit status'})))
- .concat(runs.map(x=>({name:x.name+' #'+x.run_number,status:x.conclusion||x.status,url:x.html_url,kind:'Workflow'})));
+ const safeUrl=value=>{try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:'#';}catch(_){return '#';}};
+ const rows=checks.map(x=>({name:x.name,status:x.status==='completed'?x.conclusion:x.status,url:safeUrl(x.html_url),kind:'Check'}))
+ .concat(statuses.map(x=>({name:x.context,status:x.state,url:safeUrl(x.target_url),kind:'Commit status'})))
+ .concat(runs.map(x=>({name:x.name+' #'+x.run_number,status:x.conclusion||x.status,url:safeUrl(x.html_url),kind:'Workflow'})));
  target.innerHTML='<div class="gh-stats"><span>Checks '+checks.length+'</span><span>Success '+succeeded+'</span><span>Pending '+pending+'</span><span>Failed '+failed+'</span></div>'+rows.map(x=>'<div class="gh-row"><div><b>'+esc(x.name)+'</b><div class="gh-muted">'+esc(x.kind)+'</div></div>'+pill(x.status)+'<a class="gh-link" target="_blank" rel="noopener noreferrer" href="'+esc(x.url||'#')+'">Open ↗</a></div>').join('')||'<div class="gh-empty">No CI checks or workflow runs reported for this commit.</div>';
  const errors=results.map((r,i)=>r.status==='rejected'?['checks','statuses','workflow runs'][i]+': '+r.reason.message:null).filter(Boolean);
  if(errors.length)target.insertAdjacentHTML('beforeend','<p class="gh-muted">Some sources unavailable: '+esc(errors.join(' · '))+'</p>');
