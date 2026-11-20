@@ -58,7 +58,7 @@ AFTER UPDATE OF status ON autorun_jobs
 WHEN OLD.status <> NEW.status
 BEGIN
   INSERT INTO autorun_job_events(job_id,event_type,status,runner_id,details_json,created_at)
-  VALUES(NEW.job_id,'status_changed',NEW.status,COALESCE(NEW.lease_owner,''),json_object('from',OLD.status,'attempt',NEW.attempt),NEW.updated_at);
+  VALUES(NEW.job_id,'status_changed',NEW.status,COALESCE(NEW.lease_owner,OLD.lease_owner,''),json_object('from',OLD.status,'attempt',NEW.attempt),NEW.updated_at);
 END;
 
 CREATE TRIGGER IF NOT EXISTS trg_autorun_jobs_cancel_event
