@@ -60,7 +60,7 @@ The connected execution runner currently blocks outbound HTTP requests to Worker
 
 1. Confirm the Vercel project is `mcp-auth-ocodejs`, linked to `OCodejs/mcp.auth.ocodejs`, and that Preview remains protected by Vercel SSO.
 2. Reconcile `package.json` and `package-lock.json` before requesting a new Preview build. The current mainline lockfile still names `@prisma/adapter-neon` while the manifest and Prisma client use `@prisma/adapter-pg` and `pg`.
-3. Confirm the Preview database is a dedicated non-production Auth resource. The Auth repository currently describes schema-level `auth_preview` isolation on an Auth-only PostgreSQL instance; verify the actual target before initializing it.
+3. Confirm the Preview database is a dedicated non-production Auth resource. The Auth repository currently describes schema-level `auth_preview` isolation on an Auth-only PostgreSQL instance; verify the actual target before initializing it. The current Vercel project has project-level database variable names targeting Preview and Production, while the latest Preview branch has no branch-specific Auth.js variables in the read-only inventory. Do not assume physical isolation.
 4. Configure Preview-only `DATABASE_URL`, `DATABASE_URL_POOLED`, `AUTH_SECRET`, `AUTH_URL`, provider credentials and `AUTH_PREVIEW_DB_PUSH=true` only where schema initialization is explicitly intended. Never set the Preview push flag in Production.
 5. Confirm `GET /api/health` returns `200 ready` against the intended Preview database.
 6. Verify registration, invalid-password handling, GitHub OAuth, Google OAuth, session persistence, profile creation, logout and negative authorization cases.
