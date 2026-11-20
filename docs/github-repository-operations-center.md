@@ -39,3 +39,10 @@ Until those controls are deployed and independently reviewed, this workspace mus
 - Inventory is scoped to the organization endpoint derived from the selected repository owner and returns at most 100 repositories per request.
 - Pull Request Center returns at most 30 PRs and enriches at most 12 with reviews, check-runs and legacy commit statuses. `Unknown` / `Not loaded` means GitHub did not provide a verified value; it is not treated as success.
 - GitHub App installation, OAuth identity binding, RBAC enforcement, audit persistence and all write operations remain unimplemented by design.
+
+## Review remediation update
+- Replaced dynamic `innerHTML` / `insertAdjacentHTML` writes with a centralized inert DOMParser-to-DOM import helper. All API-derived text remains HTML-escaped before parsing; external targets are limited to HTTP(S), and unsafe CI URLs render as non-clickable text.
+- Invalidated in-flight inventory, PR, file, and comparison requests whenever the repository target changes; repository panels are reset at load start and replaced with an error state on failure.
+- Added a 15-second API timeout, strict UTF-8 decoding for previews, branch/repository inventory pagination (bounded at 1,000 items), and explicit cap warnings for large comparisons.
+- CI aggregates check runs, commit statuses, and workflow runs. Check-runs use GitHub's maximum 100-per-page response; if GitHub reports more checks than returned, the headline is marked partial. Workflow and commit-status failures are included in PR-level check classification.
+- Browser smoke test and full live GitHub API interaction test remain pending. No CI workflow was dispatched manually.
