@@ -83,6 +83,9 @@ async function enqueue(request, env) {
     "SELECT job_id,repository,branch,commit_sha,command_ids_json,status,attempt,max_attempts,created_at,updated_at FROM autorun_jobs WHERE idempotency_key=?",
   ).bind(job.key).first();
   if (!saved) return reply({ error: "queue_write_failed" }, 500);
+  if (saved.repository !== job.repo || saved.branch !== job.branch || saved.commit_sha !== job.sha || saved.command_ids_json !== JSON.stringify(job.commands)) {
+    return reply({ error: "idempotency_key_conflict" }, 409);
+  }
   return reply({ job: { ...saved, commandIds: JSON.parse(saved.command_ids_json) } }, 202);
 }
 
