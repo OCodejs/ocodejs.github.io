@@ -1,0 +1,16 @@
+{
+  "name": "ocodejs-control-center",
+  "version": "1.0.0",
+  "description": "OCodeJS Server Control Center",
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'Static site - open index.html in browser'",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": ["ocodejs", "control-center", "analytics"],
+  "author": "OCodeJS",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  }
+}
