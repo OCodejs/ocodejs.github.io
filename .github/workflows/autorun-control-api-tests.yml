@@ -122,6 +122,5 @@ jobs:
           if (!response.ok) {
             throw new Error(`OCodeJS Control API rejected run: HTTP ${response.status} ${body}`);
           }
-          process.stdout.write(body + "\
-");
+          process.stdout.write(body + "\n");
           NODE
