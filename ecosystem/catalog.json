@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "updated": "2026-11-23",
+  "note": "Curated cross-organization projects. Repository presence is not a claim of deployment or operational readiness.",
+  "projects": [
+    {
+      "repository": "OCodejs/OCodejs",
+      "category": "core",
+      "name": "OCode.js Core",
+      "description": "Core OCode.js package and platform source."
+    },
+    {
+      "repository": "OCodejs/ask-chatbot",
+      "category": "ai",
+      "name": "Ask Chatbot",
+      "description": "OCodeJS AI assistant application."
+    },
+    {
+      "repository": "OCodejs/THU365",
+      "category": "ai",
+      "name": "THU365",
+      "description": "Beauty camera and creator application."
+    },
+    {
+      "repository": "OCodejs/cli-hub",
+      "category": "developer",
+      "name": "OCodeJS CLI Hub",
+      "description": "CLI tools and developer navigation."
+    },
+    {
+      "repository": "OCodejs/docs-ocodejs",
+      "category": "docs",
+      "name": "OCodeJS Documentation",
+      "description": "Documentation and technical guides."
+    },
+    {
+      "repository": "OCodejs/ocodejs-legal",
+      "category": "docs",
+      "name": "OCodeJS Legal Center",
+      "description": "Legal information and project policies."
+    },
+    {
+      "repository": "OCodejs/mcp.auth.ocodejs",
+      "category": "infra",
+      "name": "Account Portal Auth",
+      "description": "Separate authentication application; readiness must be verified independently."
+    },
+    {
+      "repository": "zskbot/ask-ocodejs",
+      "category": "ai",
+      "name": "Ask OCodeJS",
+      "description": "AI assistant and developer workflow."
+    },
+    {
+      "repository": "zskbot/v0-sdk",
+      "category": "developer",
+      "name": "v0 SDK Integration",
+      "description": "SDK integration for AI-assisted app building."
+    },
+    {
+      "repository": "zskbot/claude-code-action",
+      "category": "developer",
+      "name": "Claude Code Action",
+      "description": "GitHub automation and coding-agent workflow."
+    },
+    {
+      "repository": "zskbot/eve",
+      "category": "ai",
+      "name": "EVE",
+      "description": "AI agent project."
+    },
+    {
+      "repository": "zskbot/skills.md",
+      "category": "developer",
+      "name": "Skills Catalog",
+      "description": "Reusable agent skills and developer references."
+    },
+    {
+      "repository": "zskbot/codespaces-nextjs",
+      "category": "developer",
+      "name": "Codespaces Next.js",
+      "description": "Cloud development environment and Next.js starter."
+    },
+    {
+      "repository": "zskbot/autoship-velclaw",
+      "category": "infra",
+      "name": "AutoShip Velclaw",
+      "description": "Automation and deployment workflow integration."
+    },
+    {
+      "repository": "zskbot/skills-github-pages",
+      "category": "developer",
+      "name": "GitHub Pages Skills",
+      "description": "Reusable GitHub Pages automation skills."
+    },
+    {
+      "repository": "Velclaw/VELCLAW",
+      "category": "partner",
+      "name": "VELCLAW",
+      "description": "Connected infrastructure and platform ecosystem."
+    },
+    {
+      "repository": "Velclaw/Cloudxx",
+      "category": "partner",
+      "name": "Cloudxx",
+      "description": "Hosting and domain-management project."
+    },
+    {
+      "repository": "Velclaw/VelclawHost-Control-Center",
+      "category": "partner",
+      "name": "VelclawHost Control Center",
+      "description": "Hosting control-center integration."
+    }
+  ]
+}

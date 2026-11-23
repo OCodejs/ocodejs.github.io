@@ -2,6 +2,8 @@
 
 OCodeJS Server Control Center and public technical documentation.
 
+- **Ecosystem Hub:** [project directory](ecosystem/) · [ecosystem overview](docs/ecosystem-overview.md)
+
 - **Custom domain:** https://ocodejs.co (CNAME declared; verify DNS and HTTPS in GitHub Pages). Fallback: https://ocodejs.github.io/
 - **Control Center source:** [index.html](index.html)
 - **Project Registry:** [projects/](projects/index.html) · [registry JSON](projects.registry.json)
