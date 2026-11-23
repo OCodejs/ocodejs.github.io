@@ -3,6 +3,7 @@
 OCodeJS Server Control Center and public technical documentation.
 
 - **Ecosystem Hub:** [project directory](ecosystem/) · [ecosystem overview](docs/ecosystem-overview.md)
+
 - **Custom domain:** https://ocodejs.co (CNAME declared; verify DNS and HTTPS in GitHub Pages). Fallback: https://ocodejs.github.io/
 - **Control Center source:** [index.html](index.html)
 - **Project Registry:** [projects/](projects/index.html) · [registry JSON](projects.registry.json)
@@ -22,7 +23,7 @@ OCodeJS Server Control Center and public technical documentation.
 
 The GitHub Pages frontend is static. A separate Cloudflare staging Control API provides read-only health, service, agent and provider registries. The OCode.js CLI Pages theme is merged to main. Agent/Provider Registry and expanded MCP discovery are staged behind open PRs; Production remains unchanged.
 
-The OCodeJS CLI GitHub OAuth/PAT Worker is separate from Account Portal Auth.js. The Account Portal source is the separate OCodejs/mcp.auth.ocodejs application, deployed through the Vercel project mcp-auth-ocodejs; GitHub Pages is only the static Control Center and never handles login credentials or sessions. The latest observed Auth Preview is a READY build from an older feature branch, not a fresh build of current main. Current main has a package manifest / lockfile mismatch that must be reconciled before a reproducible Preview build. Database readiness, OAuth callbacks, session persistence and logout are not verified; sign-in remains disabled. The staging MCP server exposes six read-only tools, including provider listing and lookup. The Provider Registry lists Workers AI as not configured; the runtime readiness endpoint confirms that inference, agent execution and run lifecycle remain disabled. Workers Logs/Traces are enabled, while centralized metrics and queryable audit storage remain pending.
+The OCodeJS CLI GitHub OAuth/PAT Worker is separate from Account Portal Auth.js. The Account Portal source is the separate `OCodejs/mcp.auth.ocodejs` application, deployed through the Vercel project `mcp-auth-ocodejs`; GitHub Pages is only the static Control Center and never handles login credentials or sessions. The latest observed Auth Preview is a READY build from an older feature branch, not a fresh build of current `main`. Current `main` has a package manifest / lockfile mismatch that must be reconciled before a reproducible Preview build. Database readiness, OAuth callbacks, session persistence and logout are not verified; sign-in remains disabled. The staging MCP server exposes six read-only tools, including provider listing and lookup. The Provider Registry lists Workers AI as not configured; the runtime readiness endpoint confirms that inference, agent execution and run lifecycle remain disabled. Workers Logs/Traces are enabled, while centralized metrics and queryable audit storage remain pending.
 
 ## Development
 
