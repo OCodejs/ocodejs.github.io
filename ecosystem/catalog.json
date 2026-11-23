@@ -10,12 +10,6 @@
       "description": "Core OCode.js package and platform source."
     },
     {
-      "repository": "OCodejs/Ocode.js",
-      "category": "core",
-      "name": "OCode.js Framework",
-      "description": "Framework and package development."
-    },
-    {
       "repository": "OCodejs/ask-chatbot",
       "category": "ai",
       "name": "Ask Chatbot",
@@ -52,22 +46,10 @@
       "description": "Separate authentication application; readiness must be verified independently."
     },
     {
-      "repository": "zskbot/ocodejs-cli",
-      "category": "developer",
-      "name": "OCodeJS CLI Hub",
-      "description": "CLI ecosystem hub, tools catalog and navigation."
-    },
-    {
       "repository": "zskbot/ask-ocodejs",
       "category": "ai",
       "name": "Ask OCodeJS",
       "description": "AI assistant and developer workflow."
-    },
-    {
-      "repository": "zskbot/woww",
-      "category": "core",
-      "name": "woww Framework",
-      "description": "Independent full-stack JavaScript framework project."
     },
     {
       "repository": "zskbot/v0-sdk",
