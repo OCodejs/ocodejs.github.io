@@ -9,7 +9,10 @@ on:
       - ".github/workflows/autorun-control-api-tests.yml"
       - ".github/workflows/autorun-events.yml"
       - "scripts/autorun-control-api.test.mjs"
-      - "autorun/workspace.js"\n      - "github/workspace.js"\n      - "github/README.md"\n      - "scripts/check-github-workspace.mjs"
+      - "autorun/workspace.js"
+      - "github/workspace.js"
+      - "github/README.md"
+      - "scripts/check-github-workspace.mjs"
   push:
     branches: [main]
     paths:
@@ -37,7 +40,11 @@ jobs:
           node-version: 22
       - name: Check AutoRun dashboard workspace syntax
         run: node --check autorun/workspace.js
-      - name: Check GitHub Workspace module syntax\n        run: node --check github/workspace.js\n      - name: Test GitHub Workspace contract\n        run: node scripts/check-github-workspace.mjs\n      - name: Test AutoRun Control API and direct OIDC reporting
+      - name: Check GitHub Workspace module syntax
+        run: node --check github/workspace.js
+      - name: Test GitHub Workspace contract
+        run: node scripts/check-github-workspace.mjs
+      - name: Test AutoRun Control API and direct OIDC reporting
         run: node --experimental-sqlite --test scripts/autorun-control-api.test.mjs scripts/autorun-queue.test.mjs
 
   report:
@@ -115,5 +122,5 @@ jobs:
           if (!response.ok) {
             throw new Error(`OCodeJS Control API rejected run: HTTP ${response.status} ${body}`);
           }
-          process.stdout.write(body + "\\n");
+          process.stdout.write(body + "\n");
           NODE
