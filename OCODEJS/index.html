@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#05070f">
+<meta name="description" content="OCode.js — bộ tiện ích JavaScript và TypeScript mã nguồn mở, nhẹ, không có runtime dependencies.">
+<link rel="canonical" href="https://ocodejs.co/OCODEJS/">
+<title>OCode.js — JavaScript & TypeScript Utilities</title>
+<style>
+:root{color-scheme:dark;--bg:#05070f;--panel:#0a0d16;--line:#242c3a;--fg:#f3f5fb;--muted:#929bad;--blue:#7194ff;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse 70% 420px at 50% -180px,#18264a 0,transparent 72%),var(--bg);color:var(--fg);font:13px var(--mono);line-height:1.7}a{color:inherit;text-decoration:none}.wrap{width:min(1160px,calc(100% - 36px));margin:auto}.top{height:68px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-weight:800;letter-spacing:-.07em;font-size:16px}.brand span{color:var(--blue)}.nav{display:flex;gap:18px;color:var(--muted);font-size:10px}.nav a:hover,.link:hover{color:#fff}.hero{padding:82px 0 54px;border-bottom:1px solid var(--line)}.eyebrow{font-size:10px;color:var(--blue);letter-spacing:.17em;text-transform:uppercase}.hero h1{font-size:clamp(38px,7vw,76px);line-height:1.02;letter-spacing:-.085em;margin:18px 0}.hero p{max-width:720px;color:var(--muted);font-size:13px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:24px}.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid #536b9f;background:#14213a;padding:11px 15px;font-size:10px}.btn.secondary{background:transparent;border-color:var(--line);color:#c1cada}.btn:hover{border-color:var(--blue)}section{padding:42px 0;border-bottom:1px solid var(--line)}h2{font-size:17px;letter-spacing:-.04em;margin:0 0 15px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.card{border:1px solid var(--line);background:linear-gradient(145deg,#0d1320,#080b12);padding:18px;min-width:0}.card h3{font-size:12px;margin:0 0 7px}.card p{font-size:10px;color:var(--muted);margin:0}.tag{display:inline-block;border:1px solid #33415a;color:#b8c8e8;padding:3px 6px;font-size:8px;margin-top:13px}.code{overflow:auto;background:#080b12;border:1px solid var(--line);padding:16px;color:#cbd7ed;font:11px/1.9 var(--mono)}.columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}.links{display:flex;gap:12px;flex-wrap:wrap}.link{color:#b9ccff;border-bottom:1px solid #536b9f;padding-bottom:2px;font-size:10px}.foot{padding:22px 0;color:var(--muted);font-size:9px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:720px){.hero{padding:56px 0 38px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.nav{gap:9px;font-size:9px}.wrap{width:calc(100% - 28px)}}@media(max-width:460px){.grid{grid-template-columns:1fr}.nav a:nth-child(2){display:none}.hero h1{font-size:43px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="top wrap"><a class="brand" href="../">OCode<span>.js</span></a><nav class="nav" aria-label="Điều hướng"><a href="#features">Tính năng</a><a href="#quickstart">Bắt đầu</a><a href="https://github.com/OCodejs/OCODEJS" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">OPEN SOURCE · JAVASCRIPT / TYPESCRIPT</div><h1>Small utilities.<br>Clear APIs.</h1><p>OCode.js là bộ tiện ích JavaScript và TypeScript gọn nhẹ cho ứng dụng hiện đại. Các module có thể kết hợp độc lập, ưu tiên kiểu dữ liệu rõ ràng và không thêm runtime dependencies.</p><div class="actions"><a class="btn" href="https://github.com/OCodejs/OCODEJS" target="_blank" rel="noopener noreferrer">XEM SOURCE CODE ↗</a><a class="btn secondary" href="https://github.com/OCodejs/OCODEJS/blob/main/docs/quickstart.md" target="_blank" rel="noopener noreferrer">QUICK START ↗</a></div><p class="muted">Phiên bản mã nguồn: v0.1.0 · npm: ocode-js@0.1.0 · MIT · Node.js ≥ 18</p></section>
+<section id="features"><h2>Module catalog</h2><div class="grid">
+<article class="card"><h3>String</h3><p>Slug, chuyển đổi kiểu chữ, HTML escaping và cắt chuỗi an toàn.</p><span class="tag">ocode-js/string</span></article>
+<article class="card"><h3>Object</h3><p>Pick / omit, deep merge, đọc nested path và JSON clone.</p><span class="tag">ocode-js/object</span></article>
+<article class="card"><h3>Async</h3><p>Sleep có AbortSignal, retry/backoff, deduplicate và timeout.</p><span class="tag">ocode-js/async</span></article>
+<article class="card"><h3>URL</h3><p>Query updates, URL joining, parsing và loại tracking parameters.</p><span class="tag">ocode-js/url</span></article>
+<article class="card"><h3>Validation</h3><p>Kiểm tra string, email, HTTP URL, record và range.</p><span class="tag">ocode-js/validation</span></article>
+<article class="card"><h3>HTTP</h3><p>JSON fetch và request helpers cho ứng dụng.</p><span class="tag">ocode-js/http</span></article>
+<article class="card"><h3>Browser</h3><p>Truy cập localStorage có kiểm tra môi trường và JSON helpers.</p><span class="tag">ocode-js/browser</span></article>
+<article class="card"><h3>Environment</h3><p>Đọc biến môi trường bắt buộc/tùy chọn và parse kiểu dữ liệu.</p><span class="tag">ocode-js/env</span></article>
+<article class="card"><h3>Logger</h3><p>Logger tối giản với levels và output sink có thể cấu hình.</p><span class="tag">ocode-js/logger</span></article>
+</div></section>
+<section id="quickstart"><h2>Quick start from source</h2><div class="columns"><div><p class="muted">Cài package đã phát hành từ npm, hoặc clone repository để chạy test và phát triển:</p><pre class="code">npm install ocode-js
+
+# Từ source repository:
+git clone https://github.com/OCodejs/OCODEJS.git
+cd OCODEJS
+npm ci
+npm run build
+npm test</pre></div><div><p class="muted">Ví dụ sử dụng các helper:</p><pre class="code">import { slugify, retry } from "ocode-js";
+
+const slug = slugify("Build a better web");
+
+const result = await retry(
+  () => fetch("/api/status"),
+  { attempts: 3, delayMs: 200 }
+);</pre></div></div><p class="muted">Yêu cầu Node.js 18 trở lên. Chỉ gọi browser storage helpers trong môi trường trình duyệt. Không dùng escapeHtml cơ bản thay cho HTML sanitizer chuyên dụng với nội dung HTML không tin cậy.</p></section>
+<section><h2>Documentation & source</h2><div class="links"><a class="link" href="https://github.com/OCodejs/OCODEJS/blob/main/docs/API.md" target="_blank" rel="noopener noreferrer">API Reference ↗</a><a class="link" href="https://github.com/OCodejs/OCODEJS/blob/main/docs/quickstart.md" target="_blank" rel="noopener noreferrer">Quick Start ↗</a><a class="link" href="https://github.com/OCodejs/OCODEJS/blob/main/docs/TERMINAL.md" target="_blank" rel="noopener noreferrer">Terminal Tasks ↗</a><a class="link" href="https://github.com/OCodejs/OCODEJS/issues" target="_blank" rel="noopener noreferrer">Issues ↗</a><a class="link" href="https://github.com/OCodejs/OCODEJS/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License ↗</a></div></section>
+<footer class="foot"><span>OCode.js · Open source · MIT</span><span>Project page preview · source of truth: GitHub</span></footer>
+</main>
+</body>
+</html>
