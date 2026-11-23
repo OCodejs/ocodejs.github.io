@@ -22,7 +22,7 @@ The Ecosystem Hub at [/ecosystem/](../ecosystem/) is the public directory for OC
 | Developer tools | CLI Hub, v0 SDK, Codespaces and GitHub automation |
 | Infrastructure | Control API, MCP, Autorun and authentication integration |
 | Documentation | Technical documentation, guides and Legal Center |
-| Connected projects | woww Framework and Velclaw-related infrastructure |
+| Connected projects | connected frameworks and Velclaw-related infrastructure |
 
 ## Operational status policy
 
