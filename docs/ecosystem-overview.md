@@ -10,7 +10,7 @@ The Ecosystem Hub at [/ecosystem/](../ecosystem/) is the public directory for OC
 - OCodejs/ocodejs.github.io is the public control center, documentation entry point and project directory.
 - Product repositories remain the source of truth for application code, release history, issues and deployment configuration.
 - The organization registry in projects.registry.json tracks 38 OCodejs repositories and their explicit shared-module opt-ins.
-- The curated ecosystem/catalog.json adds selected cross-organization projects maintained under zskbot and Velclaw.
+- The curated ecosystem/catalog.json adds selected OCodejs projects plus connected public repositories maintained under zskbot and Velclaw. Its 18 entries include 7 OCodejs repositories and 11 repositories from other organizations; these are curated entries, not 18 additional cross-organization links.
 - The directory links to source repositories; it does not mirror application source or assert runtime health.
 
 ## Main project groups
