@@ -305,5 +305,10 @@ navigate('overview');
 </script>
 <script src="./autorun/workspace.js" defer></script>
 \n\n<script src="./github-workspace.js?v=1.0.0"></script>
+<script>
+if(window.OCodeNavigation&&typeof window.OCodeNavigation.registerItem==="function"){
+ window.OCodeNavigation.registerItem({id:"ecosystem-hub",label:"Ecosystem Hub",icon:"◇",group:"PLATFORM",onSelect:function(){window.location.assign("./ecosystem/");}});
+}
+</script>
 </body>
 </html>
