@@ -6,7 +6,7 @@ The organization search returned **76 repositories**. Root directory listings we
 - `OCodejs/docs.mdx` — remote protocol disconnect.
 - `OCodejs/.agents-skills-prisma-cli-SKILL.md` — returned content could not be trusted as a repository-specific listing.
 
-All 76 repositories are represented in the central registry. Classification is a working product taxonomy, not a legal or operational attestation. **18 upstream forks were explicitly verified** using GitHub repository metadata. The remaining repositories are marked lineage-unverified, not assumed to be original.
+All 76 repositories are represented in the central registry. Classification is a working product taxonomy, not a legal or operational attestation. **22 upstream forks were explicitly verified** using GitHub repository metadata. The remaining repositories are marked lineage-unverified, not assumed to be original.
 
 Root scans recorded README, manifest/lockfile presence, source directory structure, `.github` presence, and deployment-config filename presence. A root `.github` directory is not proof that workflows pass. A Vercel/Wrangler/Pages config is not proof of a healthy deployment.
 
@@ -103,7 +103,7 @@ Root scans recorded README, manifest/lockfile presence, source directory structu
 | Examples / references | 6 |
 | **Total** | **76** |
 
-Source lineage: 18 confirmed upstream forks; 58 repositories remain lineage-unverified. A repository's product type and source lineage are separate attributes.
+Source lineage: 22 confirmed upstream forks; 58 repositories remain lineage-unverified. A repository's product type and source lineage are separate attributes.
 
 ## Confirmed upstream forks
 
@@ -127,6 +127,10 @@ Source lineage: 18 confirmed upstream forks; 58 repositories remain lineage-unve
 | `OCodejs/vscode-codeql-starter` | `github/vscode-codeql-starter` |
 | `OCodejs/gh-aw` | `github/gh-aw` |
 | `OCodejs/proof-html` | `anishathalye/proof-html` |
+| `OCodejs/Cloudxx` | `Velclaw/Cloudxx` |
+| `OCodejs/documentation` | `npm/documentation` |
+| `OCodejs/ocode.js` | `vercel/next.js` |
+| `OCodejs/v0-chat` | `zskbot/v0-chat` |
 
 Forks are upstream-owned codebases. OCodeJS-specific changes must remain in isolated branches and be rebased/compared against upstream; no bulk UI injection or ownership claims.
 
