@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Framework-agnostic OCodeJS design tokens, UI primitives, and central navigation contract",
+  "description": "Framework-agnostic OCodeJS design tokens, UI primitives, and navigation contract",
   "exports": {
-    "./tokens.css": "./design-tokens.css",
-    "./ui.css": "./shared-ui.css",
-    "./navigation": "./navigation.js"
+    "./design-system": "./design-system/tokens.css",
+    "./shared-ui": "./shared-ui/ui.css",
+    "./navigation": "./navigation/navigation.js"
   },
   "sideEffects": [
-    "*.css"
+    "**/*.css"
   ]
 }
