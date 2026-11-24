@@ -3,15 +3,15 @@
 **Inventory date:** 2026-11-24  
 **Organization:** [OCodejs](https://github.com/OCodejs)  
 **Repositories discovered:** 76  
-**Registry entries after this change:** 78  
+**Registry entries after this change:** 76  
 **Existing registry entries:** 38  
-**New catalog entries:** 40
+**New catalog entries:** 38
 
 ## Executive findings
 
 The organization contains a mixture of product applications, framework and SDK sources, documentation collections, authentication services, infrastructure projects, agent skills, examples, and upstream/reference repositories. These repositories should be discoverable through one central ecosystem UI, but they should not be flattened into one runtime or have their source copied indiscriminately.
 
-The current central repository, `OCodejs/ocodejs.github.io`, already provides a static Control Center, project directory, shared design assets, a project registry, and a pull-request-based synchronization policy. The current registry contained 38 entries while the organization inventory returned 76 repositories. This change adds the missing 40 repositories as catalog entries.
+The current central repository, `OCodejs/ocodejs.github.io`, already provides a static Control Center, project directory, shared design assets, a project registry, and a pull-request-based synchronization policy. The current registry contained 38 entries while the organization inventory returned 76 repositories. This change adds the missing 38 repositories as catalog entries.
 
 ## Architecture decision
 
@@ -54,7 +54,7 @@ The current central repository, `OCodejs/ocodejs.github.io`, already provides a 
 | [THU365](https://github.com/OCodejs/THU365) | public | `main` | Already catalogued |
 | [docss](https://github.com/OCodejs/docss) | public | `main` | Added, sync disabled |
 | [ocodejs.github.io](https://github.com/OCodejs/ocodejs.github.io) | public | `main` | Already catalogued |
-| [OCODEJS](https://github.com/OCodejs/OCODEJS) | public | `main` | Added, sync disabled |
+| [OCODEJS](https://github.com/OCodejs/OCODEJS) | public | `main` | Already catalogued |
 | [Autorun](https://github.com/OCodejs/Autorun) | public | `main` | Added, sync disabled |
 | [docs.md](https://github.com/OCodejs/docs.md) | public | `main` | Added, sync disabled |
 | [docs.mdx](https://github.com/OCodejs/docs.mdx) | public | `main` | Added, sync disabled |
@@ -81,7 +81,7 @@ The current central repository, `OCodejs/ocodejs.github.io`, already provides a 
 | [github-pages](https://github.com/OCodejs/github-pages) | public | `main` | Already catalogued |
 | [feat-ocodejs-chatbot-integration](https://github.com/OCodejs/feat-ocodejs-chatbot-integration) | public | `main` | Added, sync disabled |
 | [website](https://github.com/OCodejs/website) | public | `main` | Added, sync disabled |
-| [ocode.js](https://github.com/OCodejs/ocode.js) | public | `canary` | Added, sync disabled |
+| [ocode.js](https://github.com/OCodejs/ocode.js) | public | `canary` | Already catalogued |
 | [checkout](https://github.com/OCodejs/checkout) | public | `main` | Added, sync disabled |
 | [api](https://github.com/OCodejs/api) | public | `main` | Added, sync disabled |
 | [SKILLS.SH](https://github.com/OCodejs/SKILLS.SH) | public | `main` | Added, sync disabled |
@@ -122,6 +122,7 @@ The current central repository, `OCodejs/ocodejs.github.io`, already provides a 
 | [host](https://github.com/OCodejs/host) | public | `main` | Already catalogued |
 | [github-mcp-server](https://github.com/OCodejs/github-mcp-server) | public | `main` | Already catalogued |
 | [platform-ocodejs-dev](https://github.com/OCodejs/platform-ocodejs-dev) | public | `main` | Already catalogued |
+
 
 ## Validation gaps
 
