@@ -91,6 +91,20 @@ Root scans recorded README, manifest/lockfile presence, source directory structu
 | [workflow](https://github.com/OCodejs/workflow) | application | Lineage not yet checked | manifest-presence-reviewed |
 | [workflow-examples](https://github.com/OCodejs/workflow-examples) | example-reference | Lineage not yet checked | manifest-presence-reviewed |
 
+## Classification totals
+
+| Type | Repositories |
+|---|---:|
+| Applications | 27 |
+| Services / infrastructure | 17 |
+| Documentation | 10 |
+| Shared libraries / SDKs | 11 |
+| Skills | 5 |
+| Examples / references | 6 |
+| **Total** | **76** |
+
+Source lineage: 18 confirmed upstream forks; 58 repositories remain lineage-unverified. A repository's product type and source lineage are separate attributes.
+
 ## Confirmed upstream forks
 
 | Repository | Upstream |
