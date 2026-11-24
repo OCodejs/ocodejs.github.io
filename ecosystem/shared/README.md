@@ -10,9 +10,9 @@ This directory is the source payload distributed by the central OCode.js ecosyst
 - Add a module to a target only after auditing its framework and integration path in `projects.registry.json`.
 
 ## Available modules
-- `modules/design-tokens.css` — canonical semantic tokens.
-- `modules/shared-ui.css` — accessible, square-corner UI primitives.
-- `modules/navigation.js` — shared navigation contract; no auth/session handling.
+- `modules/design-system/tokens.css` — canonical semantic tokens.
+- `modules/shared-ui/ui.css` — accessible, square-corner UI primitives.
+- `modules/navigation/navigation.js` — shared navigation contract; no auth/session handling.
 - See [module usage](modules/README.md).
 
 ## Adding a shared module
