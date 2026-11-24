@@ -5,6 +5,10 @@ on:
     paths:
       - "projects.registry.json"
       - "scripts/check-project-registry.mjs"
+      - "scripts/validate-shared-ui.mjs"
+      - "ecosystem/shared/modules/**"
+      - "ecosystem/index.html"
+      - "index.html"
       - ".github/workflows/registry-validation.yml"
   push:
     branches: [main]
