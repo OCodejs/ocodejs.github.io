@@ -65,6 +65,15 @@ jobs:
               continue
             fi
 
+            # Avoid duplicate PRs when a repository already has the dedicated shared-UI adoption PR.
+            existing_pr="$(gh pr list --repo "$repo" --state open --json headRefName,title --jq '[.[] | select(.headRefName == "feat/ocodejs-shared-ui-sync-20261124" or .title == "chore(ocodejs): add managed shared UI assets")] | length')"
+            if [[ "$existing_pr" != "0" ]]; then
+              echo "An OCodeJS shared-UI adoption PR is already open; skipping duplicate sync."
+              rm -rf "$workdir"
+              echo "::endgroup::"
+              continue
+            fi
+
             changed=false
             while IFS= read -r module; do
               source_dir="ecosystem/shared/modules/${module}"
