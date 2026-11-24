@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "registryVersion": "1.0.0",
+  "registryVersion": "1.1.0",
   "organization": "OCodejs",
   "controlRepository": "OCodejs/ocodejs.github.io",
   "sourceOfTruth": {
@@ -649,6 +649,613 @@
         "createPullRequest": true
       },
       "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+    },
+    {
+      "repository": "OCodejs/mcp.auth.ocodejs",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "identity",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/ask-ocodejs",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/oauth",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "identity",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/docss",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "documentation",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/OCODEJS",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/Autorun",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "infrastructure",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/docs.md",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "documentation",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/docs.mdx",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "documentation",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/PostgreSQL",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "infrastructure",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/Codespaces-OCodeJS",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/ocodejs-monorepo",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/mcp.server.auth",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "identity",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/docs.rtf",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "documentation",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/Ocodejs-codespaces",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/workflow",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/octocat.github.io",
+      "defaultBranch": "master",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/ai",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/nextjs-auth0",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "identity",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/eve-chat-template",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "kind": "application",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/Authentication",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "identity",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/feat-ocodejs-chatbot-integration",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/website",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/ocode.js",
+      "defaultBranch": "canary",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/checkout",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/api",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/SKILLS.SH",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "skills",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/next-platform-starter",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "infrastructure",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/repository",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/studio",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "application",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/v0-sdk",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/next-platform-starter-3d98a",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "infrastructure",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/ocodejs-api",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/vscode-codeql-starter",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/codespaces",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/sdk",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/workflow-examples",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/satori",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/vercel",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "developer-platform",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/qstash-js",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "reference",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+    },
+    {
+      "repository": "OCodejs/auth-gateway-phase-1-2",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "kind": "identity",
+      "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
+      "sync": {
+        "enabled": false,
+        "modules": [],
+        "targetDirectory": ".ocodejs/shared/",
+        "strategy": "managed-copy",
+        "createPullRequest": true
+      },
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
     }
-  ]
+  ],
+  "audit": {
+    "lastInventoryAt": "2026-11-24",
+    "organizationRepositoryCount": 76,
+    "cataloguedRepositoryCount": 78,
+    "unclassifiedSyncOptInRequired": true,
+    "notes": "Inventory metadata is based on GitHub organization search. Repository contents, build pipelines, deployments, and ownership boundaries require per-repository validation."
+  }
 }
