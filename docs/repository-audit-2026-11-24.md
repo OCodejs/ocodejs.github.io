@@ -152,7 +152,23 @@ The following manifests/configurations were read directly:
 | `mcp.auth.ocodejs` deployment | Vercel config exists; current README states Account Portal readiness and callback/session persistence are not verified. |
 | `ocodejs.github.io` | Static control center and Pages/registry; root build script is a placeholder echo, not a production compiler. Existing Vercel checks report blocked deployments/account status. |
 
+| `0codejs` | Next.js + React, private app, Next build/lint scripts; no test script declared in root manifest. |
+| `aitools-agent` | Next.js + Eve runtime, Node 24.x, typecheck/build/eval/deploy scripts; broad UI/AI dependencies. |
+| `chatbot` | Next.js, pnpm 10.32.1, Playwright tests; build invokes database migration before Next build. Never trigger a Production build to test CSS-only assets. |
+| `host` | Mixed Next.js + Vite + Express/server bundle, Bun 1.4.4, Prisma/PostgreSQL; multi-stage build and worker runtime. |
+| `nextjs-boilerplate` | Minimal Next.js + React starter; build/lint scripts but no test script in root manifest. |
+| `platform-ocodejs-dev` | Vite/React plus Node/Express API and MCP; Vitest/ESLint; broad provider and storage dependencies. |
+| `Cloudxx` | Next.js + Prisma + Auth.js, Node 22 range; confirmed fork of `Velclaw/Cloudxx`, therefore excluded from automatic OCodeJS sync. |
+
 ## CI and deployment findings
+
+- `ask-chatbot` CI workflow runs npm install, Vercel config validation, tests, and Pages frontend build. The repository has many additional generated/template workflows; workflow count alone is not a health signal.
+- `THU365` validation uses pnpm 10.11.1, frozen lockfile install, workspace typecheck and app build. Its current path filter does not include `.ocodejs/shared/**`; this asset-only PR therefore does not exercise the app build.
+- `OCODEJS` CI uses npm ci, build/tests, coverage, package dry-run and a staging build smoke test.
+- `chatbot` has a Next.js Pages workflow on pushes to main; its build invokes database migrations. This draft asset PR does not target main and does not trigger that deployment workflow.
+- `cli-hub` PR validation runs catalog checks, tests, auth-server tests and Cloudflare Worker tests.
+- `docs` and `docs-ocodejs` validate Python syntax, local links and homepage HTML; their current filters do not include `.ocodejs/shared/**`.
+- The central registry validation workflow has been extended to run the shared-UI contract check. Its Actions runs are currently queued, not completed.
 
 - Root structure scan identifies `.github` workflow directories on most repositories; actual workflow contents, required checks, and latest run conclusions have not yet been exhaustively read for all 76.
 - Manifest/lockfile presence is recorded in the inventory pass; only the nine repositories above received deeper manifest/config review in this pass.
