@@ -4,9 +4,9 @@
 Provide one framework-agnostic visual contract for OCodeJS applications without turning independent applications into a monolith.
 
 ## Canonical source
-- Tokens: `ecosystem/shared/modules/design-tokens.css`
-- Primitives: `ecosystem/shared/modules/shared-ui.css`
-- Navigation contract: `ecosystem/shared/modules/navigation.js`
+- Tokens: `ecosystem/shared/modules/design-system/tokens.css`
+- Primitives: `ecosystem/shared/modules/shared-ui/ui.css`
+- Navigation contract: `ecosystem/shared/modules/navigation/navigation.js`
 
 ## Visual language
 - Default dark palette: `#05070f` background, `#0a0d16` elevated surfaces, `#f3f5fb` foreground.
