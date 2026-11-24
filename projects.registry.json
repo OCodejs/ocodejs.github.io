@@ -690,7 +690,7 @@
       "repository": "OCodejs/gh-aw",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "dependency",
+      "kind": "shared-library",
       "description": "GitHub Agentic Workflows source",
       "sync": {
         "enabled": false,
