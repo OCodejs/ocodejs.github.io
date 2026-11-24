@@ -171,6 +171,29 @@ The existing sync workflow copies each opted-in module to `.ocodejs/shared/{modu
 
 The central Control Center and Ecosystem Hub now load the shared CSS. The Account navigation entry links to the auth source repository with an explicit unverified status; it is not a login action. No session, credentials, or auth API is proxied through static Pages.
 
+## Opt-in target PRs staged
+
+Each opted-in non-fork target receives a dedicated draft PR. The payload is isolated under `.ocodejs/shared/`; no application entrypoint or route is changed in this wave.
+
+| Target repository | Draft PR | Modules staged |
+|---|---|---|
+| `OCodejs/ask-chatbot` | [#10](https://github.com/OCodejs/ask-chatbot/pull/10) | design-system, shared-ui, navigation |
+| `OCodejs/THU365` | [#45](https://github.com/OCodejs/THU365/pull/45) | design-system, shared-ui, navigation |
+| `OCodejs/OCODEJS` | [#86](https://github.com/OCodejs/OCODEJS/pull/86) | design-system, shared-ui, navigation |
+| `OCodejs/chatbot` | [#4](https://github.com/OCodejs/chatbot/pull/4) | design-system, shared-ui, navigation |
+| `OCodejs/cli-hub` | [#6](https://github.com/OCodejs/cli-hub/pull/6) | design-system, shared-ui, navigation |
+| `OCodejs/docs` | [#5](https://github.com/OCodejs/docs/pull/5) | design-system, navigation |
+| `OCodejs/docs-ocodejs` | [#13](https://github.com/OCodejs/docs-ocodejs/pull/13) | design-system, navigation |
+| `OCodejs/0codejs` | [#1](https://github.com/OCodejs/0codejs/pull/1) | design-system, shared-ui |
+| `OCodejs/aitools-agent` | [#1](https://github.com/OCodejs/aitools-agent/pull/1) | design-system, shared-ui |
+| `OCodejs/host` | [#1](https://github.com/OCodejs/host/pull/1) | design-system, shared-ui, navigation |
+| `OCodejs/nextjs-boilerplate` | [#1](https://github.com/OCodejs/nextjs-boilerplate/pull/1) | design-system |
+| `OCodejs/OCode-js-pages` | [#2](https://github.com/OCodejs/OCode-js-pages/pull/2) | design-system, shared-ui, navigation |
+| `OCodejs/ocodejs-legal` | [#1](https://github.com/OCodejs/ocodejs-legal/pull/1) | design-system, shared-ui, navigation |
+| `OCodejs/platform-ocodejs-dev` | [#1](https://github.com/OCodejs/platform-ocodejs-dev/pull/1) | design-system, shared-ui, navigation |
+
+All 14 PRs were verified open, draft, and unmerged at the time of this audit. Four previously opted-in repositories were removed from automatic sync after fork verification: `Cloudxx`, `documentation`, `ocode.js`, and `v0-chat`. Do not sync shared UI into upstream forks without a separate upstream-aware review.
+
 ## Remaining gates
 
 1. Resolve the two inconclusive repository root scans.
