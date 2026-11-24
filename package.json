@@ -5,9 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "echo 'Static site - open index.html in browser'",
-    "build": "echo 'No build step required for static site'"
+    "build": "echo 'No build step required for static site'",
+    "validate:shared-ui": "node scripts/validate-shared-ui.mjs"
   },
-  "keywords": ["ocodejs", "control-center", "analytics"],
+  "keywords": [
+    "ocodejs",
+    "control-center",
+    "analytics"
+  ],
   "author": "OCodeJS",
   "license": "ISC",
   "dependencies": {
