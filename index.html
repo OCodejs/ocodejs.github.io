@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#07090d">
 <meta name="ocodejs-autorun-api" content="https://ocodejs-autorun-control-staging.ocodejs-df1.workers.dev">
 <meta name="description" content="OCodeJS Server Control Center — dashboard staging cho services, AI agents, API, authentication, MCP, logs và tài liệu.">
-<link rel="canonical" href="https://ocodejs.co/">
+<link rel="canonical" href="https://ocodejs.co/"><link rel="stylesheet" href="./ecosystem/shared/modules/design-tokens.css"><link rel="stylesheet" href="./ecosystem/shared/modules/shared-ui.css">
 <title>OCodeJS Server — Control Center</title>
 <style>
 :root{color-scheme:dark;--bg:#07090d;--side:#090c12;--panel:#0d1119;--panel2:#111722;--line:#202938;--text:#eef2f8;--muted:#8390a3;--blue:#7194ff;--cyan:#6dd6dc;--green:#63d6a2;--amber:#f2bd68;--red:#f07f86;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
@@ -31,7 +31,7 @@
  <div class="side-bottom"><div class="connection"><small>ENVIRONMENT</small><strong>Cloudflare · staging API</strong><span class="demo-pill">● STAGING</span></div></div>
 </aside>
 <main class="main">
- <header class="topbar"><div class="top-actions"><button class="mobile-menu" id="mobileMenu" type="button" aria-label="Mở menu điều hướng" aria-controls="sidebar" aria-expanded="false"><span aria-hidden="true">☰</span></button><div class="crumb">OCodeJS / <b id="crumb">Server Dashboard</b></div></div><div class="top-actions"><input class="search" id="globalSearch" placeholder="Tìm trong trang hiện tại..." aria-label="Tìm kiếm"><div class="avatar" title="Preview">OC</div></div></header>
+ <header class="topbar"><div class="top-actions"><button class="mobile-menu" id="mobileMenu" type="button" aria-label="Mở menu điều hướng" aria-controls="sidebar" aria-expanded="false"><span aria-hidden="true">☰</span></button><div class="crumb">OCodeJS / <b id="crumb">Server Dashboard</b></div></div><div class="top-actions"><input class="search" id="globalSearch" placeholder="Tìm trong trang hiện tại..." aria-label="Tìm kiếm"><a class="avatar" href="https://github.com/OCodejs/mcp.auth.ocodejs" target="_blank" rel="noopener noreferrer" title="Account service source — sign-in not verified" aria-label="Account service status">OC</a></div></header>
  <div class="content" id="view"></div>
 </main>
 </div>
