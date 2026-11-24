@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "registryVersion": "1.1.0",
+  "registryVersion": "1.2.0",
   "organization": "OCodejs",
   "controlRepository": "OCodejs/ocodejs.github.io",
   "sourceOfTruth": {
@@ -21,7 +21,7 @@
       "repository": "OCodejs/.agents-skills-prisma-cli-SKILL.md",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "skills",
+      "kind": "documentation",
       "description": "Prisma CLI skill reference",
       "sync": {
         "enabled": false,
@@ -30,13 +30,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/.github",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "organization-config",
+      "kind": "application",
       "description": "Organization-wide GitHub defaults",
       "sync": {
         "enabled": false,
@@ -45,7 +52,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/0codejs",
@@ -63,13 +77,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ai",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -78,13 +99,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/aitools-agent",
       "defaultBranch": "main",
       "visibility": "private",
-      "kind": "application",
+      "kind": "skills",
       "description": "AI tools agent",
       "sync": {
         "enabled": true,
@@ -96,7 +124,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/annotated_implementation_skill",
@@ -111,13 +146,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/api",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -126,7 +168,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ask-chatbot",
@@ -145,13 +194,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ask-ocodejs",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -160,13 +216,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/auth-gateway-phase-1-2",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "identity",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -175,13 +238,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/Authentication",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "identity",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -190,13 +260,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/Autorun",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "infrastructure",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -205,7 +282,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/chatbot",
@@ -224,7 +308,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/checkout",
@@ -239,13 +330,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/cli-hub",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "application",
+      "kind": "shared-library",
       "description": "OCode.js CLI Hub",
       "sync": {
         "enabled": true,
@@ -258,13 +356,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/Cloudxx",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "application",
+      "kind": "service",
       "description": "DNS and domain management application",
       "sync": {
         "enabled": true,
@@ -277,13 +382,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/codespaces",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -292,13 +404,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/Codespaces-OCodeJS",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -307,13 +426,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/demo-repository",
       "defaultBranch": "main",
       "visibility": "private",
-      "kind": "experiment",
+      "kind": "example-reference",
       "description": "Demo repository",
       "sync": {
         "enabled": false,
@@ -322,7 +448,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/docs",
@@ -340,7 +473,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/docs-ocodejs",
@@ -358,7 +498,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/docs.md",
@@ -373,7 +520,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/docs.mdx",
@@ -388,7 +542,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/docs.rtf",
@@ -403,7 +564,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/docss",
@@ -418,7 +586,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/documentation",
@@ -436,13 +611,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/dotfiles.github.com",
       "defaultBranch": "master",
       "visibility": "public",
-      "kind": "configuration",
+      "kind": "example-reference",
       "description": "Developer dotfiles",
       "sync": {
         "enabled": false,
@@ -451,7 +633,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/eve-chat-template",
@@ -466,7 +655,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/feat-ocodejs-chatbot-integration",
@@ -481,7 +677,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/gh-aw",
@@ -496,13 +699,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/github-mcp-server",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "dependency",
+      "kind": "service",
       "description": "GitHub MCP server source",
       "sync": {
         "enabled": false,
@@ -511,13 +721,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/github-pages",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "tooling",
+      "kind": "application",
       "description": "GitHub Pages utilities",
       "sync": {
         "enabled": false,
@@ -526,13 +743,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/hello-working",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "experiment",
+      "kind": "example-reference",
       "description": "Working prototype",
       "sync": {
         "enabled": false,
@@ -541,13 +765,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/host",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "application",
+      "kind": "service",
       "description": "OCode.js hosting project",
       "sync": {
         "enabled": true,
@@ -560,13 +791,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/mcp.auth.ocodejs",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "identity",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -575,13 +813,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/mcp.server.auth",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "identity",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -590,13 +835,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/next-platform-starter",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "infrastructure",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -605,13 +857,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/next-platform-starter-3d98a",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "infrastructure",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -620,13 +879,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/nextjs-auth0",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "identity",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -635,13 +901,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/nextjs-boilerplate",
       "defaultBranch": "main",
       "visibility": "private",
-      "kind": "template",
+      "kind": "shared-library",
       "description": "Next.js starter template",
       "sync": {
         "enabled": true,
@@ -652,13 +925,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/oauth",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "identity",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -667,7 +947,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/OCode-js-pages",
@@ -686,13 +973,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ocode.js",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "framework",
+      "kind": "application",
       "description": "OCode.js framework / package",
       "sync": {
         "enabled": true,
@@ -703,13 +997,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/OCODEJS",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "platform",
+      "kind": "application",
       "description": "OCode.js core platform",
       "sync": {
         "enabled": true,
@@ -722,13 +1023,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ocodejs-api",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -737,13 +1045,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/Ocodejs-codespaces",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -752,13 +1067,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ocodejs-legal",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "application",
+      "kind": "documentation",
       "description": "Legal Center",
       "sync": {
         "enabled": true,
@@ -771,13 +1093,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ocodejs-monorepo",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -786,13 +1115,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/ocodejs.github.io",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "central",
+      "kind": "application",
       "description": "Central ecosystem control plane",
       "sync": {
         "enabled": false,
@@ -801,13 +1137,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/octocat.github.io",
       "defaultBranch": "master",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -816,13 +1159,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/opencode",
       "defaultBranch": "dev",
       "visibility": "public",
-      "kind": "dependency",
+      "kind": "shared-library",
       "description": "OpenCode upstream / platform source",
       "sync": {
         "enabled": false,
@@ -831,13 +1181,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/platform-ocodejs-dev",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "application",
+      "kind": "service",
       "description": "OCode.js developer platform",
       "sync": {
         "enabled": true,
@@ -850,13 +1207,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/pnpm",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "dependency",
+      "kind": "shared-library",
       "description": "pnpm upstream / package manager source",
       "sync": {
         "enabled": false,
@@ -865,13 +1229,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/PostgreSQL",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "infrastructure",
+      "kind": "service",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -880,13 +1251,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/probot",
       "defaultBranch": "master",
       "visibility": "public",
-      "kind": "dependency",
+      "kind": "service",
       "description": "Probot upstream / automation source",
       "sync": {
         "enabled": false,
@@ -895,13 +1273,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/proof-html",
       "defaultBranch": "master",
       "visibility": "public",
-      "kind": "experiment",
+      "kind": "shared-library",
       "description": "HTML proof of concept",
       "sync": {
         "enabled": false,
@@ -910,13 +1295,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/qstash-js",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "shared-library",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -925,13 +1317,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/repository",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -940,13 +1339,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/satori",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "shared-library",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -955,13 +1361,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/sdk",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "shared-library",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -970,13 +1383,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/Signs",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "unclassified",
+      "kind": "application",
       "description": "Unclassified project",
       "sync": {
         "enabled": false,
@@ -985,7 +1405,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Repository purpose must be audited before enabling sync."
+      "notes": "Repository purpose must be audited before enabling sync.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/skills",
@@ -1000,7 +1427,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/skills-agentc",
@@ -1015,7 +1449,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/SKILLS.SH",
@@ -1030,13 +1471,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/spec",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "specification",
+      "kind": "documentation",
       "description": "Technical specifications",
       "sync": {
         "enabled": false,
@@ -1045,13 +1493,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/Spoon-Knife",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "sample",
+      "kind": "example-reference",
       "description": "GitHub sample repository",
       "sync": {
         "enabled": false,
@@ -1060,7 +1515,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/studio",
@@ -1075,13 +1537,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/surge",
       "defaultBranch": "master",
       "visibility": "public",
-      "kind": "dependency",
+      "kind": "service",
       "description": "Surge deployment tool source",
       "sync": {
         "enabled": false,
@@ -1090,7 +1559,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Excluded from automatic product-code synchronization; requires explicit review."
+      "notes": "Excluded from automatic product-code synchronization; requires explicit review.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/THU365",
@@ -1109,7 +1585,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/v0-chat",
@@ -1128,13 +1611,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched."
+      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/v0-sdk",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "shared-library",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -1143,13 +1633,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/vercel",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "shared-library",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -1158,13 +1655,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/vscode-codeql-starter",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "reference",
+      "kind": "example-reference",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -1173,7 +1677,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "upstream-fork",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/website",
@@ -1188,13 +1699,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/workflow",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "application",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -1203,13 +1721,20 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     },
     {
       "repository": "OCodejs/workflow-examples",
       "defaultBranch": "main",
       "visibility": "public",
-      "kind": "developer-platform",
+      "kind": "example-reference",
       "description": "Organization repository indexed for ecosystem discovery; detailed source audit pending.",
       "sync": {
         "enabled": false,
@@ -1218,7 +1743,14 @@
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically."
+      "notes": "Catalog-only until a repository-specific source audit and explicit module opt-in are completed. No files are copied automatically.",
+      "sourceType": "organization-source-unverified",
+      "audit": {
+        "inventory": "root-structure-reviewed",
+        "sourceDepth": "manifest-presence-reviewed",
+        "ci": "workflow-presence-not-full-run-audit",
+        "deployment": "config-presence-not-live-health-verified"
+      }
     }
   ],
   "audit": {
@@ -1228,6 +1760,26 @@
     "unclassifiedSyncOptInRequired": true,
     "notes": "Inventory metadata is based on GitHub organization search. Repository contents, build pipelines, deployments, and ownership boundaries require per-repository validation.",
     "canonicalizedCaseVariants": 2,
-    "unverifiedRegistryReferences": 0
+    "unverifiedRegistryReferences": 0,
+    "sourceAuditDate": "2026-11-24",
+    "rootStructureReviewed": 74,
+    "rootStructureInconclusive": [
+      "OCodejs/docs.mdx",
+      "OCodejs/.agents-skills-prisma-cli-SKILL.md"
+    ],
+    "manifestReviewed": [
+      "OCodejs/ask-chatbot",
+      "OCodejs/THU365",
+      "OCodejs/OCODEJS",
+      "OCodejs/ocodejs-monorepo",
+      "OCodejs/mcp.auth.ocodejs",
+      "OCodejs/mcp.server.auth",
+      "OCodejs/docs-ocodejs",
+      "OCodejs/cli-hub",
+      "OCodejs/sdk"
+    ],
+    "forksConfirmed": 18,
+    "fullCiRunAuditPending": true,
+    "liveDeploymentHealthAuditPending": true
   }
 }
