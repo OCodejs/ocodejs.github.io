@@ -372,24 +372,21 @@
       "kind": "service",
       "description": "DNS and domain management application",
       "sync": {
-        "enabled": true,
-        "modules": [
-          "design-system",
-          "shared-ui",
-          "navigation"
-        ],
+        "enabled": false,
+        "modules": [],
         "targetDirectory": ".ocodejs/shared/",
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
-      "sourceType": "organization-source-unverified",
+      "notes": "Upstream fork: keep isolated from automatic OCodeJS asset sync; review changes against upstream first.",
+      "sourceType": "upstream-fork",
       "audit": {
         "inventory": "root-structure-reviewed",
         "sourceDepth": "manifest-presence-reviewed",
         "ci": "workflow-presence-not-full-run-audit",
         "deployment": "config-presence-not-live-health-verified"
-      }
+      },
+      "upstream": "Velclaw/Cloudxx"
     },
     {
       "repository": "OCodejs/codespaces",
@@ -602,23 +599,21 @@
       "kind": "documentation",
       "description": "Documentation repository",
       "sync": {
-        "enabled": true,
-        "modules": [
-          "design-system",
-          "navigation"
-        ],
+        "enabled": false,
+        "modules": [],
         "targetDirectory": ".ocodejs/shared/",
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
-      "sourceType": "organization-source-unverified",
+      "notes": "Upstream fork: keep isolated from automatic OCodeJS asset sync; review changes against upstream first.",
+      "sourceType": "upstream-fork",
       "audit": {
         "inventory": "root-structure-reviewed",
         "sourceDepth": "manifest-presence-reviewed",
         "ci": "workflow-presence-not-full-run-audit",
         "deployment": "config-presence-not-live-health-verified"
-      }
+      },
+      "upstream": "npm/documentation"
     },
     {
       "repository": "OCodejs/dotfiles.github.com",
@@ -989,22 +984,21 @@
       "kind": "application",
       "description": "OCode.js framework / package",
       "sync": {
-        "enabled": true,
-        "modules": [
-          "design-system"
-        ],
+        "enabled": false,
+        "modules": [],
         "targetDirectory": ".ocodejs/shared/",
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
-      "sourceType": "organization-source-unverified",
+      "notes": "Upstream fork: keep isolated from automatic OCodeJS asset sync; review changes against upstream first.",
+      "sourceType": "upstream-fork",
       "audit": {
         "inventory": "root-structure-reviewed",
         "sourceDepth": "manifest-presence-reviewed",
         "ci": "workflow-presence-not-full-run-audit",
         "deployment": "config-presence-not-live-health-verified"
-      }
+      },
+      "upstream": "vercel/next.js"
     },
     {
       "repository": "OCodejs/OCODEJS",
@@ -1601,24 +1595,21 @@
       "kind": "application",
       "description": "Chat interface",
       "sync": {
-        "enabled": true,
-        "modules": [
-          "design-system",
-          "shared-ui",
-          "navigation"
-        ],
+        "enabled": false,
+        "modules": [],
         "targetDirectory": ".ocodejs/shared/",
         "strategy": "managed-copy",
         "createPullRequest": true
       },
-      "notes": "Only opted-in shared modules are eligible; app-specific source remains untouched.",
-      "sourceType": "organization-source-unverified",
+      "notes": "Upstream fork: keep isolated from automatic OCodeJS asset sync; review changes against upstream first.",
+      "sourceType": "upstream-fork",
       "audit": {
         "inventory": "root-structure-reviewed",
         "sourceDepth": "manifest-presence-reviewed",
         "ci": "workflow-presence-not-full-run-audit",
         "deployment": "config-presence-not-live-health-verified"
-      }
+      },
+      "upstream": "zskbot/v0-chat"
     },
     {
       "repository": "OCodejs/v0-sdk",
@@ -1778,7 +1769,7 @@
       "OCodejs/cli-hub",
       "OCodejs/sdk"
     ],
-    "forksConfirmed": 18,
+    "forksConfirmed": 22,
     "fullCiRunAuditPending": true,
     "liveDeploymentHealthAuditPending": true
   }
